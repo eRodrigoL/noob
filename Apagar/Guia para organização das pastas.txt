@@ -1,0 +1,32 @@
+/root
+  ├── /app
+  │   ├── /auth              # Telas e fluxos de autenticação
+  │   ├── /components        # Componentes reutilizáveis
+  │   ├── /hooks             # Custom hooks
+  │   ├── /layout            # Layouts globais
+  │   ├── /navigation        # Configuração de navegação (Stack, Drawer, Tab, etc.)
+  │   ├── /screens           # Todas as telas principais do app
+  │   │   ├── HomeScreen.tsx # Tela inicial
+  │   │   ├── ProfileScreen.tsx
+  │   │   └── SettingsScreen.tsx
+  │   ├── /services          # Funções e classes para lidar com APIs ou back-end
+  │   ├── /styles            # Estilos globais, cores e temas
+  │   └── _layout.tsx        # Layout principal do app
+  │
+  ├── /assets
+  │   ├── /fonts             # Fontes customizadas do app
+  │   ├── /images            # Imagens do app
+  │   └── /icons             # Ícones
+  │
+  ├── /config                # Configurações do app (variáveis de ambiente, constantes)
+  │
+  ├── /contexts              # Contexts (React Context API para gerenciamento de estado)
+  │
+  ├── /utils                 # Funções utilitárias e helpers
+  │
+  ├── App.tsx                # Entrada principal do aplicativo
+  ├── app.json               # Configurações específicas do Expo
+  ├── tsconfig.json          # Configurações do TypeScript
+  ├── package.json           # Dependências e scripts do projeto
+  ├── babel.config.js        # Configurações do Babel
+  └── metro.config.js        # Configurações do bundler Metro
