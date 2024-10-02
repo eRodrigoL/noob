@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import styles from "@styles/Default";
+import ButtonPrimary from "@components/ButtonPrimary";
 import { useRouter } from "expo-router";
 
 const Register: React.FC = () => {
@@ -34,9 +35,7 @@ const Register: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* Botão Retornar */}
-      <TouchableOpacity style={styles.button} onPress={() => router.back()}>
-        <Text style={styles.buttonText}>↩</Text>
-      </TouchableOpacity>
+      <ButtonPrimary title="↩" onPress={() => router.back()} />
 
       {/* Título */}
       <Text style={styles.title}>Crie sua conta:</Text>
@@ -80,9 +79,8 @@ const Register: React.FC = () => {
       />
 
       {/* Botão para Cadastrar */}
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>CADASTRAR</Text>
-      </TouchableOpacity>
+      <ButtonPrimary title="Cadastrar" onPress={() => {}} />
+      {/* AINDA SEM AÇÃO */}
     </View>
   );
 };
