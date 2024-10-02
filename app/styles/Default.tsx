@@ -54,6 +54,25 @@ const styles = StyleSheet.create({
     color: "#FF8C00",
     fontWeight: "bold",
   },
+  profileImageContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#ccc",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+    alignSelf: "center",
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
+  profileImagePlaceholder: {
+    color: "#fff",
+    fontSize: 16,
+  },
 });
 
 export default styles;
