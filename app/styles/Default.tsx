@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 20,
   },
-  button: {
+  buttonPrimary: {
     width: "80%",
     height: 50,
     backgroundColor: "#FF8C00",
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 20,
   },
-  buttonText: {
+  buttonPrimaryText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",

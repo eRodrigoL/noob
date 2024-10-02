@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import styles from "@styles/Default";
 import SCREENS from "@routes/Routes";
+import ButtonPrimary from "@components/ButtonPrimary";
 import { useRouter } from "expo-router";
 
 const Login: React.FC = () => {
@@ -26,9 +27,8 @@ const Login: React.FC = () => {
       <TextInput style={styles.input} secureTextEntry />
 
       {/* Botão de Login */}
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>LOGIN</Text>
-      </TouchableOpacity>
+      <ButtonPrimary title="Entrar" onPress={() => {}} />
+      {/* AINDA SEM AÇÃO */}
 
       {/* Texto de Cadastrar-se */}
       <View style={{ flexDirection: "row", alignItems: "center" }}>

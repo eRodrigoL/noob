@@ -1,7 +1,9 @@
+import React from "react";
 import { useRouter } from "expo-router";
 import { View, TouchableOpacity, Text } from "react-native";
 import styles from "@styles/Default";
 import SCREENS from "@routes/Routes";
+import ButtonPrimary from "@components/ButtonPrimary";
 
 export default function Index() {
   const router = useRouter();
@@ -16,15 +18,8 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => goToLogin()} style={styles.button}>
-        {/* Adiciona um texto para o botão */}
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => goToList()} style={styles.button}>
-        {/* Adiciona um texto para o botão */}
-        <Text style={styles.buttonText}>Lista</Text>
-      </TouchableOpacity>
+      <ButtonPrimary title="Login" onPress={() => goToLogin()} />
+      <ButtonPrimary title="Lista" onPress={() => goToList()} />
     </View>
   );
 }

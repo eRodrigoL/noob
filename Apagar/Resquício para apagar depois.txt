@@ -1,0 +1,15 @@
+Arquivos:
+
+- Collapsible.tsx
+- ExternalLink.tsx
+- HelloWave.tsx
+- ParallaxScrollView.tsx
+- ThemedText.tsx
+- ThemedView.tsx
+
+
+Pastas:
+
+- script
+- _tests_
+- navigation
