@@ -73,6 +73,14 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
   },
+  searchBar: {
+    height: 40,
+    borderColor: "#FF8C00",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    margin: 10,
+  },
 });
 
 export default styles;
