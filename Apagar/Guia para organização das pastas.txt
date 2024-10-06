@@ -4,7 +4,7 @@
   │   ├── /components        # Componentes reutilizáveis
   │   ├── /hooks             # Custom hooks
   │   ├── /layout            # Layouts globais
-  │   ├── /navigation        # Configuração de navegação (Stack, Drawer, Tab, etc.)
+  │   ├── /routes            # Configuração de navegação (Stack, Drawer, Tab, etc.)
   │   ├── /screens           # Todas as telas principais do app
   │   │   ├── HomeScreen.tsx # Tela inicial
   │   │   ├── ProfileScreen.tsx

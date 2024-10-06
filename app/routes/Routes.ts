@@ -2,6 +2,9 @@ import { Router } from "expo-router";
 
 const IMAGES = {
   loading: require("../../assets/images/Loading.gif"),
+  loading1: require("../../assets/images/1.gif"),
+  loading2: require("../../assets/images/2.gif"),
+  loading3: require("../../assets/images/3.gif"),
 };
 
 const SCREENS = {
