@@ -9,6 +9,9 @@ import {
 } from "react-native";
 import IMAGES from "@routes/Routes";
 import SearchBar from "@/components/SearchBar";
+import { Theme } from "@/app/styles/Colors";
+import styles from "@/app/styles/Default";
+import Header from "@/components/Header";
 
 // Definição de tipos para o produto
 interface Product {
@@ -53,7 +56,7 @@ export default function List() {
 
   // Função para renderizar cada item da lista
   const renderProduct = ({ item }: { item: Product }) => (
-    <View style={localStyles.card}>
+    <View style={styles.card}>
       <Image source={IMAGES.IMAGES.loading} style={localStyles.image} />
       <Text style={localStyles.productName}>{item.name}</Text>
       <Text style={localStyles.productRating}>{item.rating}</Text>
@@ -62,6 +65,7 @@ export default function List() {
 
   return (
     <View style={{ flex: 1 }}>
+      <Header title="Cadastro de usuário" />
       {/* Barra de pesquisa */}
       <SearchBar
         placeholder="Pesquisar jogos..."
@@ -83,22 +87,8 @@ export default function List() {
 
 const localStyles = StyleSheet.create({
   container: {
-    justifyContent: "space-between", // Ajusta o espaçamento para preencher a tela corretamente
+    justifyContent: "space-between",
     paddingHorizontal: 10,
-  },
-  card: {
-    width: "45%", // Mantém o tamanho dos cards
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-    marginHorizontal: 10, // Adiciona uma pequena margem lateral
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
   },
   image: {
     width: 100,
@@ -109,11 +99,11 @@ const localStyles = StyleSheet.create({
   productName: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: Theme.light.text,
     marginBottom: 5,
   },
   productRating: {
     fontSize: 14,
-    color: "#888",
+    color: Theme.light.borda,
   },
 });

@@ -1,8 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import styles from "@styles/Default";
 import ButtonPrimary from "@components/ButtonPrimary";
+import Header from "@/components/Header";
 import { useRouter } from "expo-router";
 
 const Register: React.FC = () => {
@@ -33,54 +41,61 @@ const Register: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Botão Retornar */}
-      <ButtonPrimary title="↩" onPress={() => router.back()} />
+    <View>
+      <Header title="Cadastro de usuário" />
+      <ScrollView>
+        <View style={styles.container}>
+          {/* Botão Retornar */}
+          <ButtonPrimary title="↩" onPress={() => router.back()} />
 
-      {/* Título */}
-      <Text style={styles.title}>Crie sua conta:</Text>
+          {/* Título */}
+          <Text style={styles.title}>Crie sua conta:</Text>
 
-      {/* Imagem de Perfil */}
-      <TouchableOpacity
-        onPress={pickImage}
-        style={styles.profileImageContainer}
-      >
-        {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.profileImage} />
-        ) : (
-          <Text style={styles.profileImagePlaceholder}>Adicionar Imagem</Text>
-        )}
-      </TouchableOpacity>
+          {/* Imagem de Perfil */}
+          <TouchableOpacity
+            onPress={pickImage}
+            style={styles.profileImageContainer}
+          >
+            {imageUri ? (
+              <Image source={{ uri: imageUri }} style={styles.profileImage} />
+            ) : (
+              <Text style={styles.profileImagePlaceholder}>
+                Adicionar Imagem
+              </Text>
+            )}
+          </TouchableOpacity>
 
-      {/* Campo para Nome */}
-      <TextInput style={styles.input} placeholder="Nome" />
+          {/* Campo para Nome */}
+          <TextInput style={styles.input} placeholder="Nome" />
 
-      {/* Campo para Apelido */}
-      <TextInput style={styles.input} placeholder="Apelido" />
+          {/* Campo para Apelido */}
+          <TextInput style={styles.input} placeholder="Apelido" />
 
-      {/* Campo para Data de Nascimento */}
-      <TextInput style={styles.input} placeholder="Data nascimento" />
+          {/* Campo para Data de Nascimento */}
+          <TextInput style={styles.input} placeholder="Data nascimento" />
 
-      {/* Campo para Email */}
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        keyboardType="email-address"
-      />
+          {/* Campo para Email */}
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            keyboardType="email-address"
+          />
 
-      {/* Campo para Senha */}
-      <TextInput style={styles.input} placeholder="Senha" secureTextEntry />
+          {/* Campo para Senha */}
+          <TextInput style={styles.input} placeholder="Senha" secureTextEntry />
 
-      {/* Campo para Confirmar Senha */}
-      <TextInput
-        style={styles.input}
-        placeholder="Confirmar senha"
-        secureTextEntry
-      />
+          {/* Campo para Confirmar Senha */}
+          <TextInput
+            style={styles.input}
+            placeholder="Confirmar senha"
+            secureTextEntry
+          />
 
-      {/* Botão para Cadastrar */}
-      <ButtonPrimary title="Cadastrar" onPress={() => {}} />
-      {/* AINDA SEM AÇÃO */}
+          {/* Botão para Cadastrar */}
+          <ButtonPrimary title="Cadastrar" onPress={() => {}} />
+          {/* AINDA SEM AÇÃO */}
+        </View>
+      </ScrollView>
     </View>
   );
 };

@@ -1,16 +1,17 @@
 import { StyleSheet } from "react-native";
+import { Theme } from "./Colors";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F5F5F5",
+    backgroundColor: Theme.light.background,
   },
   title: {
     fontSize: 48,
     fontWeight: "bold",
-    color: "#000",
+    color: Theme.light.text,
     marginBottom: 40,
   },
   diceIcon: {
@@ -18,7 +19,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-    color: "#000",
+    color: Theme.light.text,
     alignSelf: "flex-start",
     marginLeft: "10%",
     marginBottom: 8,
@@ -26,7 +27,7 @@ const styles = StyleSheet.create({
   input: {
     width: "80%",
     height: 40,
-    borderColor: "#ccc",
+    borderColor: Theme.light.imput,
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
@@ -35,30 +36,31 @@ const styles = StyleSheet.create({
   buttonPrimary: {
     width: "80%",
     height: 50,
-    backgroundColor: "#FF8C00",
+    backgroundColor: Theme.light.backgroundButton,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 5,
     marginTop: 20,
+    marginBottom: 20,
   },
   buttonPrimaryText: {
-    color: "#fff",
+    color: Theme.light.textButton,
     fontSize: 18,
     fontWeight: "bold",
   },
   signupText: {
-    color: "#000",
+    color: Theme.light.text,
     fontSize: 16,
   },
   signupLink: {
-    color: "#FF8C00",
+    color: Theme.light.link,
     fontWeight: "bold",
   },
   profileImageContainer: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#ccc",
+    backgroundColor: Theme.light.secondary.backgroundButton,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
@@ -75,11 +77,25 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     height: 40,
-    borderColor: "#FF8C00",
+    borderColor: Theme.light.borda,
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
     margin: 10,
+  },
+  card: {
+    width: "45%",
+    backgroundColor: Theme.light.backgroundCard,
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+    marginHorizontal: 10,
+    alignItems: "center",
+    shadowColor: Theme.light.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
   },
 });
 
