@@ -1,15 +1,8 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  FlatList,
-  StyleSheet,
-  TextInput,
-} from "react-native";
+import { View, Text, Image, FlatList, StyleSheet } from "react-native";
 import IMAGES from "@routes/Routes";
 import SearchBar from "@/components/SearchBar";
-import { Theme } from "@/app/styles/Colors";
+import { Theme } from "@/app/styles/Theme";
 import styles from "@/app/styles/Default";
 import Header from "@/components/Header";
 

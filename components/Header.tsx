@@ -1,41 +1,54 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Biblioteca de ícones
-import { Theme } from "@/app/styles/Colors";
+import { Theme } from "@/app/styles/Theme";
+import SandwichMenu from "./SandwichMenu";
 
 // Definição do componente Header que recebe o título como prop
 const Header = ({ title }: { title: string }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleOpenModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
   return (
-    <View style={styles.headerContainer}>
+    <View style={localStyles.headerContainer}>
       {/* Menu sanduíche à esquerda */}
       <TouchableOpacity
-        style={styles.menuButton}
-        onPress={() => console.log("Menu aberto")}
+        style={localStyles.menuButton}
+        onPress={handleOpenModal}
       >
-        <Ionicons name="menu" size={24} color="black" />
+        <Ionicons name="menu" size={30} color="black" />
       </TouchableOpacity>
+      {/* Modal */}
+      <SandwichMenu visible={modalVisible} onClose={handleCloseModal} />
 
       {/* Título centralizado */}
-      <Text style={styles.title}>{title}</Text>
+      <Text style={localStyles.title}>{title}</Text>
 
       {/* Botão de configurações à direita */}
       <TouchableOpacity
-        style={styles.settingsButton}
+        style={localStyles.settingsButton}
         onPress={() => console.log("Configurações abertas")}
       >
-        <Ionicons name="settings" size={24} color="black" />
+        <Text style={localStyles.text}>🎲</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
 // Estilos para o cabeçalho
-const styles = StyleSheet.create({
+const localStyles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 10,
+    padding: 0,
     backgroundColor: Theme.light.backgroundHeader,
     height: 60,
   },
@@ -46,6 +59,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: Theme.light.text,
+  },
+  text: {
+    fontSize: 30,
   },
   settingsButton: {
     padding: 10,

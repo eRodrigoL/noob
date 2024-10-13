@@ -16,10 +16,15 @@ export default function Index() {
     SCREENS.SCREENS.boardgame.list(router);
   };
 
+  const goToModal = () => {
+    router.push("./screens/teste/ScreenWithModal");
+  };
+
   return (
     <View style={styles.container}>
       <ButtonPrimary title="Login" onPress={() => goToLogin()} />
       <ButtonPrimary title="Lista" onPress={() => goToList()} />
+      <ButtonPrimary title="Model" onPress={() => goToModal()} />
     </View>
   );
 }
