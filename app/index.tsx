@@ -24,7 +24,6 @@ export default function Index() {
     <View style={styles.container}>
       <ButtonPrimary title="Login" onPress={() => goToLogin()} />
       <ButtonPrimary title="Lista" onPress={() => goToList()} />
-      <ButtonPrimary title="Model" onPress={() => goToModal()} />
     </View>
   );
 }

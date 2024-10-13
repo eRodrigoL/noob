@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "expo-router";
 import {
   Modal,
   View,
@@ -9,6 +10,8 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
 } from "react-native";
+import SCREENS from "@routes/Routes";
+import ButtonPrimary from "./ButtonPrimary";
 import { Theme } from "@styles/Theme"; // Importa o Theme com as cores
 
 interface ModalProps {
@@ -45,6 +48,16 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
     }).start(() => onClose());
   };
 
+  const router = useRouter();
+
+  const goToLogin = () => {
+    SCREENS.SCREENS.user.login(router);
+  };
+
+  const goToList = () => {
+    SCREENS.SCREENS.boardgame.list(router);
+  };
+
   return (
     <Modal
       animationType="none"
@@ -62,15 +75,9 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
               ]}
             >
               <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.modalButton}>
-                  <Text style={styles.buttonText}>Início</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.modalButton}>
-                  <Text style={styles.buttonText}>Perfil</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.modalButton}>
-                  <Text style={styles.buttonText}>Jogos</Text>
-                </TouchableOpacity>
+                <ButtonPrimary title="Login" onPress={() => goToLogin()} />
+                <ButtonPrimary title="Inicio" onPress={() => goToList()} />
+                <ButtonPrimary title="Jogar" onPress={() => {}} />
               </View>
             </Animated.View>
           </TouchableWithoutFeedback>
