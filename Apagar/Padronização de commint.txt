@@ -1,0 +1,41 @@
+1. Não acumule commits
+        Faça commits pequenos e focados.
+        Cada commit deve representar uma única mudança ou correção.
+        Isso facilita a revisão e permite reverter problemas facilmente.
+
+2. Siga a estrutura "Tipo: Objeto > Descrição"
+
+3. Escreva Resumos Claros
+        Tente ser direto, mas evite excesso de detalhes.
+        Um bom commit explica o porquê e o o que está sendo alterado,
+            mas sem entrar muito em como.
+
+4. (Opcional) Adicione Mensagens Explicativas
+        Se necessário, adicione uma descrição mais detalhada após o título.
+        Use uma linha em branco entre o título e o corpo da mensagem.
+        O corpo da mensagem pode incluir o motivo da alteração e detalhes técnicos,
+            quando relevantes.
+
+
+
+ESTRUTURA - definições
+    - Tipo: Indica a natureza do commit (como feat, fix, etc.).
+    - Objeto: O que foi modificado (como um componente, função ou funcionalidade).
+    - Descrição: Um resumo claro do que foi alterado.
+
+TIPOS - mais comumente usados
+    - feat: Nova funcionalidade ou feature.
+    - fix: Correção de bug.
+    - refactor: Mudança no código que não altera a funcionalidade (reorganização, melhoria de performance).
+    - style: Alterações de formatação (espaços, vírgulas, etc.).
+    - docs: Alteração na documentação.
+    - test: Adiciona ou modifica testes.
+    - chore: Tarefas menores ou mudanças que não impactam diretamente o código da aplicação (configuração de ferramentas, etc.).
+
+
+Exemplo de um commit com mensagem Explicativa
+
+feat: implementa filtro de produtos
+
+Adiciona a funcionalidade de filtrar produtos por categoria.
+Isso melhora a experiência do usuário ao encontrar itens mais rapidamente.

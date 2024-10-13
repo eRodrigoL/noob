@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import styles from "@styles/Default";
 import SCREENS from "@routes/Routes";
 import ButtonPrimary from "@components/ButtonPrimary";
+import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
 
 const Login: React.FC = () => {
@@ -13,6 +14,9 @@ const Login: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      {/* Botão de voltar (X) */}
+      <ButtonGoBack />
+
       {/* Título */}
       <Text style={styles.title}>
         Noob <Text style={styles.diceIcon}>🎲</Text>

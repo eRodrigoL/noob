@@ -10,6 +10,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import styles from "@styles/Default";
 import ButtonPrimary from "@components/ButtonPrimary";
+import ButtonGoBack from "@/components/ButtonGoBack";
 import Header from "@/components/Header";
 import { useRouter } from "expo-router";
 
@@ -42,11 +43,13 @@ const Register: React.FC = () => {
 
   return (
     <View>
-      <Header title="Cadastro de usuário" />
       <ScrollView>
         <View style={styles.container}>
-          {/* Botão Retornar */}
-          <ButtonPrimary title="↩" onPress={() => router.back()} />
+          {/* Botão de voltar (X) */}
+          <ButtonGoBack />
+
+          {/* ESPAÇO VAZIO -- TROCAR ISSO E CORRIGIR NO STYLE */}
+          <View style={{ width: 100, height: 70 }}></View>
 
           {/* Título */}
           <Text style={styles.title}>Crie sua conta:</Text>
