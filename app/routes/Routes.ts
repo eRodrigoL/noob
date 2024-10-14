@@ -8,7 +8,7 @@ const IMAGES = {
 };
 
 const SCREENS = {
-  testeDeRota: require("../screens/user/Register"),
+  testeDeRota: require("../"),
 
   user: {
     login: (router: Router) => {
@@ -20,11 +20,8 @@ const SCREENS = {
   },
 
   boardgame: {
-    // list: (router: Router) => {
-    //   router.push("/screens/boardgame/List");
-    // },
     list: (router: Router) => {
-      router.push("../index");
+      router.push("/screens/boardgame/List");
     },
   },
 };

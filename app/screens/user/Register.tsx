@@ -11,7 +11,6 @@ import * as ImagePicker from "expo-image-picker";
 import styles from "@styles/Default";
 import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
-import Header from "@/components/Header";
 import { useRouter } from "expo-router";
 
 const Register: React.FC = () => {

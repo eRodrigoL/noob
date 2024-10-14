@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Biblioteca de ícones
 import { Theme } from "@/app/styles/Theme";
 import SandwichMenu from "./SandwichMenu";
+import { useFocusEffect } from "@react-navigation/native"; // Importa o hook de navegação
 
 // Definição do componente Header que recebe o título como prop
 const Header = ({ title }: { title: string }) => {
@@ -15,6 +16,15 @@ const Header = ({ title }: { title: string }) => {
   const handleCloseModal = () => {
     setModalVisible(false);
   };
+
+  // Garante que o modal será fechado sempre que a tela perder o foco e reabrirá corretamente ao focar novamente.
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        setModalVisible(false); // Fecha o modal sempre que a tela perder o foco
+      };
+    }, [])
+  );
 
   return (
     <View style={localStyles.headerContainer}>
