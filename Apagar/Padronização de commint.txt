@@ -3,7 +3,7 @@
         Cada commit deve representar uma única mudança ou correção.
         Isso facilita a revisão e permite reverter problemas facilmente.
 
-2. Siga a estrutura "Tipo: Objeto > Descrição"
+2. Siga a estrutura "Tipo: Descrição e Objeto"
 
 3. Escreva Resumos Claros
         Tente ser direto, mas evite excesso de detalhes.
@@ -35,7 +35,7 @@ TIPOS - mais comumente usados
 
 Exemplo de um commit com mensagem Explicativa
 
-feat: implementa filtro de produtos
+feat: implementa filtro de produtos em produtos.tsx
 
 Adiciona a funcionalidade de filtrar produtos por categoria.
 Isso melhora a experiência do usuário ao encontrar itens mais rapidamente.

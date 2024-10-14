@@ -20,8 +20,11 @@ const SCREENS = {
   },
 
   boardgame: {
+    // list: (router: Router) => {
+    //   router.push("/screens/boardgame/List");
+    // },
     list: (router: Router) => {
-      router.push("/screens/boardgame/List");
+      router.push("../index");
     },
   },
 };
