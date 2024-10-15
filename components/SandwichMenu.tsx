@@ -54,6 +54,10 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
     SCREENS.SCREENS.user.login(router);
   };
 
+  const goToUser = () => {
+    SCREENS.SCREENS.user.user(router);
+  };
+
   const goToList = () => {
     SCREENS.SCREENS.boardgame.list(router);
   };
@@ -76,6 +80,7 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
             >
               <View style={styles.buttonContainer}>
                 <ButtonPrimary title="Login" onPress={() => goToLogin()} />
+                <ButtonPrimary title="Perfil" onPress={() => goToUser()} />
                 <ButtonPrimary title="Inicio" onPress={() => goToList()} />
                 <ButtonPrimary title="Jogar" onPress={() => {}} />
               </View>

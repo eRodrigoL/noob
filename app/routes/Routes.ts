@@ -1,4 +1,4 @@
-import { Router } from "expo-router";
+import { router, Router } from "expo-router";
 
 const IMAGES = {
   loading: require("../../assets/images/Loading.gif"),
@@ -16,6 +16,9 @@ const SCREENS = {
     },
     register: (router: Router) => {
       router.push("/screens/user/Register");
+    },
+    user: (router: Router) => {
+      router.push("/screens/user/UserProfile");
     },
   },
 
