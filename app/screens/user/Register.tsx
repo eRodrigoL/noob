@@ -6,20 +6,28 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
 import styles from "@styles/Default";
 import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
+import SCREENS from "@routes/Routes";
 
 const Register: React.FC = () => {
+  const [nome, setNome] = useState("");
+  const [apelido, setApelido] = useState("");
+  const [nascimento, setNascimento] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
   const [imageUri, setImageUri] = useState<string | null>(null);
   const router = useRouter();
 
   // Função para selecionar uma imagem da galeria
   const pickImage = async () => {
-    // Pede permissão ao usuário para acessar a galeria
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -31,12 +39,71 @@ const Register: React.FC = () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [1, 1], // Para cortar a imagem em formato quadrado
+      aspect: [1, 1], 
       quality: 1,
     });
 
     if (!result.canceled && result.assets.length > 0) {
-      setImageUri(result.assets[0].uri); // Define a URI da imagem
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
+  // Função para cadastrar o usuário
+  const handleRegister = async () => {
+
+    if (!nome || !apelido || !email || !senha || !confirmarSenha) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    if (senha !== confirmarSenha) {
+      Alert.alert("Erro", "As senhas não coincidem.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("nome", nome);
+      formData.append("apelido", apelido);
+      formData.append("nascimento", nascimento);
+      formData.append("email", email);
+      formData.append("senha", senha);
+
+      // Se a imagem foi selecionada, adicioná-la ao formData
+      if (imageUri) {
+        const filename = imageUri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename ?? "");
+        const fileType = match ? `image/${match[1]}` : `image`;
+
+        formData.append("file", {
+          uri: imageUri,
+          name: filename,
+          type: fileType,
+        } as any);
+      }
+
+      const response = await axios.post(
+        "https://api-noob-react.onrender.com/api/usuarios",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+
+      const message = response.data.message;
+      Alert.alert("Sucesso", message);
+
+      SCREENS.SCREENS.user.login(router);
+
+      }
+    } catch (response) {
+    console.log(response);
+      Alert.alert("Erro", "Houve um erro ao criar o usuário. Tente com novas credenciais!");
+    
     }
   };
 
@@ -44,16 +111,12 @@ const Register: React.FC = () => {
     <View>
       <ScrollView>
         <View style={styles.container}>
-          {/* Botão de voltar (X) */}
           <ButtonGoBack />
 
-          {/* ESPAÇO VAZIO -- TROCAR ISSO E CORRIGIR NO STYLE */}
           <View style={{ width: 100, height: 70 }}></View>
 
-          {/* Título */}
           <Text style={styles.title}>Crie sua conta:</Text>
 
-          {/* Imagem de Perfil */}
           <TouchableOpacity
             onPress={pickImage}
             style={styles.profileImageContainer}
@@ -67,35 +130,52 @@ const Register: React.FC = () => {
             )}
           </TouchableOpacity>
 
-          {/* Campo para Nome */}
-          <TextInput style={styles.input} placeholder="Nome" />
+          <TextInput
+            style={styles.input}
+            placeholder="Nome"
+            value={nome}
+            onChangeText={setNome}
+          />
 
-          {/* Campo para Apelido */}
-          <TextInput style={styles.input} placeholder="Apelido" />
+          <TextInput
+            style={styles.input}
+            placeholder="Apelido"
+            value={apelido}
+            onChangeText={setApelido}
+          />
 
-          {/* Campo para Data de Nascimento */}
-          <TextInput style={styles.input} placeholder="Data nascimento" />
+          <TextInput
+            style={styles.input}
+            placeholder="Data nascimento"
+            value={nascimento}
+            onChangeText={setNascimento}
+          />
 
-          {/* Campo para Email */}
           <TextInput
             style={styles.input}
             placeholder="Email"
             keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
           />
 
-          {/* Campo para Senha */}
-          <TextInput style={styles.input} placeholder="Senha" secureTextEntry />
+          <TextInput
+            style={styles.input}
+            placeholder="Senha"
+            secureTextEntry
+            value={senha}
+            onChangeText={setSenha}
+          />
 
-          {/* Campo para Confirmar Senha */}
           <TextInput
             style={styles.input}
             placeholder="Confirmar senha"
             secureTextEntry
+            value={confirmarSenha}
+            onChangeText={setConfirmarSenha}
           />
 
-          {/* Botão para Cadastrar */}
-          <ButtonPrimary title="Cadastrar" onPress={() => {}} />
-          {/* AINDA SEM AÇÃO */}
+          <ButtonPrimary title="Cadastrar" onPress={handleRegister} />
         </View>
       </ScrollView>
     </View>
