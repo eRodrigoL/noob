@@ -1,0 +1,144 @@
+- - USUÁRIO - -
+
+Descrição dos Campos:
+
+|<Campos (Model)>|<Tipo>      |<Obrigatório (required)>|<Obs>                  |
+|                |            |                        |                       |
+|          nome  |     String |                   True |                   NaN |
+|       apelido  |     String |                   True |                   NaN |
+|    nascimento  |     Date   |                  False |                   NaN |
+|         email  |     String |                   True |                   NaN |
+|         senha  |     String |                   True |                   NaN |
+|         nivel  |     Number |                  False | por padrão vem como 1 |
+|          foto  |     String |                  False |                   NaN |
+
+Link das Chamadas:
+
+|<Funções(controllers)>   |<Método>    |<Chamada>                                                                     |<Token>|
+|                         |            |                                                                              |       |
+|       Cadastrar usuário |       POST |        https://api-noob-react.onrender.com/api/usuarios/passar dados do body |   Não |
+|       Listar um usuário |        GET |                        https://api-noob-react.onrender.com/api/usuarios/{id} |   Sim |
+|Listar todos os usuários |        GET |                             https://api-noob-react.onrender.com/api/usuarios |   Sim |
+|         Excluir usuário |     DELETE |                        https://api-noob-react.onrender.com/api/usuarios/{id} |   Sim |
+|       Atualizar usuário |        PUT | https://api-noob-react.onrender.com/api/usuarios/{id} - passar dados do body |   Sim |
+|         Atualizar senha |        PUT |                  https://api-noob-react.onrender.com/api/usuarios/senha/{id} |   Sim |
+
+
+
+- - JOGOS - -
+
+Descrição dos Campos:
+
+|<Campos (Model)>|<Tipo>  |<Obrigatório (required)>|<Obs>|
+|                |        |                              |
+|         titulo | String |                   True | NaN |
+|            ano | String |                  False | NaN |
+|          idade | Number |                  False | NaN |
+|       designer | String |                  False | NaN |
+|        artista | String |                  False | NaN |
+|        editora | String |                  False | NaN |
+|        digital | String |                  False | NaN |
+|      categoria | String |                  False | NaN |
+|    componentes | String |                  False | NaN |
+|      descricao | String |                  False | NaN |
+|     idOriginal | String |                  False | NaN |
+|      descricao | String |                  False | NaN |
+|           capa | String |                  False | NaN |
+
+Link das Chamadas:
+
+|<Funções (controllers)>|<Método>|<Chamada>                                                                     |<Token>|
+|                       |        |                                                                              |       |
+|        Cadastrar jogo |   POST |           https://api-noob-react.onrender.com/api/jogos/passar dados do body |   Sim |
+|        Buscar um jogo |    GET |                           https://api-noob-react.onrender.com/api/jogos/{id} |   Não |
+| Buscar todos os jogos |    GET |                               https://api-noob-react.onrender.com/api/jogos/ |   Não |
+|          Excluir jogo | DELETE |                           https://api-noob-react.onrender.com/api/jogos/{id} |   Sim |
+|        Atualizar jogo |    PUT | https://api-noob-react.onrender.com/api/usuarios/{id} - passar dados do body |   Sim |
+
+
+
+- - PARTIDAS - -
+
+Descrição dos Campos:
+
+|<Campos (Model)>|<Tipo>  |<Obrigatório (required)>|<Obs>  |       NaN
+|                |        |                        |       |
+|       usuarios | String |                  False | Array |       NaN
+|           jogo | String |                  False |   NaN |       NaN
+|       vencedor | String |                  False | Array |       NaN
+|        duracao | String |                  False |   NaN |       NaN
+
+Link das Chamadas:
+
+|<Funções (controllers)>   |<Método>|<Chamada>                                                                     |<Token>|
+|                          |        |                                                                              |       |
+|        Cadastrar partida |   POST |        https://api-noob-react.onrender.com/api/partidas/passar dados do body |   Sim |
+|       Buscar uma partida |    GET |                        https://api-noob-react.onrender.com/api/partidas/{id} |   Sim |
+| Buscar todas as partidas |    GET |                            https://api-noob-react.onrender.com/api/partidas/ |   Sim |
+|          Excluir partida | DELETE |                         https://api-noob-react.onrender.com/api/patidas/{id} |   Sim |
+|        Atualizar partida |    PUT | https://api-noob-react.onrender.com/api/partidas/{id} - passar dados do body |   Sim |
+
+
+
+- - AVALIAÇÕES - -
+
+Descrição dos Campos:
+
+|<Campos (Model)>|<Tipo>  |<Obrigatório (required)>|<Obs>                            |
+|                |        |                        |                                 |
+|        usuario | String |                  False |                             NaN |
+|           jogo | String |                  False |                             NaN |
+|         beleza | Number |                  False |                             NaN |
+|   divertimento | Number |                  False |                             NaN |
+|        duracao | Number |                  False |                             NaN |
+|          preco | Number |                  False |                             NaN |
+|  armazenamento | Number |                  False |                             NaN |
+|           nota | Number |                  False | Calcula automaticamente a média |
+
+Link das Chamadas:
+
+|<Funções (controllers)>     |<Método>|<Chamada>                                                                       |<Token>|
+|                            |        |                                                                                |       |
+|        Cadastrar avaliação |   POST |        https://api-noob-react.onrender.com/api/avaliacoes/passar dados do body |   Sim |
+|       Buscar uma avaliação |    GET |                        https://api-noob-react.onrender.com/api/avaliacoes/{id} |   Não |
+| Buscar todas as avaliações |    GET |                            https://api-noob-react.onrender.com/api/avaliacoes/ |   Não |
+|          Excluir avaliação | DELETE |                        https://api-noob-react.onrender.com/api/avaliacoes/{id} |   Sim |
+|        Atualizar avaliação |    PUT | https://api-noob-react.onrender.com/api/avaliacoes/{id} - passar dados do body |   Sim |
+
+
+
+- - DENUNCIAS - -
+
+Descrição dos Campos:
+
+|<Campos (Model)>|<Tipo>      |<Obrigatório (required)>|<Obs>                               |
+|                |            |                        |                                    |
+|     idRegistro |     String |                  False | Identifica se é um usuário ou jogo |
+|          texto |     String |                  False |              descricao da denuncia |
+|      timestamp |  Date/time |                  False |            Data e hora de registro |
+
+Link das Chamadas:
+
+|<Funções (controllers)>    |<Método>|<Chamada>                                                                      |<Token>|
+|                           |        |                                                                               |       |
+|        Cadastrar denuncia |      0 |        https://api-noob-react.onrender.com/api/denuncias/passar dados do body |   Sim |
+|       Buscar uma denuncia |    GET |                        https://api-noob-react.onrender.com/api/denuncias/{id} |   Sim |
+| Buscar todas as denuncias |    GET |                            https://api-noob-react.onrender.com/api/denuncias/ |   Sim |
+|          Excluir denuncia | DELETE |                        https://api-noob-react.onrender.com/api/denuncias/{id} |   Sim |
+|        Atualizar denuncia |    PUT | https://api-noob-react.onrender.com/api/denuncias/{id} - passar dados do body |   Sim |
+
+
+
+- - LOGIN - -
+
+Descrição dos Campos:
+
+|<Campos (Model)>|<Tipo>  | Obrigatório (required)> |<Obs>  |
+|                |        |                         |       |
+|        apelido | String |                    True |   NaN |
+|          senha | String |                    True |   NaN |
+
+Link das Chamadas:
+
+|<Funções (controllers)>|<Método>|<Chamada>                                                           |<Token>                                                                                                  |
+|                 Logar | POST   | https://api-noob-react.onrender.com/api/login/passar dados do body | Gera um token aleatório a ser passado no campo "bearer token" no auth para acessar demais partes da API |
