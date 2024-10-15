@@ -1,57 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Image, FlatList, StyleSheet } from "react-native";
+import axios from "axios"; // Adiciona o axios para requisição
 import IMAGES from "@routes/Routes";
 import SearchBar from "@/components/SearchBar";
 import { Theme } from "@/app/styles/Theme";
 import styles from "@/app/styles/Default";
 import Header from "@/components/Header";
 
-// Definição de tipos para o produto
+// Definição de tipos para o produto baseado na API
 interface Product {
-  name: string;
-  rating: string;
+  titulo: string;
+  ano?: number; // Pode ser opcional
+  capa?: string; // Pode ser opcional
+  rating: string; // Para a nota gerada automaticamente
 }
 
 export default function List() {
-  // Estado para armazenar os jogos e a pesquisa
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [retryCount, setRetryCount] = useState<number>(0); // Contador de tentativas
 
-  // Lista de jogos
-  const products: Product[] = [
-    { name: "Projeto Gaia", rating: 91 + " ⭐" },
-    { name: "Terraforming Mars", rating: 90 + " ⭐" },
-    { name: "Terra Mystica", rating: 90 + " ⭐" },
-    { name: "Captive", rating: 78 + " ⭐" },
-    { name: "Puerto Rico", rating: 89 + " ⭐" },
-    { name: "Wingspan", rating: 88 + " ⭐" },
-    { name: "Root", rating: 89 + " ⭐" },
-    { name: "Lobisomem", rating: 89 + " ⭐" },
-    { name: "Everdell", rating: 88 + " ⭐" },
-    { name: "A Cidade de Your Town", rating: 77 + " ⭐" },
-    { name: "Zumbis!", rating: 73 + " ⭐" },
-    { name: "Scout", rating: 87 + " ⭐" },
-    { name: "Quatro Casos de Sherlock Holmes", rating: 82 + " ⭐" },
-    { name: "Power Grid: Versão Energizada", rating: 88 + " ⭐" },
-    { name: "Trio", rating: 85 + " ⭐" },
-    { name: "Splendor: Marvel", rating: 85 + " ⭐" },
-    { name: "Istanbul", rating: 83 + " ⭐" },
-    { name: "Calico", rating: 84 + " ⭐" },
-    { name: "Abstratus", rating: 84 + " ⭐" },
-    { name: "Telestrations", rating: 84 + " ⭐" },
-    { name: "Quartz", rating: 81 + " ⭐" },
-    { name: "Cartógrafos", rating: 82 + " ⭐" },
-  ];
+  const MAX_RETRY = 5; // Número máximo de tentativas
+
+  // Função para buscar os produtos da API com retry
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        "https://api-noob-react.onrender.com/api/jogos/"
+      );
+      // Atualiza os produtos com os dados da API e gera as notas
+      const updatedProducts = response.data.map((item: any) => ({
+        titulo: item.titulo,
+        ano: item.ano, // Mantém o ano se existir
+        capa: item.capa, // Mantém a capa se existir
+        rating: Math.floor(Math.random() * (100 - 70 + 1)) + 70 + " ⭐", // Gera uma nota aleatória entre 70 e 100
+      }));
+      setProducts(updatedProducts);
+      setLoading(false); // Desativa o carregamento ao receber os dados
+    } catch (error) {
+      console.error("Erro ao buscar os dados da API:", error);
+      if (retryCount < MAX_RETRY) {
+        setTimeout(() => {
+          setRetryCount(retryCount + 1);
+          fetchData(); // Tenta novamente após 1 segundo
+        }, 1000);
+      } else {
+        setLoading(false); // Para as tentativas após atingir o limite
+      }
+    }
+  };
+
+  // Chama a função de buscar dados quando o componente for montado
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // Filtra os produtos com base na consulta de pesquisa
   const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    product.titulo.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Função para renderizar cada item da lista
   const renderProduct = ({ item }: { item: Product }) => (
     <View style={styles.card}>
-      <Image source={IMAGES.IMAGES.loading} style={localStyles.image} />
-      <Text style={localStyles.productName}>{item.name}</Text>
+      <Image
+        source={
+          item.capa ? { uri: item.capa } : IMAGES.IMAGES.unavailable // Se não houver imagem, usa a imagem de "indisponível"
+        }
+        style={localStyles.image}
+      />
+      <Text style={localStyles.productName}>
+        {item.titulo} {item.ano ? `(${item.ano})` : ""}
+      </Text>
       <Text style={localStyles.productRating}>{item.rating}</Text>
     </View>
   );
@@ -66,14 +87,25 @@ export default function List() {
         onChangeText={setSearchQuery}
       />
 
-      <FlatList
-        data={filteredProducts}
-        renderItem={renderProduct}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={{ ...localStyles.container, flexGrow: 1 }}
-        numColumns={2}
-        columnWrapperStyle={{ justifyContent: "space-between" }} // Aqui é onde você centraliza os cards na linha
-      />
+      {loading ? (
+        // Exibe a imagem de carregamento enquanto os dados estão sendo carregados
+        <View style={localStyles.loadingContainer}>
+          <Image
+            source={IMAGES.IMAGES.loading}
+            style={localStyles.loadingImage}
+          />
+          <Text>Carregando jogos...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredProducts}
+          renderItem={renderProduct}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={{ ...localStyles.container, flexGrow: 1 }}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
+        />
+      )}
     </View>
   );
 }
@@ -98,5 +130,16 @@ const localStyles = StyleSheet.create({
   productRating: {
     fontSize: 14,
     color: Theme.light.borda,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingImage: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
+    resizeMode: "contain",
   },
 });
