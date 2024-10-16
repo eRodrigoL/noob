@@ -83,11 +83,11 @@ export default function List() {
         style={localStyles.image}
       />
       <Text style={localStyles.productName}>
-        {item.titulo} {item.ano ? `(${item.ano})` : ""}{" "}
         {/* Exibe título e ano se existir */}
+        {item.titulo} {item.ano ? `(${item.ano})` : ""}
       </Text>
-      <Text style={localStyles.productRating}>{item.rating}</Text>{" "}
       {/* Exibe a nota do jogo */}
+      <Text style={localStyles.productRating}>{item.rating}</Text>
     </View>
   );
 
@@ -98,8 +98,8 @@ export default function List() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Header title="Cadastro de usuário" />{" "}
       {/* Exibe o cabeçalho com título */}
+      <Header title="Cadastro de usuário" />
       <SearchBar
         placeholder="Pesquisar jogos..."
         value={searchQuery}
@@ -130,8 +130,8 @@ export default function List() {
           <Text style={localStyles.noResultsText}>
             Jogo não encontrado. Deseja adicioná-lo?
           </Text>
-          <ButtonPrimary title="Adicionar" onPress={goToRegisterGame} />{" "}
           {/* Botão para adicionar novo jogo */}
+          <ButtonPrimary title="Adicionar" onPress={goToRegisterGame} />
         </View>
       )}
     </View>
