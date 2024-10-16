@@ -16,7 +16,7 @@ const SCREENS = {
       router.push("/screens/user/Login");
     },
     register: (router: Router) => {
-      router.push("/screens/user/Register");
+      router.push("/screens/user/RegisterUser");
     },
     user: (router: Router) => {
       router.push("/screens/user/UserProfile");
@@ -26,6 +26,9 @@ const SCREENS = {
   boardgame: {
     list: (router: Router) => {
       router.push("/screens/boardgame/List");
+    },
+    register: (router: Router) => {
+      router.push("/screens/boardgame/RegisterGame");
     },
   },
 };

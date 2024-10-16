@@ -8,7 +8,7 @@ import { useRouter } from "expo-router";
 
 const Login: React.FC = () => {
   const router = useRouter();
-  const goToRegister = () => {
+  const goToRegisterUser = () => {
     SCREENS.SCREENS.user.register(router);
   };
 
@@ -37,7 +37,7 @@ const Login: React.FC = () => {
       {/* Texto de Cadastrar-se */}
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Text style={styles.signupText}>Ainda não tem uma conta? </Text>
-        <TouchableOpacity onPress={goToRegister}>
+        <TouchableOpacity onPress={goToRegisterUser}>
           <Text style={styles.signupLink}> Cadastre-se</Text>
         </TouchableOpacity>
       </View>

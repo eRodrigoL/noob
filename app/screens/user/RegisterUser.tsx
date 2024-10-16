@@ -13,7 +13,7 @@ import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
 
-const Register: React.FC = () => {
+const RegisterUser: React.FC = () => {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const router = useRouter();
 
@@ -102,4 +102,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default RegisterUser;

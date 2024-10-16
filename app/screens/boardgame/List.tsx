@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, FlatList, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import axios from "axios"; // Adiciona o axios para requisição
 import IMAGES from "@routes/Routes";
 import SearchBar from "@/components/SearchBar";
 import { Theme } from "@/app/styles/Theme";
 import styles from "@/app/styles/Default";
 import Header from "@/components/Header";
+import SCREENS from "@routes/Routes"; // Importação adicional
+import ButtonPrimary from "@components/ButtonPrimary"; // Importação adicional
+import { useRouter } from "expo-router"; // Importar useRouter para navegação
 
 // Definição de tipos para o produto baseado na API
 interface Product {
@@ -21,7 +31,8 @@ export default function List() {
   const [loading, setLoading] = useState<boolean>(true);
   const [retryCount, setRetryCount] = useState<number>(0); // Contador de tentativas
 
-  const MAX_RETRY = 5; // Número máximo de tentativas
+  const MAX_RETRY = 10; // Número máximo de tentativas
+  const router = useRouter(); // Inicializa o router
 
   // Função para buscar os produtos da API com retry
   const fetchData = async () => {
@@ -34,7 +45,7 @@ export default function List() {
         titulo: item.titulo,
         ano: item.ano, // Mantém o ano se existir
         capa: item.capa, // Mantém a capa se existir
-        rating: Math.floor(Math.random() * (100 - 70 + 1)) + 70 + " ⭐", // Gera uma nota aleatória entre 70 e 100
+        rating: Math.floor(Math.random() * 101) + " ⭐", // Gera uma nota aleatória entre 0 e 100
       }));
       setProducts(updatedProducts);
       setLoading(false); // Desativa o carregamento ao receber os dados
@@ -77,6 +88,11 @@ export default function List() {
     </View>
   );
 
+  // Função para lidar com a navegação ao clicar no botão "Adicionar"
+  const goToRegisterGame = () => {
+    SCREENS.SCREENS.boardgame.register(router);
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <Header title="Cadastro de usuário" />
@@ -96,7 +112,7 @@ export default function List() {
           />
           <Text>Carregando jogos...</Text>
         </View>
-      ) : (
+      ) : filteredProducts.length > 0 ? (
         <FlatList
           data={filteredProducts}
           renderItem={renderProduct}
@@ -105,6 +121,14 @@ export default function List() {
           numColumns={2}
           columnWrapperStyle={{ justifyContent: "space-between" }}
         />
+      ) : (
+        // Renderiza a mensagem e o botão quando nenhum jogo é encontrado
+        <View style={localStyles.noResultsContainer}>
+          <Text style={localStyles.noResultsText}>
+            Jogo não encontrado. Deseja adicioná-lo?
+          </Text>
+          <ButtonPrimary title="Adicionar" onPress={goToRegisterGame} />
+        </View>
       )}
     </View>
   );
@@ -141,5 +165,17 @@ const localStyles = StyleSheet.create({
     height: 100,
     marginBottom: 20,
     resizeMode: "contain",
+  },
+  noResultsContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  noResultsText: {
+    fontSize: 18,
+    color: Theme.light.text,
+    marginBottom: 20,
+    textAlign: "center",
   },
 });
