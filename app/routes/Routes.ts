@@ -1,5 +1,6 @@
-import { router, Router } from "expo-router";
+import { Router } from "expo-router"; // Importa o Router para gerenciar as rotas do aplicativo
 
+// Definição de constantes com imagens que serão usadas em diversas telas
 const IMAGES = {
   unavailable: require("../../assets/images/Unavailable.png"),
   loading: require("../../assets/images/Loading.gif"),
@@ -8,29 +9,36 @@ const IMAGES = {
   loading3: require("../../assets/images/3.gif"),
 };
 
+// Definição de rotas do aplicativo, organizadas por seções
 const SCREENS = {
-  testeDeRota: require("../"),
+  testeDeRota: require("../"), // Rota de teste <{só para testar caminhos}>
 
   user: {
+    // Rota para login do usuário
     login: (router: Router) => {
-      router.push("/screens/user/Login");
+      router.push("/screens/user/Login"); // Direciona para a tela de login
     },
+    // Rota para registro de um novo usuário
     register: (router: Router) => {
-      router.push("/screens/user/RegisterUser");
+      router.push("/screens/user/RegisterUser"); // Direciona para a tela de registro de usuário
     },
+    // Rota para o perfil do usuário
     user: (router: Router) => {
-      router.push("/screens/user/UserProfile");
+      router.push("/screens/user/UserProfile"); // Direciona para a tela de perfil do usuário
     },
   },
 
   boardgame: {
+    // Rota para a lista de jogos de tabuleiro
     list: (router: Router) => {
-      router.push("/screens/boardgame/List");
+      router.push("/screens/boardgame/List"); // Direciona para a tela de listagem de jogos
     },
+    // Rota para o cadastro de novos jogos de tabuleiro
     register: (router: Router) => {
-      router.push("/screens/boardgame/RegisterGame");
+      router.push("/screens/boardgame/RegisterGame"); // Direciona para a tela de registro de jogos
     },
   },
 };
 
+// Exporta as constantes IMAGES e SCREENS para serem usadas em outras partes do aplicativo
 export default { IMAGES, SCREENS };

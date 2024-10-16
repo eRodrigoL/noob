@@ -1,13 +1,25 @@
 {
+  // Estende a configuração base do TypeScript para aplicativos Expo
   "extends": "expo/tsconfig.base",
+
+  // Opções do compilador TypeScript
   "compilerOptions": {
-    "strict": true,
+    "strict": true, // Habilita verificações de tipo estritas
+
+    // Define os caminhos de importação personalizados
     "paths": {
-      "@/*": ["./*"],
-      "@styles/*": ["./app/styles/*"],
-      "@routes/*": ["./app/routes/*"],
-      "@components/*": ["./components/*"]
+      "@/*": ["./*"], // Permite importar módulos a partir do diretório raiz
+      "@styles/*": ["./app/styles/*"], // Permite importar estilos usando a sintaxe @styles/
+      "@routes/*": ["./app/routes/*"], // Permite importar rotas usando a sintaxe @routes/
+      "@components/*": ["./components/*"] // Permite importar componentes usando a sintaxe @components/
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
+
+  // Especifica os arquivos e diretórios que devem ser incluídos na compilação
+  "include": [
+    "**/*.ts", // Inclui todos os arquivos TypeScript (.ts)
+    "**/*.tsx", // Inclui todos os arquivos TypeScript (.tsx)
+    ".expo/types/**/*.ts", // Inclui definições de tipo específicas do Expo
+    "expo-env.d.ts" // Inclui o arquivo de definições do ambiente Expo
+  ]
 }

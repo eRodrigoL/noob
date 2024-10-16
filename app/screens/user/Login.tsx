@@ -9,83 +9,83 @@ import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
 
 const Login: React.FC = () => {
-  const router = useRouter();
+  const router = useRouter(); // Hook para manipular rotas
 
-  // Estados para armazenar apelido e senha
-  const [apelido, setApelido] = useState("");
-  const [senha, setSenha] = useState("");
+  const [apelido, setApelido] = useState(""); // Estado para armazenar o apelido do usuário
+  const [senha, setSenha] = useState(""); // Estado para armazenar a senha do usuário
 
-  // Função para redirecionar para a tela de cadastro
+  // Função para navegar para a tela de cadastro de usuário
   const goToRegisterUser = () => {
-    SCREENS.SCREENS.user.register(router);
+    SCREENS.SCREENS.user.register(router); // Chama a função de navegação para a tela de cadastro
   };
 
-  // Função de login
+  // Função de login, que verifica as credenciais do usuário
   const handleLogin = async () => {
+    // Verifica se os campos de apelido e senha foram preenchidos
     if (!apelido || !senha) {
-      Alert.alert("Erro", "Por favor, preencha todos os campos.");
+      Alert.alert("Erro", "Por favor, preencha todos os campos."); // Exibe um alerta caso os campos estejam vazios
       return;
     }
 
     try {
+      // Faz uma requisição para o backend para autenticação
       const response = await axios.post(
         "https://api-noob-react.onrender.com/api/login",
         { apelido, senha }
       );
 
+      // Se o status da resposta for 200, login é bem-sucedido
       if (response.status === 200) {
-        const { token, usuario, msg } = response.data;
+        const { token, usuario, msg } = response.data; // Extrai o token, informações do usuário e mensagem da resposta
 
-        // Armazenar o token e o ID do usuário no AsyncStorage
+        // Armazena o token e o ID do usuário no armazenamento local
         await AsyncStorage.multiSet([
           ["token", token],
           ["userId", usuario.id], // Armazena o ID do usuário
         ]);
 
-        // Exibir mensagem de sucesso
-        Alert.alert("Sucesso", msg);
+        Alert.alert("Sucesso", msg); // Exibe mensagem de sucesso
 
-        // Redirecionar o usuário, por exemplo, para a página inicial
-        // COLOCAR AQUI TELA A SER REDIRECIONADA
+        // Redireciona para a tela inicial ou outra tela <{ARRUMAR: inserir tela desejada}>
         //router.push("/home");
       }
     } catch (error) {
-      // Exibir mensagem de erro
+      // Exibe um alerta de erro em caso de falha no login
       Alert.alert("Erro", "Apelido ou senha incorreta. Tente novamente!");
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Botão de voltar (X) */}
+      {/* Componente para o botão de voltar */}
       <ButtonGoBack />
 
-      {/* Título */}
+      {/* Título da página com ícone */}
       <Text style={styles.title}>
         Noob <Text style={styles.diceIcon}>🎲</Text>
       </Text>
 
-      {/* Entrada para Apelido */}
+      {/* Campo de texto para inserção do apelido */}
       <Text style={styles.label}>Apelido:</Text>
       <TextInput
         style={styles.input}
         value={apelido}
-        onChangeText={setApelido} // Atualiza o estado do apelido
+        onChangeText={setApelido} // Atualiza o estado do apelido conforme o usuário digita
       />
 
-      {/* Entrada para Senha */}
+      {/* Campo de texto para inserção da senha */}
       <Text style={styles.label}>Senha:</Text>
       <TextInput
         style={styles.input}
-        secureTextEntry
+        secureTextEntry // Define o campo como senha, ocultando o texto
         value={senha}
-        onChangeText={setSenha} // Atualiza o estado da senha
+        onChangeText={setSenha} // Atualiza o estado da senha conforme o usuário digita
       />
 
-      {/* Botão de Login */}
+      {/* Botão para realizar o login */}
       <ButtonPrimary title="Entrar" onPress={handleLogin} />
 
-      {/* Texto de Cadastrar-se */}
+      {/* Texto e link para redirecionar para a tela de cadastro */}
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Text style={styles.signupText}>Ainda não tem uma conta? </Text>
         <TouchableOpacity onPress={goToRegisterUser}>
