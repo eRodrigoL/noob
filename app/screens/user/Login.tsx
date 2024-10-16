@@ -36,8 +36,13 @@ const Login: React.FC = () => {
       if (response.status === 200) {
         const { token, usuario, msg } = response.data;
 
-        // Armazenar o token no AsyncStorage
-        await AsyncStorage.setItem("token", token);
+        
+
+        // Armazenar o token e o ID do usuário no AsyncStorage
+        await AsyncStorage.multiSet([
+          ["token", token],
+          ["userId", usuario.id],  // Armazena o ID do usuário
+        ]);
 
         // Exibir mensagem de sucesso
         Alert.alert("Sucesso", msg);
