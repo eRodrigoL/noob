@@ -72,7 +72,7 @@ const UserProfile = () => {
       {/* Container da Imagem do Perfil */}
       <View style={localStyles.profileImageContainer}>
         <Image
-          source={{ uri: user.src || "https://example.com/user-image.jpg" }} // URL da imagem do perfil ou imagem default
+          source={{ uri: user.foto || "https://example.com/user-image.jpg" }} // URL da imagem do perfil ou imagem default
           style={localStyles.profileImage}
         />
       </View>
@@ -83,7 +83,7 @@ const UserProfile = () => {
 
       {/* Apelido */}
       <Text style={localStyles.label}>Apelido:</Text>
-      <Text style={localStyles.userInfoText}>@{user.apelido}</Text>
+      <Text style={localStyles.userInfoText}>{user.apelido}</Text>
 
       {/* Data de Nascimento */}
       <Text style={localStyles.label}>Data de Nascimento:</Text>
