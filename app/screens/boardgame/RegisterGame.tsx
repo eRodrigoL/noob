@@ -66,7 +66,7 @@ const RegisterGame: React.FC = () => {
     try {
       // Faz a requisição para registrar o jogo
       const response = await axios.post(
-        "https://api-noob-react.onrender.com/api/jogos/passar",
+        "https://api-noob-react.onrender.com/api/jogos/VERIFICAR",
         {
           titulo, // Dados do jogo
           ano,

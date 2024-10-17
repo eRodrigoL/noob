@@ -61,12 +61,12 @@ Link das Chamadas:
 
 Descrição dos Campos:
 
-|<Campos (Model)>|<Tipo>  |<Obrigatório (required)>|<Obs>  |       NaN
+|<Campos (Model)>|<Tipo>  |<Obrigatório (required)>|<Obs>  |
 |                |        |                        |       |
-|       usuarios | String |                  False | Array |       NaN
-|           jogo | String |                  False |   NaN |       NaN
-|       vencedor | String |                  False | Array |       NaN
-|        duracao | String |                  False |   NaN |       NaN
+|       usuarios | String |                  False | Array |
+|           jogo | String |                  False |   NaN |
+|       vencedor | String |                  False | Array |
+|        duracao | String |                  False |   NaN |
 
 Link das Chamadas:
 
