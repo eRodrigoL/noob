@@ -14,6 +14,7 @@ import styles from "@styles/Default"; // Importa estilos padrão
 import ButtonPrimary from "@components/ButtonPrimary"; // Importa botão primário customizado
 import ButtonGoBack from "@/components/ButtonGoBack"; // Importa botão de voltar
 import { useRouter } from "expo-router"; // Importa roteamento do Expo
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const RegisterGame: React.FC = () => {
   // Estados para armazenar valores dos campos do formulário
@@ -63,14 +64,31 @@ const RegisterGame: React.FC = () => {
       return;
     }
 
+    // Recupera o ID e o token do usuário do armazenamento local
+    const userId = await AsyncStorage.getItem("userId");
+    const token = await AsyncStorage.getItem("token");
+
+    // Verifica se o ID ou o token estão ausentes
+    if (!userId || !token) {
+      Alert.alert("Erro", "ID do usuário ou token não encontrados.");
+      return;
+    }
+
+    // Configura o cabeçalho da requisição com o token de autorização
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
     try {
       // Faz a requisição para registrar o jogo
       const response = await axios.post(
-        "https://api-noob-react.onrender.com/api/jogos/VERIFICAR",
+        "https://api-noob-react.onrender.com/api/jogos",
         {
           titulo, // Dados do jogo
           ano,
-          idade: parseInt(idade), // Converte idade para número
+          idade, // Converte idade para número
           designer,
           artista,
           editora,
@@ -80,7 +98,8 @@ const RegisterGame: React.FC = () => {
           descricao,
           idOriginal,
           capa, // URI da capa
-        }
+        },
+        config // passando o token na requisição
       );
       if (response.status === 200) {
         Alert.alert("Sucesso", "Jogo cadastrado com sucesso!"); // Exibe sucesso
