@@ -48,6 +48,7 @@ const Login: React.FC = () => {
 
         // Redireciona para a tela inicial ou outra tela <{ARRUMAR: inserir tela desejada}>
         //router.push("/home");
+      
       }
     } catch (error) {
       // Exibe um alerta de erro em caso de falha no login
