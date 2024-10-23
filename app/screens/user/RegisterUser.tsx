@@ -49,6 +49,11 @@ const RegisterUser: React.FC = () => {
     }
   };
 
+  const isPasswordStrong = (password: string) => {
+    const strongPasswordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return strongPasswordRegex.test(password);
+  };
+
   const handleRegister = async () => {
     if (!nome || !apelido || !email || !senha || !confirmarSenha) {
       Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
@@ -57,6 +62,14 @@ const RegisterUser: React.FC = () => {
 
     if (senha !== confirmarSenha) {
       Alert.alert("Erro", "As senhas não coincidem.");
+      return;
+    }
+
+    if (!isPasswordStrong(senha)) {
+      Alert.alert(
+        "Erro",
+        "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial."
+      );
       return;
     }
 
