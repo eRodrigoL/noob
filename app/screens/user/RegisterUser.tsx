@@ -11,6 +11,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import styles from "@styles/Default";
+import { TextInputMask } from "react-native-masked-text";
 import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
@@ -164,8 +165,12 @@ const RegisterUser: React.FC = () => {
             value={apelido}
             onChangeText={setApelido}
           />
-          <TextInput
+        <TextInputMask
             style={styles.input}
+            type={"datetime"}
+            options={{
+              format: "DD/MM/YYYY",
+            }}
             placeholder="Data nascimento"
             value={nascimento}
             onChangeText={setNascimento}
