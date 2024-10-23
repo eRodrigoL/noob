@@ -114,7 +114,7 @@ const RegisterUser: React.FC = () => {
           },
         }
       );
-
+//
       if (response.status === 201) {
         const message = response.data.message;
         Alert.alert("Sucesso", message);
