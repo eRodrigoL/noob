@@ -10,15 +10,18 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens
 import styles from "@styles/Default";
+import { TextInputMask } from 'react-native-masked-text';
 import { Theme } from "@/app/styles/Theme";
 
 const UserProfile = () => {
-  const [user, setUser] = useState<any>(null); // Estado para armazenar os dados do usuário
-  const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
-  const [isEditing, setIsEditing] = useState(false); // Estado para controlar se está em modo de edição
-  const [editedUser, setEditedUser] = useState<any>(null); // Estado para armazenar os dados editados
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedUser, setEditedUser] = useState<any>(null);
 
+  // Função para buscar os dados do usuário
   const fetchUserData = async () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
@@ -41,7 +44,7 @@ const UserProfile = () => {
       );
 
       setUser(response.data);
-      setEditedUser(response.data); // Inicializa o estado de edição com os dados atuais
+      setEditedUser(response.data);
     } catch (error) {
       console.error("Erro ao buscar os dados do usuário:", error);
       Alert.alert("Erro", "Não foi possível carregar os dados do usuário.");
@@ -50,16 +53,105 @@ const UserProfile = () => {
     }
   };
 
+  // Função para enviar os dados atualizados
+  const updateUserProfile = async () => {
+    if (!editedUser || !editedUser.nome || !editedUser.email) {
+      Alert.alert("Erro", "Nome e email são obrigatórios.");
+      return;
+    }
+
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+
+      if (!userId || !token) {
+        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
+        return;
+      }
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data', // Certifique-se de que o tipo de conteúdo seja multipart/form-data
+        },
+      };
+
+      // Usando FormData para envio de arquivos e outros dados
+      const formData = new FormData();
+      formData.append('nome', editedUser.nome);
+      formData.append('email', editedUser.email);
+      formData.append('nascimento', editedUser.nascimento);
+
+      if (editedUser.foto) {
+        const localUri = editedUser.foto;
+        const filename = localUri.split('/').pop(); // Extrai o nome do arquivo
+        const match = /\.(\w+)$/.exec(filename ?? ''); // Obtém a extensão do arquivo
+        const fileType = match ? `image/${match[1]}` : `image`; // Define o tipo de arquivo
+        
+        formData.append('foto', {
+          uri: localUri,          // URI da imagem selecionada
+          name: filename ?? 'profile.jpg',  // Nome do arquivo
+          type: fileType,         // Tipo do arquivo (ajustado dinamicamente)
+        }as any);
+      }
+
+      const response = await axios.put(
+        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
+        formData, // Envia o FormData com a imagem e os outros campos
+        config
+      );
+
+      setUser(response.data);
+      setEditedUser(response.data);
+
+      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
+    } catch (error: any) {
+      if (error.response) {
+        console.error("Erro no servidor:", error.response.data);
+      } else if (error.request) {
+        console.error("Erro de rede:", error.request);
+      } else {
+        console.error("Erro desconhecido:", error.message);
+      }
+      Alert.alert("Erro", "Não foi possível atualizar o perfil.");
+    }
+  };
+
   useEffect(() => {
     fetchUserData();
   }, []);
 
+  // Função para alternar entre edição e exibição
   const handleEditToggle = () => {
     if (isEditing) {
-      // Lógica para salvar os dados editados pode ser adicionada aqui
-      Alert.alert("Perfil salvo com sucesso!");
+      updateUserProfile();
     }
     setIsEditing(!isEditing);
+  };
+
+  // Função para selecionar uma nova foto
+  const handleImagePick = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert("Erro", "Você precisa permitir o acesso à galeria de imagens!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (result.canceled) {
+      console.log("Usuário cancelou a seleção da imagem.");
+      return;
+    }
+
+    const source = result.assets[0].uri;
+    setEditedUser((prevState: any) => ({ ...prevState, foto: source }));
   };
 
   if (loading) {
@@ -78,15 +170,32 @@ const UserProfile = () => {
     );
   }
 
+  const addOneDay = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1); // Adiciona 1 dia
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Perfil do Usuário</Text>
 
+      {/* Imagem de Perfil */}
+      <Text style={localStyles.label}>Foto:</Text>
       <View style={localStyles.profileImageContainer}>
         <Image
-          source={{ uri: user.foto || "https://example.com/user-image.jpg" }}
+          source={{ uri: editedUser.foto || "https://example.com/user-image.jpg" }}
           style={localStyles.profileImage}
         />
+        {isEditing && (
+          <TouchableOpacity style={styles.buttonPrimary} onPress={handleImagePick}>
+            <Text style={styles.buttonPrimaryText}>Selecionar nova foto</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Nome */}
@@ -103,41 +212,41 @@ const UserProfile = () => {
         <Text style={localStyles.userInfoText}>{user.nome}</Text>
       )}
 
-      {/* Apelido */}
+      {/* Apelido (não editável) */}
       <Text style={localStyles.label}>Apelido:</Text>
+      <Text style={localStyles.userInfoText}>{user.apelido}</Text>
+
+      {/* Email */}
+      <Text style={localStyles.label}>Email:</Text>
       {isEditing ? (
         <TextInput
           style={localStyles.userInfoTextEditable}
-          value={editedUser.apelido}
+          value={editedUser.email}
           onChangeText={(text) =>
-            setEditedUser((prevState: any) => ({ ...prevState, apelido: text }))
+            setEditedUser((prevState: any) => ({ ...prevState, email: text }))
           }
         />
       ) : (
-        <Text style={localStyles.userInfoText}>{user.apelido}</Text>
+        <Text style={localStyles.userInfoText}>{user.email}</Text>
       )}
+
+      
 
       {/* Data de Nascimento */}
       <Text style={localStyles.label}>Data de Nascimento:</Text>
       {isEditing ? (
         <TextInput
           style={localStyles.userInfoTextEditable}
-          value={new Date(editedUser.nascimento)
-            .toISOString()
-            .substring(0, 10)} // Formato YYYY-MM-DD
-          onChangeText={(text) =>
-            setEditedUser((prevState: any) => ({
-              ...prevState,
-              nascimento: text,
-            }))
-          }
+            value={addOneDay(editedUser.nascimento)} 
+            
         />
       ) : (
         <Text style={localStyles.userInfoText}>
-          {new Date(user.nascimento).toLocaleDateString()}
+          {addOneDay(user.nascimento)}
         </Text>
       )}
 
+      {/* Botão de Editar/Salvar */}
       <TouchableOpacity style={styles.buttonPrimary} onPress={handleEditToggle}>
         <Text style={styles.buttonPrimaryText}>
           {isEditing ? "Salvar" : "Editar Perfil"}
@@ -149,11 +258,6 @@ const UserProfile = () => {
 
 const localStyles = StyleSheet.create({
   profileImageContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: Theme.light.secondary.backgroundButton,
-    justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
   },
@@ -161,6 +265,7 @@ const localStyles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
+    marginBottom: 20,
   },
   label: {
     fontSize: 18,
@@ -188,4 +293,11 @@ const localStyles = StyleSheet.create({
 });
 
 export default UserProfile;
+
+
+
+
+
+
+
 
