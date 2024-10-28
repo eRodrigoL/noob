@@ -54,68 +54,69 @@ const UserProfile = () => {
   };
 
   // Função para enviar os dados atualizados
-  const updateUserProfile = async () => {
-    if (!editedUser || !editedUser.nome || !editedUser.email) {
-      Alert.alert("Erro", "Nome e email são obrigatórios.");
+// Função para enviar os dados atualizados
+const updateUserProfile = async () => {
+  if (!editedUser || !editedUser.nome || !editedUser.email) {
+    Alert.alert("Erro", "Nome e email são obrigatórios.");
+    return;
+  }
+
+  try {
+    const userId = await AsyncStorage.getItem("userId");
+    const token = await AsyncStorage.getItem("token");
+
+    if (!userId || !token) {
+      Alert.alert("Erro", "ID do usuário ou token não encontrados.");
       return;
     }
 
-    try {
-      const userId = await AsyncStorage.getItem("userId");
-      const token = await AsyncStorage.getItem("token");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    };
 
-      if (!userId || !token) {
-        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
-        return;
-      }
+    const formData = new FormData();
+    formData.append('nome', editedUser.nome);
+    formData.append('email', editedUser.email);
+    formData.append('nascimento', editedUser.nascimento);
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data', // Certifique-se de que o tipo de conteúdo seja multipart/form-data
-        },
-      };
+    if (editedUser.foto) {
+      const localUri = editedUser.foto;
+      const filename = localUri.split('/').pop();
+      const match = /\.(\w+)$/.exec(filename ?? '');
+      const fileType = match ? `image/${match[1]}` : `image`;
 
-      // Usando FormData para envio de arquivos e outros dados
-      const formData = new FormData();
-      formData.append('nome', editedUser.nome);
-      formData.append('email', editedUser.email);
-      formData.append('nascimento', editedUser.nascimento);
-
-      if (editedUser.foto) {
-        const localUri = editedUser.foto;
-        const filename = localUri.split('/').pop(); // Extrai o nome do arquivo
-        const match = /\.(\w+)$/.exec(filename ?? ''); // Obtém a extensão do arquivo
-        const fileType = match ? `image/${match[1]}` : `image`; // Define o tipo de arquivo
-        
-        formData.append('foto', {
-          uri: localUri,          // URI da imagem selecionada
-          name: filename ?? 'profile.jpg',  // Nome do arquivo
-          type: fileType,         // Tipo do arquivo (ajustado dinamicamente)
-        }as any);
-      }
-
-      const response = await axios.put(
-        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
-        formData, // Envia o FormData com a imagem e os outros campos
-        config
-      );
-
-      setUser(response.data);
-      setEditedUser(response.data);
-
-      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
-    } catch (error: any) {
-      if (error.response) {
-        console.error("Erro no servidor:", error.response.data);
-      } else if (error.request) {
-        console.error("Erro de rede:", error.request);
-      } else {
-        console.error("Erro desconhecido:", error.message);
-      }
-      Alert.alert("Erro", "Não foi possível atualizar o perfil.");
+      formData.append('foto', {
+        uri: localUri,
+        name: filename ?? 'profile.jpg',
+        type: fileType,
+      } as any);
     }
-  };
+
+    await axios.put(
+      `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
+      formData,
+      config
+    );
+
+    Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
+    
+    // Recarregar os dados do usuário após a atualização
+    fetchUserData();
+  } catch (error: any) {
+    if (error.response) {
+      console.error("Erro no servidor:", error.response.data);
+    } else if (error.request) {
+      console.error("Erro de rede:", error.request);
+    } else {
+      console.error("Erro desconhecido:", error.message);
+    }
+    Alert.alert("Erro", "Não foi possível atualizar o perfil.");
+  }
+};
+
 
   useEffect(() => {
     fetchUserData();
