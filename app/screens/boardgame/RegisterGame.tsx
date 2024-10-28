@@ -64,23 +64,6 @@ const RegisterGame: React.FC = () => {
       return;
     }
 
-    // Recupera o ID e o token do usuário do armazenamento local
-    const userId = await AsyncStorage.getItem("userId");
-    const token = await AsyncStorage.getItem("token");
-
-    // Verifica se o ID ou o token estão ausentes
-    if (!userId || !token) {
-      Alert.alert("Erro", "ID do usuário ou token não encontrados.");
-      return;
-    }
-
-    // Configura o cabeçalho da requisição com o token de autorização
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
     try {
       const userId = await AsyncStorage.getItem("userId");
       const token = await AsyncStorage.getItem("token");
