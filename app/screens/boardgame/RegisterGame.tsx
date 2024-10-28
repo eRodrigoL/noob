@@ -1,23 +1,24 @@
-import React, { useState } from "react"; // Importa React e useState para gerenciar estados
+import React, { useState } from "react";
 import {
-  ScrollView, // Importa componente para scroll
-  View, // Importa componente de layout
-  Text, // Importa componente de texto
-  TextInput, // Importa componente para campos de entrada de texto
-  TouchableOpacity, // Importa componente para toque/pressão
-  Alert, // Importa componente de alerta
-  Image, // Importa componente para exibir imagens
+  ScrollView,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Alert,
 } from "react-native";
-import axios from "axios"; // Importa Axios para fazer requisições HTTP
-import * as ImagePicker from "expo-image-picker"; // Importa expo-image-picker para selecionar imagens da galeria
-import styles from "@styles/Default"; // Importa estilos padrão
-import ButtonPrimary from "@components/ButtonPrimary"; // Importa botão primário customizado
-import ButtonGoBack from "@/components/ButtonGoBack"; // Importa botão de voltar
-import { useRouter } from "expo-router"; // Importa roteamento do Expo
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
+import styles from "@styles/Default";
+import ButtonPrimary from "@components/ButtonPrimary";
+import ButtonGoBack from "@/components/ButtonGoBack";
+import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import SCREENS from "@routes/Routes";
 
 const RegisterGame: React.FC = () => {
-  // Estados para armazenar valores dos campos do formulário
+  // Estados para armazenar os dados do jogo
   const [titulo, setTitulo] = useState("");
   const [ano, setAno] = useState("");
   const [idade, setIdade] = useState("");
@@ -29,38 +30,37 @@ const RegisterGame: React.FC = () => {
   const [componentes, setComponentes] = useState("");
   const [descricao, setDescricao] = useState("");
   const [idOriginal, setIdOriginal] = useState("");
-  const [capa, setCapa] = useState<string | null>(null); // Estado para armazenar a capa do jogo (URI da imagem)
+  const [imageUri, setImageUri] = useState<string | null>(null); // Foto
+  const [capaUri, setCapaUri] = useState<string | null>(null); // Capa
 
-  const router = useRouter(); // Hook de navegação do Expo
+  const router = useRouter();
 
-  // Função para selecionar uma imagem da galeria
-  const pickImage = async () => {
-    // Solicita permissão para acessar a galeria
+  // Função responsável por abrir a galeria de imagens para escolher a foto
+  const pickImage = async (
+    setImageCallback: React.Dispatch<React.SetStateAction<string | null>>
+  ) => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
-      alert("Permissão para acessar as fotos é necessária!"); // Exibe alerta caso a permissão seja negada
+      alert("Permissão para acessar as fotos é necessária!");
       return;
     }
-
-    // Abre a galeria para selecionar uma imagem
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Somente imagens
-      allowsEditing: true, // Permite edição
-      aspect: [1, 1], // Define o formato quadrado para a imagem
-      quality: 1, // Define a qualidade máxima da imagem
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
     });
 
-    // Se o usuário selecionar uma imagem, armazena a URI
     if (!result.canceled && result.assets.length > 0) {
-      setCapa(result.assets[0].uri); // Define a URI da imagem selecionada como capa
+      setImageCallback(result.assets[0].uri);
     }
   };
 
-  // Função para registrar o jogo
-  const registerGame = async () => {
+  // Função que lida com o cadastro do jogo
+  const gameRegister = async () => {
     if (!titulo) {
-      Alert.alert("Erro", "O campo 'Título' é obrigatório."); // Exibe erro se o título estiver vazio
+      Alert.alert("Erro", "O campo 'Título' é obrigatório.");
       return;
     }
 
@@ -82,32 +82,70 @@ const RegisterGame: React.FC = () => {
     };
 
     try {
-      // Faz a requisição para registrar o jogo
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+
+      if (!userId || !token) {
+        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
+        return;
+      }
+
+      // Cria um FormData para o envio dos dados
+      const formData = new FormData();
+      formData.append("titulo", titulo);
+      formData.append("ano", ano);
+      formData.append("idade", idade);
+      formData.append("designer", designer);
+      formData.append("artista", artista);
+      formData.append("editora", editora);
+      formData.append("digital", digital);
+      formData.append("categoria", categoria);
+      formData.append("componentes", componentes);
+      formData.append("descricao", descricao);
+      formData.append("idOriginal", idOriginal);
+
+      // Adiciona a foto e a capa no FormData, caso tenham sido escolhidas
+      if (imageUri) {
+        const filename = imageUri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename ?? "");
+        const fileType = match ? `image/${match[1]}` : `image`;
+        formData.append("foto", {
+          uri: imageUri,
+          name: filename,
+          type: fileType,
+        } as any);
+      }
+
+      if (capaUri) {
+        const filename = capaUri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename ?? "");
+        const fileType = match ? `image/${match[1]}` : `image`;
+        formData.append("capa", {
+          uri: capaUri,
+          name: filename,
+          type: fileType,
+        } as any);
+      }
+
+      // Envia a requisição com os dados para o backend
       const response = await axios.post(
         "https://api-noob-react.onrender.com/api/jogos",
+        formData,
         {
-          titulo, // Dados do jogo
-          ano,
-          idade, // Converte idade para número
-          designer,
-          artista,
-          editora,
-          digital,
-          categoria,
-          componentes,
-          descricao,
-          idOriginal,
-          capa, // URI da capa
-        },
-        config // passando o token na requisição
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
-      if (response.status === 200) {
-        Alert.alert("Sucesso", "Jogo cadastrado com sucesso!"); // Exibe sucesso
-        router.push("/"); // Redireciona para a página inicial
+
+      if (response.status === 201) {
+        const message = response.data.msg;
+        Alert.alert("Sucesso", message);
+        //router.push("/success"); // Redireciona para uma página de sucesso
       }
     } catch (error) {
-      Alert.alert("Erro", "Falha ao cadastrar o jogo."); // Exibe erro se o cadastro falhar
-      console.error(error); // Loga o erro no console
+      Alert.alert("Erro", "Houve um erro ao criar o jogo. Tente novamente!");
     }
   };
 
@@ -115,95 +153,105 @@ const RegisterGame: React.FC = () => {
     <View>
       <ScrollView>
         <View style={styles.container}>
-          {/* Botão de voltar */}
           <ButtonGoBack />
+          <View style={{ width: 100, height: 70 }}></View>
+          <Text style={styles.title}>Registrar Jogo:</Text>
 
-          {/* Título da página */}
-          <Text style={styles.title}>Registrar Jogo</Text>
-
-          {/* Upload da capa do jogo */}
+          {/* Selecionar a foto */}
           <TouchableOpacity
-            onPress={pickImage}
+            onPress={() => pickImage(setImageUri)}
             style={styles.profileImageContainer}
           >
-            {capa ? (
-              <Image source={{ uri: capa }} style={styles.profileImage} /> // Mostra a capa selecionada
+            {imageUri ? (
+              <Image source={{ uri: imageUri }} style={styles.profileImage} />
             ) : (
-              <Text style={styles.profileImagePlaceholder}>Adicionar Capa</Text> // Mostra texto se nenhuma capa for selecionada
+              <Text style={styles.profileImagePlaceholder}>Adicionar Foto</Text>
             )}
           </TouchableOpacity>
 
-          {/* Campos de entrada para os dados do jogo */}
+          {/* Selecionar a capa */}
+          <TouchableOpacity
+            onPress={() => pickImage(setCapaUri)}
+            style={styles.profileImageContainer}
+          >
+            {capaUri ? (
+              <Image source={{ uri: capaUri }} style={styles.profileImage} />
+            ) : (
+              <Text style={styles.profileImagePlaceholder}>Adicionar Capa</Text>
+            )}
+          </TouchableOpacity>
+
+          {/* Campos de entrada do jogo */}
           <TextInput
             style={styles.input}
-            placeholder="Título (obrigatório)" // Campo obrigatório
+            placeholder="Título (obrigatório)"
             value={titulo}
-            onChangeText={setTitulo} // Atualiza o estado do título
+            onChangeText={setTitulo}
           />
           <TextInput
             style={styles.input}
             placeholder="Ano"
             value={ano}
-            onChangeText={setAno} // Atualiza o estado do ano
+            onChangeText={setAno}
           />
           <TextInput
             style={styles.input}
             placeholder="Idade"
-            keyboardType="numeric" // Define o teclado numérico
+            keyboardType="numeric"
             value={idade}
-            onChangeText={setIdade} // Atualiza o estado da idade
+            onChangeText={setIdade}
           />
           <TextInput
             style={styles.input}
             placeholder="Designer"
             value={designer}
-            onChangeText={setDesigner} // Atualiza o estado do designer
+            onChangeText={setDesigner}
           />
           <TextInput
             style={styles.input}
             placeholder="Artista"
             value={artista}
-            onChangeText={setArtista} // Atualiza o estado do artista
+            onChangeText={setArtista}
           />
           <TextInput
             style={styles.input}
             placeholder="Editora"
             value={editora}
-            onChangeText={setEditora} // Atualiza o estado da editora
+            onChangeText={setEditora}
           />
           <TextInput
             style={styles.input}
             placeholder="Digital"
             value={digital}
-            onChangeText={setDigital} // Atualiza o estado de digital
+            onChangeText={setDigital}
           />
           <TextInput
             style={styles.input}
             placeholder="Categoria"
             value={categoria}
-            onChangeText={setCategoria} // Atualiza o estado da categoria
+            onChangeText={setCategoria}
           />
           <TextInput
             style={styles.input}
             placeholder="Componentes"
             value={componentes}
-            onChangeText={setComponentes} // Atualiza o estado de componentes
+            onChangeText={setComponentes}
           />
           <TextInput
             style={styles.input}
             placeholder="Descrição"
             value={descricao}
-            onChangeText={setDescricao} // Atualiza o estado da descrição
+            onChangeText={setDescricao}
           />
           <TextInput
             style={styles.input}
             placeholder="ID Original"
             value={idOriginal}
-            onChangeText={setIdOriginal} // Atualiza o estado do ID original
+            onChangeText={setIdOriginal}
           />
 
           {/* Botão para cadastrar o jogo */}
-          <ButtonPrimary title="Cadastrar Jogo" onPress={registerGame} />
+          <ButtonPrimary title="Cadastrar Jogo" onPress={gameRegister} />
         </View>
       </ScrollView>
     </View>

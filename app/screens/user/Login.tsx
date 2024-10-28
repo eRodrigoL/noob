@@ -47,7 +47,8 @@ const Login: React.FC = () => {
         Alert.alert("Sucesso", msg); // Exibe mensagem de sucesso
 
         // Redireciona para a tela inicial ou outra tela <{ARRUMAR: inserir tela desejada}>
-        //router.push("/home");
+        SCREENS.SCREENS.boardgame.list(router);
+      
       }
     } catch (error) {
       // Exibe um alerta de erro em caso de falha no login
