@@ -15,7 +15,7 @@ import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import SCREENS from "@routes/Routes"; 
+import SCREENS from "@routes/Routes";
 
 const RegisterGame: React.FC = () => {
   // Estados para armazenar os dados do jogo
@@ -36,8 +36,11 @@ const RegisterGame: React.FC = () => {
   const router = useRouter();
 
   // Função responsável por abrir a galeria de imagens para escolher a foto
-  const pickImage = async (setImageCallback: React.Dispatch<React.SetStateAction<string | null>>) => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  const pickImage = async (
+    setImageCallback: React.Dispatch<React.SetStateAction<string | null>>
+  ) => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
       alert("Permissão para acessar as fotos é necessária!");
       return;
@@ -138,7 +141,10 @@ const RegisterGame: React.FC = () => {
           <Text style={styles.title}>Registrar Jogo:</Text>
 
           {/* Selecionar a foto */}
-          <TouchableOpacity onPress={() => pickImage(setImageUri)} style={styles.profileImageContainer}>
+          <TouchableOpacity
+            onPress={() => pickImage(setImageUri)}
+            style={styles.profileImageContainer}
+          >
             {imageUri ? (
               <Image source={{ uri: imageUri }} style={styles.profileImage} />
             ) : (
@@ -147,7 +153,10 @@ const RegisterGame: React.FC = () => {
           </TouchableOpacity>
 
           {/* Selecionar a capa */}
-          <TouchableOpacity onPress={() => pickImage(setCapaUri)} style={styles.profileImageContainer}>
+          <TouchableOpacity
+            onPress={() => pickImage(setCapaUri)}
+            style={styles.profileImageContainer}
+          >
             {capaUri ? (
               <Image source={{ uri: capaUri }} style={styles.profileImage} />
             ) : (
@@ -156,17 +165,73 @@ const RegisterGame: React.FC = () => {
           </TouchableOpacity>
 
           {/* Campos de entrada do jogo */}
-          <TextInput style={styles.input} placeholder="Título (obrigatório)" value={titulo} onChangeText={setTitulo} />
-          <TextInput style={styles.input} placeholder="Ano" value={ano} onChangeText={setAno} />
-          <TextInput style={styles.input} placeholder="Idade" keyboardType="numeric" value={idade} onChangeText={setIdade} />
-          <TextInput style={styles.input} placeholder="Designer" value={designer} onChangeText={setDesigner} />
-          <TextInput style={styles.input} placeholder="Artista" value={artista} onChangeText={setArtista} />
-          <TextInput style={styles.input} placeholder="Editora" value={editora} onChangeText={setEditora} />
-          <TextInput style={styles.input} placeholder="Digital" value={digital} onChangeText={setDigital} />
-          <TextInput style={styles.input} placeholder="Categoria" value={categoria} onChangeText={setCategoria} />
-          <TextInput style={styles.input} placeholder="Componentes" value={componentes} onChangeText={setComponentes} />
-          <TextInput style={styles.input} placeholder="Descrição" value={descricao} onChangeText={setDescricao} />
-          <TextInput style={styles.input} placeholder="ID Original" value={idOriginal} onChangeText={setIdOriginal} />
+          <TextInput
+            style={styles.input}
+            placeholder="Título (obrigatório)"
+            value={titulo}
+            onChangeText={setTitulo}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Ano"
+            value={ano}
+            onChangeText={setAno}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Idade"
+            keyboardType="numeric"
+            value={idade}
+            onChangeText={setIdade}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Designer"
+            value={designer}
+            onChangeText={setDesigner}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Artista"
+            value={artista}
+            onChangeText={setArtista}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Editora"
+            value={editora}
+            onChangeText={setEditora}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Digital"
+            value={digital}
+            onChangeText={setDigital}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Categoria"
+            value={categoria}
+            onChangeText={setCategoria}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Componentes"
+            value={componentes}
+            onChangeText={setComponentes}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Descrição"
+            value={descricao}
+            onChangeText={setDescricao}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="ID Original"
+            value={idOriginal}
+            onChangeText={setIdOriginal}
+          />
 
           {/* Botão para cadastrar o jogo */}
           <ButtonPrimary title="Cadastrar Jogo" onPress={gameRegister} />
