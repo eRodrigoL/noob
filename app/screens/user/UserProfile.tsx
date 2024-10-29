@@ -2,20 +2,42 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
-  Image,
-  TouchableOpacity,
   StyleSheet,
+  Dimensions,
+  Image,
+  ImageBackground,
+  TextInput,
+  TouchableOpacity,
   Alert,
 } from "react-native";
+import Animated, {
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens
 import styles from "@styles/Default";
 import { TextInputMask } from "react-native-masked-text";
-import { Theme } from "@/app/styles/Theme";
+import IMAGES from "@routes/Routes";
+import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
+import Header from "@/components/Header";
 
-const UserProfile = () => {
+const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
+
+const UserProfile: React.FC = () => {
+  // TRECHO PARA O PARALLAX -- INICIO
+  const scrollY = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    scrollY.value = event.contentOffset.y;
+  });
+
+  const backgroundStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: scrollY.value * 0.3 }], // Parallax mais lento para imagem de fundo
+  }));
+  // TREHO PARA O PARALLAX -- FIM
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -183,95 +205,179 @@ const UserProfile = () => {
       year: "numeric",
     });
   };
+  // TRECHO API -- INICIO
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Perfil do Usuário</Text>
+    <View style={{ flex: 1 }}>
+      {/* Exibe o cabeçalho com título */}
+      <Header title="Cadastro de usuário" />
+      <View style={localStyles.container}>
+        {/* Cabeçalho fixo */}
+        <View style={localStyles.header}>
+          <ImageBackground
+            source={IMAGES.IMAGES.fundo}
+            style={localStyles.backgroundImage}
+          ></ImageBackground>
+        </View>
 
-      {/* Imagem de Perfil */}
-      <Text style={localStyles.label}>Foto:</Text>
-      <View style={localStyles.profileImageContainer}>
-        <Image
-          source={{
-            uri: editedUser.foto || "https://example.com/user-image.jpg",
-          }}
-          style={localStyles.profileImage}
-        />
-        {isEditing && (
-          <TouchableOpacity
-            style={styles.buttonPrimary}
-            onPress={handleImagePick}
-          >
-            <Text style={styles.buttonPrimaryText}>Selecionar nova foto</Text>
-          </TouchableOpacity>
-        )}
+        <Animated.ScrollView
+          contentContainerStyle={localStyles.scrollContent}
+          onScroll={scrollHandler}
+          scrollEventThrottle={16}
+        >
+          {/* Corpo da tela com conteúdo */}
+          <View style={localStyles.bodyContainer}>
+            {/* Primeiro container com imagem */}
+            <View style={[localStyles.imageContainer, { height: 50 }]}>
+              {/* Imagem de Perfil */}
+              <Image
+                source={{
+                  uri: editedUser.foto || "https://example.com/user-image.jpg",
+                }}
+                style={localStyles.foto}
+              />
+              {isEditing && (
+                <TouchableOpacity
+                  style={styles.buttonPrimary}
+                  onPress={handleImagePick}
+                >
+                  <Text style={styles.buttonPrimaryText}>
+                    Selecionar nova foto
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {/* Apelido (não editável) */}
+              <Text style={localStyles.headerTitle}>{user.apelido}</Text>
+            </View>
+
+            {/* Segundo container com conteúdo, ajustando o topo para começar após a imagem */}
+            <View style={[localStyles.textContainer, { marginTop: 25 }]}>
+              {/* Nome */}
+              <Text style={localStyles.label}>Nome:</Text>
+              {isEditing ? (
+                <TextInput
+                  style={localStyles.userInfoTextEditable}
+                  value={editedUser.nome}
+                  onChangeText={(text) =>
+                    setEditedUser((prevState: any) => ({
+                      ...prevState,
+                      nome: text,
+                    }))
+                  }
+                />
+              ) : (
+                <Text style={localStyles.userInfoText}>{user.nome}</Text>
+              )}
+
+              {/* Email */}
+              <Text style={localStyles.label}>Email:</Text>
+              {isEditing ? (
+                <TextInput
+                  style={localStyles.userInfoTextEditable}
+                  value={editedUser.email}
+                  onChangeText={(text) =>
+                    setEditedUser((prevState: any) => ({
+                      ...prevState,
+                      email: text,
+                    }))
+                  }
+                />
+              ) : (
+                <Text style={localStyles.userInfoText}>{user.email}</Text>
+              )}
+
+              {/* Data de Nascimento */}
+              <Text style={localStyles.label}>Data de Nascimento:</Text>
+              {isEditing ? (
+                <TextInput
+                  style={localStyles.userInfoTextEditable}
+                  value={addOneDay(editedUser.nascimento)}
+                />
+              ) : (
+                <Text style={localStyles.userInfoText}>
+                  {addOneDay(user.nascimento)}
+                </Text>
+              )}
+
+              {/* Botão de Editar/Salvar */}
+              <TouchableOpacity
+                style={styles.buttonPrimary}
+                onPress={handleEditToggle}
+              >
+                <Text style={styles.buttonPrimaryText}>
+                  {isEditing ? "Salvar" : "Editar Perfil"}
+                </Text>
+              </TouchableOpacity>
+
+              <Text style={localStyles.content}>Demais informações...</Text>
+            </View>
+          </View>
+        </Animated.ScrollView>
       </View>
-
-      {/* Nome */}
-      <Text style={localStyles.label}>Nome:</Text>
-      {isEditing ? (
-        <TextInput
-          style={localStyles.userInfoTextEditable}
-          value={editedUser.nome}
-          onChangeText={(text) =>
-            setEditedUser((prevState: any) => ({ ...prevState, nome: text }))
-          }
-        />
-      ) : (
-        <Text style={localStyles.userInfoText}>{user.nome}</Text>
-      )}
-
-      {/* Apelido (não editável) */}
-      <Text style={localStyles.label}>Apelido:</Text>
-      <Text style={localStyles.userInfoText}>{user.apelido}</Text>
-
-      {/* Email */}
-      <Text style={localStyles.label}>Email:</Text>
-      {isEditing ? (
-        <TextInput
-          style={localStyles.userInfoTextEditable}
-          value={editedUser.email}
-          onChangeText={(text) =>
-            setEditedUser((prevState: any) => ({ ...prevState, email: text }))
-          }
-        />
-      ) : (
-        <Text style={localStyles.userInfoText}>{user.email}</Text>
-      )}
-
-      {/* Data de Nascimento */}
-      <Text style={localStyles.label}>Data de Nascimento:</Text>
-      {isEditing ? (
-        <TextInput
-          style={localStyles.userInfoTextEditable}
-          value={addOneDay(editedUser.nascimento)}
-        />
-      ) : (
-        <Text style={localStyles.userInfoText}>
-          {addOneDay(user.nascimento)}
-        </Text>
-      )}
-
-      {/* Botão de Editar/Salvar */}
-      <TouchableOpacity style={styles.buttonPrimary} onPress={handleEditToggle}>
-        <Text style={styles.buttonPrimaryText}>
-          {isEditing ? "Salvar" : "Editar Perfil"}
-        </Text>
-      </TouchableOpacity>
     </View>
   );
 };
 
 const localStyles = StyleSheet.create({
-  profileImageContainer: {
-    alignItems: "center",
-    marginBottom: 20,
+  container: {
+    flex: 1,
+    backgroundColor: Theme.light.background,
   },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 20,
+  backgroundImage: {
+    flex: 1, // Faz a imagem ocupar toda a área disponível
+    justifyContent: "center", // Centraliza o conteúdo verticalmente
+    alignItems: "center", // Centraliza o conteúdo horizontalmente
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+  },
+  header: {
+    position: "absolute",
+    top: 0,
+    width: screenWidth,
+    height: 200,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.6)", // Fundo semi-transparente
+  },
+  headerTitle: {
+    fontSize: 30, // Aumenta o tamanho do texto
+    fontWeight: "bold",
+    color: "#333",
+    marginLeft: 180, // Margem esquerda ajustada
+  },
+  scrollContent: {
+    paddingTop: 200, // Espaço para exibir o cabeçalho
+  },
+  bodyContainer: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: Theme.light.background,
+  },
+  imageContainer: {
+    flexDirection: "row", // Adiciona flexDirection para alinhar imagem e texto na horizontal
+    alignItems: "center", // Centraliza verticalmente o conteúdo
+  },
+  foto: {
+    width: 150,
+    height: 150,
+    borderWidth: 5,
+    borderColor: "#333",
+    borderRadius: 15,
+    marginLeft: 15,
+    marginBottom: 16,
+    backgroundColor: "white",
+    position: "absolute",
+    top: -90,
+  },
+  textContainer: {
+    paddingLeft: 16,
+    flex: 1, // Permite que o container ocupe o espaço restante
+  },
+  content: {
+    fontSize: 16,
+    color: "#555",
   },
   label: {
     fontSize: 18,
