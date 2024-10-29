@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,19 +6,28 @@ import {
   Dimensions,
   Image,
   ImageBackground,
+  TextInput,
+  TouchableOpacity,
+  Alert,
 } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens
+import styles from "@styles/Default";
+import { TextInputMask } from "react-native-masked-text";
 import IMAGES from "@routes/Routes";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
-const ParallaxScreen: React.FC = () => {
+const UserProfile: React.FC = () => {
+  // TRECHO PARA O PARALLAX -- INICIO
   const scrollY = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler((event) => {
@@ -28,6 +37,175 @@ const ParallaxScreen: React.FC = () => {
   const backgroundStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: scrollY.value * 0.3 }], // Parallax mais lento para imagem de fundo
   }));
+  // TREHO PARA O PARALLAX -- FIM
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedUser, setEditedUser] = useState<any>(null);
+
+  // Função para buscar os dados do usuário
+  const fetchUserData = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+
+      if (!userId || !token) {
+        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
+        return;
+      }
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const response = await axios.get(
+        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
+        config
+      );
+
+      setUser(response.data);
+      setEditedUser(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar os dados do usuário:", error);
+      Alert.alert("Erro", "Não foi possível carregar os dados do usuário.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Função para enviar os dados atualizados
+  const updateUserProfile = async () => {
+    if (!editedUser || !editedUser.nome || !editedUser.email) {
+      Alert.alert("Erro", "Nome e email são obrigatórios.");
+      return;
+    }
+
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+
+      if (!userId || !token) {
+        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
+        return;
+      }
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data", // Certifique-se de que o tipo de conteúdo seja multipart/form-data
+        },
+      };
+
+      // Usando FormData para envio de arquivos e outros dados
+      const formData = new FormData();
+      formData.append("nome", editedUser.nome);
+      formData.append("email", editedUser.email);
+      formData.append("nascimento", editedUser.nascimento);
+
+      if (editedUser.foto) {
+        const localUri = editedUser.foto;
+        const filename = localUri.split("/").pop(); // Extrai o nome do arquivo
+        const match = /\.(\w+)$/.exec(filename ?? ""); // Obtém a extensão do arquivo
+        const fileType = match ? `image/${match[1]}` : `image`; // Define o tipo de arquivo
+
+        formData.append("foto", {
+          uri: localUri, // URI da imagem selecionada
+          name: filename ?? "profile.jpg", // Nome do arquivo
+          type: fileType, // Tipo do arquivo (ajustado dinamicamente)
+        } as any);
+      }
+
+      const response = await axios.put(
+        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
+        formData, // Envia o FormData com a imagem e os outros campos
+        config
+      );
+
+      setUser(response.data);
+      setEditedUser(response.data);
+
+      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
+    } catch (error: any) {
+      if (error.response) {
+        console.error("Erro no servidor:", error.response.data);
+      } else if (error.request) {
+        console.error("Erro de rede:", error.request);
+      } else {
+        console.error("Erro desconhecido:", error.message);
+      }
+      Alert.alert("Erro", "Não foi possível atualizar o perfil.");
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  // Função para alternar entre edição e exibição
+  const handleEditToggle = () => {
+    if (isEditing) {
+      updateUserProfile();
+    }
+    setIsEditing(!isEditing);
+  };
+
+  // Função para selecionar uma nova foto
+  const handleImagePick = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert(
+        "Erro",
+        "Você precisa permitir o acesso à galeria de imagens!"
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (result.canceled) {
+      console.log("Usuário cancelou a seleção da imagem.");
+      return;
+    }
+
+    const source = result.assets[0].uri;
+    setEditedUser((prevState: any) => ({ ...prevState, foto: source }));
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Carregando dados do usuário...</Text>
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text>Erro ao carregar os dados do usuário.</Text>
+      </View>
+    );
+  }
+
+  const addOneDay = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1); // Adiciona 1 dia
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+  // TRECHO API -- INICIO
 
   return (
     <View style={{ flex: 1 }}>
@@ -39,9 +217,7 @@ const ParallaxScreen: React.FC = () => {
           <ImageBackground
             source={IMAGES.IMAGES.fundo}
             style={localStyles.backgroundImage}
-          >
-            <Text style={localStyles.headerTitle}>Título</Text>
-          </ImageBackground>
+          ></ImageBackground>
         </View>
 
         <Animated.ScrollView
@@ -51,32 +227,90 @@ const ParallaxScreen: React.FC = () => {
         >
           {/* Corpo da tela com conteúdo */}
           <View style={localStyles.bodyContainer}>
-            <View>
-              {/* Imagem antes do texto */}
+            {/* Primeiro container com imagem */}
+            <View style={[localStyles.imageContainer, { height: 50 }]}>
+              {/* Imagem de Perfil */}
               <Image
-                source={IMAGES.IMAGES.loading1}
-                style={localStyles.foto} // Estilo para a imagem
+                source={{
+                  uri: editedUser.foto || "https://example.com/user-image.jpg",
+                }}
+                style={localStyles.foto}
               />
+              {isEditing && (
+                <TouchableOpacity
+                  style={styles.buttonPrimary}
+                  onPress={handleImagePick}
+                >
+                  <Text style={styles.buttonPrimaryText}>
+                    Selecionar nova foto
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {/* Apelido (não editável) */}
+              <Text style={localStyles.headerTitle}>{user.apelido}</Text>
             </View>
-            <View>
-              <Text style={localStyles.content}>
-                Este é um exemplo de tela com efeito Parallax no React Native.
-                Ao rolar, o fundo se move mais lentamente que o primeiro plano,
-                criando um efeito de profundidade.
-                {"\n\n"}
-                Este{"\n\n"} é{"\n\n"} um{"\n\n"} exemplo{"\n\n"} de{"\n\n"}{" "}
-                tela
-                {"\n\n"} com{"\n\n"} efeito{"\n\n"} Parallax{"\n\n"} no{"\n\n"}{" "}
-                React{"\n\n"} Native.{"\n\n"} Ao{"\n\n"}
-                rolar,{"\n\n"} o{"\n\n"} fundo{"\n\n"} se{"\n\n"} move{"\n\n"}{" "}
-                mais
-                {"\n\n"} lentamente{"\n\n"} que{"\n\n"} o{"\n\n"} primeiro
-                {"\n\n"} plano,{"\n\n"} criando um{"\n\n"} efeito{"\n\n"} de
-                {"\n\n"} profundidade.
-                {"\n\n"}
-                Adicione mais conteúdo aqui para testar a rolagem e o efeito
-                parallax...
-              </Text>
+
+            {/* Segundo container com conteúdo, ajustando o topo para começar após a imagem */}
+            <View style={[localStyles.textContainer, { marginTop: 25 }]}>
+              {/* Nome */}
+              <Text style={localStyles.label}>Nome:</Text>
+              {isEditing ? (
+                <TextInput
+                  style={localStyles.userInfoTextEditable}
+                  value={editedUser.nome}
+                  onChangeText={(text) =>
+                    setEditedUser((prevState: any) => ({
+                      ...prevState,
+                      nome: text,
+                    }))
+                  }
+                />
+              ) : (
+                <Text style={localStyles.userInfoText}>{user.nome}</Text>
+              )}
+
+              {/* Email */}
+              <Text style={localStyles.label}>Email:</Text>
+              {isEditing ? (
+                <TextInput
+                  style={localStyles.userInfoTextEditable}
+                  value={editedUser.email}
+                  onChangeText={(text) =>
+                    setEditedUser((prevState: any) => ({
+                      ...prevState,
+                      email: text,
+                    }))
+                  }
+                />
+              ) : (
+                <Text style={localStyles.userInfoText}>{user.email}</Text>
+              )}
+
+              {/* Data de Nascimento */}
+              <Text style={localStyles.label}>Data de Nascimento:</Text>
+              {isEditing ? (
+                <TextInput
+                  style={localStyles.userInfoTextEditable}
+                  value={addOneDay(editedUser.nascimento)}
+                />
+              ) : (
+                <Text style={localStyles.userInfoText}>
+                  {addOneDay(user.nascimento)}
+                </Text>
+              )}
+
+              {/* Botão de Editar/Salvar */}
+              <TouchableOpacity
+                style={styles.buttonPrimary}
+                onPress={handleEditToggle}
+              >
+                <Text style={styles.buttonPrimaryText}>
+                  {isEditing ? "Salvar" : "Editar Perfil"}
+                </Text>
+              </TouchableOpacity>
+
+              <Text style={localStyles.content}>Demais informações...</Text>
             </View>
           </View>
         </Animated.ScrollView>
@@ -88,7 +322,7 @@ const ParallaxScreen: React.FC = () => {
 const localStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Theme.light.background,
   },
   backgroundImage: {
     flex: 1, // Faz a imagem ocupar toda a área disponível
@@ -97,19 +331,6 @@ const localStyles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     height: "100%",
-  },
-  foto: {
-    width: 150, // Largura da imagem
-    height: 150, // Altere para metade da altura do cabeçalho (200 / 2)
-    borderWidth: 2, // Largura da borda
-    borderColor: "#333", // Cor da borda
-    borderRadius: 15, // Raio de arredondamento dos cantos
-    alignSelf: "flex-start", // Alinha a imagem à esquerda
-    marginLeft: 15, // Afasta a imagem 15 unidades da borda esquerda
-    marginBottom: 16, // Espaço abaixo da imagem
-    backgroundColor: "white", // Cor de fundo da imagem
-    position: "absolute", // Permite o posicionamento absoluto
-    top: -75, // Move a imagem para cima, para que ocupe parte do cabeçalho
   },
   header: {
     position: "absolute",
@@ -124,20 +345,62 @@ const localStyles = StyleSheet.create({
     fontSize: 30, // Aumenta o tamanho do texto
     fontWeight: "bold",
     color: "#333",
-    marginTop: 90, // Adiciona espaço acima do texto
+    marginLeft: 180, // Margem esquerda ajustada
   },
   scrollContent: {
     paddingTop: 200, // Espaço para exibir o cabeçalho
   },
   bodyContainer: {
-    backgroundColor: Theme.light.background,
     flex: 1,
     padding: 16,
+  },
+  imageContainer: {
+    flexDirection: "row", // Adiciona flexDirection para alinhar imagem e texto na horizontal
+    alignItems: "center", // Centraliza verticalmente o conteúdo
+  },
+  foto: {
+    width: 150,
+    height: 150,
+    borderWidth: 5,
+    borderColor: "#333",
+    borderRadius: 15,
+    marginLeft: 15,
+    marginBottom: 16,
+    backgroundColor: "white",
+    position: "absolute",
+    top: -90,
+  },
+  textContainer: {
+    paddingLeft: 16,
+    flex: 1, // Permite que o container ocupe o espaço restante
   },
   content: {
     fontSize: 16,
     color: "#555",
   },
+  label: {
+    fontSize: 18,
+    color: Theme.light.text,
+    alignSelf: "flex-start",
+    marginLeft: "10%",
+    marginBottom: 8,
+  },
+  userInfoText: {
+    fontSize: 16,
+    color: Theme.light.text,
+    marginBottom: 20,
+    alignSelf: "flex-start",
+    marginLeft: "10%",
+  },
+  userInfoTextEditable: {
+    fontSize: 16,
+    color: Theme.light.text,
+    marginBottom: 20,
+    alignSelf: "flex-start",
+    marginLeft: "10%",
+    borderBottomWidth: 1,
+    borderBottomColor: Theme.light.text,
+  },
 });
 
-export default ParallaxScreen;
+export default UserProfile;

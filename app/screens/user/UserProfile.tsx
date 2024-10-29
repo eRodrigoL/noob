@@ -12,7 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens
 import styles from "@styles/Default";
-import { TextInputMask } from 'react-native-masked-text';
+import { TextInputMask } from "react-native-masked-text";
 import { Theme } from "@/app/styles/Theme";
 
 const UserProfile = () => {
@@ -72,27 +72,27 @@ const UserProfile = () => {
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data', // Certifique-se de que o tipo de conteúdo seja multipart/form-data
+          "Content-Type": "multipart/form-data", // Certifique-se de que o tipo de conteúdo seja multipart/form-data
         },
       };
 
       // Usando FormData para envio de arquivos e outros dados
       const formData = new FormData();
-      formData.append('nome', editedUser.nome);
-      formData.append('email', editedUser.email);
-      formData.append('nascimento', editedUser.nascimento);
+      formData.append("nome", editedUser.nome);
+      formData.append("email", editedUser.email);
+      formData.append("nascimento", editedUser.nascimento);
 
       if (editedUser.foto) {
         const localUri = editedUser.foto;
-        const filename = localUri.split('/').pop(); // Extrai o nome do arquivo
-        const match = /\.(\w+)$/.exec(filename ?? ''); // Obtém a extensão do arquivo
+        const filename = localUri.split("/").pop(); // Extrai o nome do arquivo
+        const match = /\.(\w+)$/.exec(filename ?? ""); // Obtém a extensão do arquivo
         const fileType = match ? `image/${match[1]}` : `image`; // Define o tipo de arquivo
-        
-        formData.append('foto', {
-          uri: localUri,          // URI da imagem selecionada
-          name: filename ?? 'profile.jpg',  // Nome do arquivo
-          type: fileType,         // Tipo do arquivo (ajustado dinamicamente)
-        }as any);
+
+        formData.append("foto", {
+          uri: localUri, // URI da imagem selecionada
+          name: filename ?? "profile.jpg", // Nome do arquivo
+          type: fileType, // Tipo do arquivo (ajustado dinamicamente)
+        } as any);
       }
 
       const response = await axios.put(
@@ -131,10 +131,14 @@ const UserProfile = () => {
 
   // Função para selecionar uma nova foto
   const handleImagePick = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (permissionResult.granted === false) {
-      Alert.alert("Erro", "Você precisa permitir o acesso à galeria de imagens!");
+      Alert.alert(
+        "Erro",
+        "Você precisa permitir o acesso à galeria de imagens!"
+      );
       return;
     }
 
@@ -188,11 +192,16 @@ const UserProfile = () => {
       <Text style={localStyles.label}>Foto:</Text>
       <View style={localStyles.profileImageContainer}>
         <Image
-          source={{ uri: editedUser.foto || "https://example.com/user-image.jpg" }}
+          source={{
+            uri: editedUser.foto || "https://example.com/user-image.jpg",
+          }}
           style={localStyles.profileImage}
         />
         {isEditing && (
-          <TouchableOpacity style={styles.buttonPrimary} onPress={handleImagePick}>
+          <TouchableOpacity
+            style={styles.buttonPrimary}
+            onPress={handleImagePick}
+          >
             <Text style={styles.buttonPrimaryText}>Selecionar nova foto</Text>
           </TouchableOpacity>
         )}
@@ -230,15 +239,12 @@ const UserProfile = () => {
         <Text style={localStyles.userInfoText}>{user.email}</Text>
       )}
 
-      
-
       {/* Data de Nascimento */}
       <Text style={localStyles.label}>Data de Nascimento:</Text>
       {isEditing ? (
         <TextInput
           style={localStyles.userInfoTextEditable}
-            value={addOneDay(editedUser.nascimento)} 
-            
+          value={addOneDay(editedUser.nascimento)}
         />
       ) : (
         <Text style={localStyles.userInfoText}>
@@ -293,11 +299,3 @@ const localStyles = StyleSheet.create({
 });
 
 export default UserProfile;
-
-
-
-
-
-
-
-
