@@ -7,11 +7,16 @@ const IMAGES = {
   loading1: require("../../assets/images/1.gif"),
   loading2: require("../../assets/images/2.gif"),
   loading3: require("../../assets/images/3.gif"),
+  fundo: require("../../assets/images/Plano de fundo.jpg"),
 };
 
 // Definição de rotas do aplicativo, organizadas por seções
 const SCREENS = {
   testeDeRota: require("../"), // Rota de teste <{só para testar caminhos}>
+
+  teste: (router: Router) => {
+    router.push("/screens/user/Teste2"); // Direciona para a tela de login
+  },
 
   user: {
     // Rota para login do usuário

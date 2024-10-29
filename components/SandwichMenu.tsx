@@ -62,6 +62,10 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
     SCREENS.SCREENS.boardgame.list(router);
   };
 
+  const goToTeste = () => {
+    SCREENS.SCREENS.teste(router);
+  };
+
   return (
     <Modal
       animationType="none"
@@ -83,6 +87,7 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
                 <ButtonPrimary title="Perfil" onPress={() => goToUser()} />
                 <ButtonPrimary title="Inicio" onPress={() => goToList()} />
                 <ButtonPrimary title="Jogar" onPress={() => {}} />
+                <ButtonPrimary title="Teste" onPress={() => goToTeste()} />
               </View>
             </Animated.View>
           </TouchableWithoutFeedback>
