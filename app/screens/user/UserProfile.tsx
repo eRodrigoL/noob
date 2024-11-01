@@ -210,7 +210,7 @@ const UserProfile: React.FC = () => {
   return (
     <View style={{ flex: 1 }}>
       {/* Exibe o cabeçalho com título */}
-      <Header title="Cadastro de usuário" />
+      <Header title="Perfil" />
       <View style={localStyles.container}>
         {/* Cabeçalho fixo */}
         <View style={localStyles.header}>
@@ -310,7 +310,9 @@ const UserProfile: React.FC = () => {
                 </Text>
               </TouchableOpacity>
 
-              <Text style={localStyles.content}>Demais informações...</Text>
+              <Text style={localStyles.content}>
+                Demais informações...{"\n\n"}
+              </Text>
             </View>
           </View>
         </Animated.ScrollView>

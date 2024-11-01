@@ -99,7 +99,7 @@ export default function List() {
   return (
     <View style={{ flex: 1 }}>
       {/* Exibe o cabeçalho com título */}
-      <Header title="Cadastro de usuário" />
+      <Header title="Jogos" />
       <SearchBar
         placeholder="Pesquisar jogos..."
         value={searchQuery}

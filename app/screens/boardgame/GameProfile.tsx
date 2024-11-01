@@ -210,7 +210,7 @@ const UserProfile: React.FC = () => {
   return (
     <View style={{ flex: 1 }}>
       {/* Exibe o cabeçalho com título */}
-      <Header title="Cadastro de usuário" />
+      <Header title="Perfil" />
       <View style={localStyles.container}>
         {/* Cabeçalho fixo */}
         <View style={localStyles.header}>
@@ -310,7 +310,9 @@ const UserProfile: React.FC = () => {
                 </Text>
               </TouchableOpacity>
 
-              <Text style={localStyles.content}>Demais informações...</Text>
+              <Text style={localStyles.content}>
+                Demais informações...{"\n\n"}
+              </Text>
             </View>
           </View>
         </Animated.ScrollView>
@@ -353,6 +355,7 @@ const localStyles = StyleSheet.create({
   bodyContainer: {
     flex: 1,
     padding: 16,
+    backgroundColor: Theme.light.background,
   },
   imageContainer: {
     flexDirection: "row", // Adiciona flexDirection para alinhar imagem e texto na horizontal

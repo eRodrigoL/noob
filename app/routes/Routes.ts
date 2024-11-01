@@ -1,4 +1,4 @@
-import { Router } from "expo-router"; // Importa o Router para gerenciar as rotas do aplicativo
+import { router, Router } from "expo-router"; // Importa o Router para gerenciar as rotas do aplicativo
 
 // Definição de constantes com imagens que serão usadas em diversas telas
 const IMAGES = {
@@ -15,7 +15,9 @@ const SCREENS = {
   testeDeRota: require("../"), // Rota de teste <{só para testar caminhos}>
 
   teste: (router: Router) => {
-    router.push("/screens/user/Teste2"); // Direciona para a tela de login
+    router.push("/screens/matches/MatchFinish"); // Direciona para a tela de login
+    // router.push("/TESTE");
+    // router.push("/screens/matches/MatchFinish");
   },
 
   user: {
@@ -41,6 +43,12 @@ const SCREENS = {
     // Rota para o cadastro de novos jogos de tabuleiro
     register: (router: Router) => {
       router.push("/screens/boardgame/RegisterGame"); // Direciona para a tela de registro de jogos
+    },
+  },
+
+  matches: {
+    play: (router: Router) => {
+      router.push("/screens/matches/MatchStart");
     },
   },
 };
