@@ -15,7 +15,7 @@ import { TextInputMask } from "react-native-masked-text";
 import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
-import SCREENS from "@routes/Routes";
+import { screens } from "@routes/Routes";
 
 const RegisterUser: React.FC = () => {
   const [nome, setNome] = useState("");
@@ -50,7 +50,8 @@ const RegisterUser: React.FC = () => {
   };
 
   const isPasswordStrong = (password: string) => {
-    const strongPasswordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const strongPasswordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return strongPasswordRegex.test(password);
   };
 
@@ -114,12 +115,12 @@ const RegisterUser: React.FC = () => {
           },
         }
       );
-//
+      //
       if (response.status === 201) {
         const message = response.data.message;
         Alert.alert("Sucesso", message);
 
-        SCREENS.SCREENS.user.login(router);
+        screens.user.login();
       }
     } catch (error: any) {
       if (error.response && error.response.status === 401) {
@@ -148,9 +149,7 @@ const RegisterUser: React.FC = () => {
             {imageUri ? (
               <Image source={{ uri: imageUri }} style={styles.profileImage} />
             ) : (
-              <Text style={styles.profileImagePlaceholder}>
-                Adicionar Foto
-              </Text>
+              <Text style={styles.profileImagePlaceholder}>Adicionar Foto</Text>
             )}
           </TouchableOpacity>
           {/* Botão para selecionar capa */}
@@ -161,9 +160,7 @@ const RegisterUser: React.FC = () => {
             {capaUri ? (
               <Image source={{ uri: capaUri }} style={styles.profileImage} />
             ) : (
-              <Text style={styles.profileImagePlaceholder}>
-                Adicionar Capa
-              </Text>
+              <Text style={styles.profileImagePlaceholder}>Adicionar Capa</Text>
             )}
           </TouchableOpacity>
           <TextInput
@@ -178,7 +175,7 @@ const RegisterUser: React.FC = () => {
             value={apelido}
             onChangeText={setApelido}
           />
-        <TextInputMask
+          <TextInputMask
             style={styles.input}
             type={"datetime"}
             options={{

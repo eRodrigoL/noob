@@ -1,7 +1,7 @@
-import { router, Router } from "expo-router"; // Importa o Router para gerenciar as rotas do aplicativo
+import { router } from "expo-router"; // Importa o Router para gerenciar as rotas do aplicativo
 
 // Definição de constantes com imagens que serão usadas em diversas telas
-const IMAGES = {
+const images = {
   unavailable: require("../../assets/images/Unavailable.png"),
   loading: require("../../assets/images/Loading.gif"),
   loading1: require("../../assets/images/1.gif"),
@@ -11,47 +11,38 @@ const IMAGES = {
 };
 
 // Definição de rotas do aplicativo, organizadas por seções
-const SCREENS = {
-  testeDeRota: require("../"), // Rota de teste <{só para testar caminhos}>
+const screens = {
+  testeDeRota: "/",
 
-  teste: (router: Router) => {
-    router.push("/screens/matches/MatchFinish"); // Direciona para a tela de login
-    // router.push("/TESTE");
-    // router.push("/screens/matches/MatchFinish");
-  },
+  teste: () => router.push("./"),
 
   user: {
     // Rota para login do usuário
-    login: (router: Router) => {
-      router.push("/screens/user/Login"); // Direciona para a tela de login
-    },
+    login: () => router.push("/screens/user/Login"),
+
     // Rota para registro de um novo usuário
-    register: (router: Router) => {
-      router.push("/screens/user/RegisterUser"); // Direciona para a tela de registro de usuário
-    },
+    register: () => router.push("/screens/user/RegisterUser"),
+
     // Rota para o perfil do usuário
-    user: (router: Router) => {
-      router.push("/screens/user/UserProfile"); // Direciona para a tela de perfil do usuário
-    },
+    userProfile: () => router.push("/screens/user/UserProfile"),
   },
 
   boardgame: {
     // Rota para a lista de jogos de tabuleiro
-    list: (router: Router) => {
-      router.push("/screens/boardgame/List"); // Direciona para a tela de listagem de jogos
-    },
+    list: () => router.push("/screens/boardgame/List"),
+
     // Rota para o cadastro de novos jogos de tabuleiro
-    register: (router: Router) => {
-      router.push("/screens/boardgame/RegisterGame"); // Direciona para a tela de registro de jogos
-    },
+    register: () => router.push("/screens/boardgame/RegisterGame"),
+
+    // Rota para o perfil dos jogos
+    gameProfile: () => router.push("/screens/boardgame/GameProfile"),
   },
 
   matches: {
-    play: (router: Router) => {
-      router.push("/screens/matches/MatchStart");
-    },
+    play: () => router.push("/screens/matches/MatchStart"),
+    finish: () => router.push("/screens/matches/MatchFinish"),
   },
 };
 
 // Exporta as constantes IMAGES e SCREENS para serem usadas em outras partes do aplicativo
-export default { IMAGES, SCREENS };
+export { images, screens };

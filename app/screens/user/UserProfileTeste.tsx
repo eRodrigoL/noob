@@ -12,7 +12,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import IMAGES from "@routes/Routes";
+import { images } from "@routes/Routes";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
 
@@ -37,7 +37,7 @@ const ParallaxScreen: React.FC = () => {
         {/* Cabeçalho fixo */}
         <View style={localStyles.header}>
           <ImageBackground
-            source={IMAGES.IMAGES.fundo}
+            source={images.fundo}
             style={localStyles.backgroundImage}
           ></ImageBackground>
         </View>
@@ -51,7 +51,7 @@ const ParallaxScreen: React.FC = () => {
           <View style={localStyles.bodyContainer}>
             {/* Primeiro container com imagem */}
             <View style={[localStyles.imageContainer, { height: 50 }]}>
-              <Image source={IMAGES.IMAGES.loading1} style={localStyles.foto} />
+              <Image source={images.loading1} style={localStyles.foto} />
               <Text style={localStyles.headerTitle}>Título</Text>
             </View>
 

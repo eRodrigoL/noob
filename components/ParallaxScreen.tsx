@@ -5,7 +5,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import IMAGES from "@routes/Routes";
+import { images } from "@routes/Routes";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
@@ -30,7 +30,7 @@ const ParallaxScreen: React.FC = () => {
     <View style={localStyles.container}>
       {/* Imagem de fundo com efeito parallax */}
       <Animated.Image
-        source={IMAGES.IMAGES.fundo}
+        source={images.fundo}
         style={[localStyles.backgroundImage, backgroundStyle]}
         resizeMode="cover"
       />

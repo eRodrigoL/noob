@@ -8,12 +8,12 @@ import {
   TouchableOpacity, // Importa os componentes do React Native
 } from "react-native";
 import axios from "axios"; // Adiciona o axios para requisições HTTP
-import IMAGES from "@routes/Routes"; // Importa imagens de um arquivo de rotas
+import { images } from "@routes/Routes"; // Importa imagens de um arquivo de rotas
 import SearchBar from "@/components/SearchBar"; // Importa o componente de barra de pesquisa
 import { Theme } from "@/app/styles/Theme"; // Importa tema de cores
 import styles from "@/app/styles/Default"; // Importa estilos padrões
 import Header from "@/components/Header"; // Importa componente de cabeçalho
-import SCREENS from "@routes/Routes"; // Importa rotas
+import { screens } from "@routes/Routes"; // Importa rotas
 import ButtonPrimary from "@components/ButtonPrimary"; // Importa botão primário para ações
 import { useRouter } from "expo-router"; // Importa useRouter para navegação entre telas
 
@@ -32,7 +32,6 @@ export default function List() {
   const [retryCount, setRetryCount] = useState<number>(0); // Contador de tentativas de retry em caso de erro
 
   const MAX_RETRY = 10; // Define o número máximo de tentativas
-  const router = useRouter(); // Inicializa o router para navegação
 
   // Função para buscar os produtos da API com retry
   const fetchData = async () => {
@@ -75,10 +74,13 @@ export default function List() {
 
   // Função para renderizar cada item da lista
   const renderProduct = ({ item }: { item: Product }) => (
-    <View style={styles.card}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => screens.boardgame.gameProfile()}
+    >
       <Image
         source={
-          item.capa ? { uri: item.capa } : IMAGES.IMAGES.unavailable // Usa a imagem de capa ou uma imagem de "indisponível"
+          item.capa ? { uri: item.capa } : images.unavailable // Usa a imagem de capa ou uma imagem de "indisponível"
         }
         style={localStyles.image}
       />
@@ -88,13 +90,8 @@ export default function List() {
       </Text>
       {/* Exibe a nota do jogo */}
       <Text style={localStyles.productRating}>{item.rating}</Text>
-    </View>
+    </TouchableOpacity>
   );
-
-  // Função para navegação ao clicar no botão "Adicionar"
-  const goToRegisterGame = () => {
-    SCREENS.SCREENS.boardgame.register(router); // Navega para a tela de cadastro de jogo
-  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -109,7 +106,7 @@ export default function List() {
         // Exibe a imagem de carregamento enquanto os dados estão sendo carregados
         <View style={localStyles.loadingContainer}>
           <Image
-            source={IMAGES.IMAGES.loading} // Imagem de carregamento
+            source={images.loading} // Imagem de carregamento
             style={localStyles.loadingImage}
           />
           <Text>Carregando jogos...</Text>
@@ -131,7 +128,10 @@ export default function List() {
             Jogo não encontrado. Deseja adicioná-lo?
           </Text>
           {/* Botão para adicionar novo jogo */}
-          <ButtonPrimary title="Adicionar" onPress={goToRegisterGame} />
+          <ButtonPrimary
+            title="Adicionar"
+            onPress={screens.boardgame.register}
+          />
         </View>
       )}
     </View>

@@ -3,14 +3,12 @@ import { useRouter } from "expo-router";
 import {
   Modal,
   View,
-  Text,
-  TouchableOpacity,
   StyleSheet,
   Animated,
   Dimensions,
   TouchableWithoutFeedback,
 } from "react-native";
-import SCREENS from "@routes/Routes";
+import { screens } from "@/app/routes/Routes";
 import ButtonPrimary from "./ButtonPrimary";
 import { Theme } from "@styles/Theme"; // Importa o Theme com as cores
 
@@ -48,28 +46,6 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
     }).start(() => onClose());
   };
 
-  const router = useRouter();
-
-  const goToLogin = () => {
-    SCREENS.SCREENS.user.login(router);
-  };
-
-  const goToUser = () => {
-    SCREENS.SCREENS.user.user(router);
-  };
-
-  const goToList = () => {
-    SCREENS.SCREENS.boardgame.list(router);
-  };
-
-  const goToPlay = () => {
-    SCREENS.SCREENS.matches.play(router);
-  };
-
-  const goToTeste = () => {
-    SCREENS.SCREENS.teste(router);
-  };
-
   return (
     <Modal
       animationType="none"
@@ -87,11 +63,23 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
               ]}
             >
               <View style={styles.buttonContainer}>
-                <ButtonPrimary title="Login" onPress={() => goToLogin()} />
-                <ButtonPrimary title="Perfil" onPress={() => goToUser()} />
-                <ButtonPrimary title="Inicio" onPress={() => goToList()} />
-                <ButtonPrimary title="Jogar" onPress={() => goToPlay()} />
-                <ButtonPrimary title="Teste" onPress={() => goToTeste()} />
+                <ButtonPrimary
+                  title="Login"
+                  onPress={() => screens.user.login()}
+                />
+                <ButtonPrimary
+                  title="Perfil"
+                  onPress={() => screens.user.userProfile()}
+                />
+                <ButtonPrimary
+                  title="Início"
+                  onPress={() => screens.boardgame.list()}
+                />
+                <ButtonPrimary
+                  title="Jogar"
+                  onPress={() => screens.matches.play()}
+                />
+                <ButtonPrimary title="Teste" onPress={() => screens.teste()} />
               </View>
             </Animated.View>
           </TouchableWithoutFeedback>

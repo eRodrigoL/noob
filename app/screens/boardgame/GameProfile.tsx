@@ -20,7 +20,7 @@ import axios from "axios";
 import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens
 import styles from "@styles/Default";
 import { TextInputMask } from "react-native-masked-text";
-import IMAGES from "@routes/Routes";
+import { images } from "@routes/Routes";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
 
@@ -215,7 +215,7 @@ const UserProfile: React.FC = () => {
         {/* Cabeçalho fixo */}
         <View style={localStyles.header}>
           <ImageBackground
-            source={IMAGES.IMAGES.fundo}
+            source={images.fundo}
             style={localStyles.backgroundImage}
           ></ImageBackground>
         </View>

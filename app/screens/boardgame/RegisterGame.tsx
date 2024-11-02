@@ -15,7 +15,7 @@ import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import SCREENS from "@routes/Routes";
+import { screens } from "@routes/Routes";
 
 const RegisterGame: React.FC = () => {
   // Estados para armazenar os dados do jogo

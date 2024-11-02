@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons"; // Biblioteca de ícones
 import { Theme } from "@/app/styles/Theme";
 import SandwichMenu from "./SandwichMenu";
 import { useFocusEffect } from "@react-navigation/native"; // Importa o hook de navegação
-import SCREENS from "@routes/Routes";
+import { screens } from "@routes/Routes";
 
 // Definição do componente Header que recebe o título como prop
 const Header = ({ title }: { title: string }) => {
@@ -28,11 +28,6 @@ const Header = ({ title }: { title: string }) => {
     }, [])
   );
 
-  const router = useRouter();
-  const goToPlay = () => {
-    SCREENS.SCREENS.matches.play(router);
-  };
-
   return (
     <View style={localStyles.headerContainer}>
       {/* Menu sanduíche à esquerda */}
@@ -51,7 +46,7 @@ const Header = ({ title }: { title: string }) => {
       {/* Botão de configurações à direita */}
       <TouchableOpacity
         style={localStyles.settingsButton}
-        onPress={() => goToPlay()}
+        onPress={() => screens.matches.play()}
       >
         <Text style={localStyles.text}>🎲</Text>
       </TouchableOpacity>
