@@ -34,8 +34,11 @@ const screens = {
     // Rota para o cadastro de novos jogos de tabuleiro
     register: () => router.push("/screens/boardgame/RegisterGame"),
 
+    // // Rota para o perfil dos jogos
+    // gameProfile: (id: string | number) =>
+    //   router.push(`/screens/boardgame/GameProfile?id=${id}`),
     // Rota para o perfil dos jogos
-    gameProfile: () => router.push("/screens/boardgame/GameProfile"),
+    gameProfile: (id: string | number) => router.push(`/TESTE2?id=${id}`),
   },
 
   matches: {

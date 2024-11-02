@@ -19,6 +19,7 @@ import { useRouter } from "expo-router"; // Importa useRouter para navegação e
 
 // Definição de tipos para o produto baseado na API
 interface Product {
+  id: number;
   titulo: string; // O título do jogo
   ano?: number; // O ano é opcional
   capa?: string; // A capa também é opcional
@@ -76,7 +77,7 @@ export default function List() {
   const renderProduct = ({ item }: { item: Product }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => screens.boardgame.gameProfile()}
+      onPress={() => screens.boardgame.gameProfile(item.id)} // Passa o id do item aqui
     >
       <Image
         source={
