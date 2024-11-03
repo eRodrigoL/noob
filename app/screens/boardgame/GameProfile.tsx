@@ -23,10 +23,13 @@ import { TextInputMask } from "react-native-masked-text";
 import { images } from "@routes/Routes";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
+import ApiWakeUp from "@/components/AcordarAPI";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
-const UserProfile: React.FC = () => {
+const GameProfile: React.FC = () => {
+  <ApiWakeUp />; // Mantem a API desperta
+
   // TRECHO PARA O PARALLAX -- INICIO
   const scrollY = useSharedValue(0);
 
@@ -38,6 +41,7 @@ const UserProfile: React.FC = () => {
     transform: [{ translateY: scrollY.value * 0.3 }], // Parallax mais lento para imagem de fundo
   }));
   // TREHO PARA O PARALLAX -- FIM
+
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -94,11 +98,10 @@ const UserProfile: React.FC = () => {
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data", // Certifique-se de que o tipo de conteúdo seja multipart/form-data
+          "Content-Type": "multipart/form-data",
         },
       };
 
-      // Usando FormData para envio de arquivos e outros dados
       const formData = new FormData();
       formData.append("nome", editedUser.nome);
       formData.append("email", editedUser.email);
@@ -106,27 +109,27 @@ const UserProfile: React.FC = () => {
 
       if (editedUser.foto) {
         const localUri = editedUser.foto;
-        const filename = localUri.split("/").pop(); // Extrai o nome do arquivo
-        const match = /\.(\w+)$/.exec(filename ?? ""); // Obtém a extensão do arquivo
-        const fileType = match ? `image/${match[1]}` : `image`; // Define o tipo de arquivo
+        const filename = localUri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename ?? "");
+        const fileType = match ? `image/${match[1]}` : `image`;
 
         formData.append("foto", {
-          uri: localUri, // URI da imagem selecionada
-          name: filename ?? "profile.jpg", // Nome do arquivo
-          type: fileType, // Tipo do arquivo (ajustado dinamicamente)
+          uri: localUri,
+          name: filename ?? "profile.jpg",
+          type: fileType,
         } as any);
       }
 
-      const response = await axios.put(
+      await axios.put(
         `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
-        formData, // Envia o FormData com a imagem e os outros campos
+        formData,
         config
       );
 
-      setUser(response.data);
-      setEditedUser(response.data);
-
       Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
+
+      // Recarregar os dados do usuário após a atualização
+      fetchUserData();
     } catch (error: any) {
       if (error.response) {
         console.error("Erro no servidor:", error.response.data);
@@ -406,4 +409,4 @@ const localStyles = StyleSheet.create({
   },
 });
 
-export default UserProfile;
+export default GameProfile;

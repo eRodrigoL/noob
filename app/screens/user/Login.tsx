@@ -7,8 +7,11 @@ import { screens } from "@routes/Routes";
 import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
+import ApiWakeUp from "@/components/AcordarAPI";
 
 const Login: React.FC = () => {
+  <ApiWakeUp />; // Mantem a API desperta
+
   const router = useRouter(); // Hook para manipular rotas
 
   const [apelido, setApelido] = useState(""); // Estado para armazenar o apelido do usuário

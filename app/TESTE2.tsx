@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import { Theme } from "@/app/styles/Theme";
 
@@ -17,7 +17,6 @@ interface Game {
 }
 
 export default function GameProfile() {
-  const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>(); // Define 'id' como opcional
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);

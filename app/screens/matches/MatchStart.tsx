@@ -10,8 +10,11 @@ import {
 } from "react-native";
 import styles from "@/app/styles/Default"; // Importa os estilos principais do seu projeto
 import { Theme } from "@/app/styles/Theme";
+import ApiWakeUp from "@/components/AcordarAPI";
 
 const RegistroPartidaScreen = () => {
+  <ApiWakeUp />; // Mantem a API desperta
+
   const [explicacao, setExplicacao] = useState(false);
   const [tempoExplicacao, setTempoExplicacao] = useState("");
   const [inputText, setInputText] = useState("");

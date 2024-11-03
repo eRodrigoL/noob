@@ -16,8 +16,11 @@ import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
 import { screens } from "@routes/Routes";
+import ApiWakeUp from "@/components/AcordarAPI";
 
 const RegisterUser: React.FC = () => {
+  <ApiWakeUp />; // Mantem a API desperta
+
   const [nome, setNome] = useState("");
   const [apelido, setApelido] = useState("");
   const [nascimento, setNascimento] = useState("");

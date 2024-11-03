@@ -15,10 +15,13 @@ import Animated, {
 import { images } from "@routes/Routes";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
+import ApiWakeUp from "@/components/AcordarAPI";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
 const ParallaxScreen: React.FC = () => {
+  <ApiWakeUp /> // Mantem a API desperta
+
   const scrollY = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler((event) => {

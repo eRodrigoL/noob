@@ -9,8 +9,11 @@ import {
 import { RadioButton } from "react-native-paper";
 import styles from "@/app/styles/Default";
 import { Theme } from "@/app/styles/Theme";
+import ApiWakeUp from "@/components/AcordarAPI";
 
 const RegistroPartidaScreen = () => {
+  <ApiWakeUp />; // Mantem a API desperta
+
   const [victory, setVictory] = useState("");
   const [scoreType, setScoreType] = useState("");
 

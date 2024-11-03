@@ -16,6 +16,7 @@ import Header from "@/components/Header";
 import ButtonPrimary from "@components/ButtonPrimary";
 import { useRouter } from "expo-router"; // Hook de navegação
 import { screens } from "@routes/Routes";
+import ApiWakeUp from "@/components/AcordarAPI";
 
 interface Product {
   id: number;
@@ -61,6 +62,8 @@ export default function List() {
     }
   };
 
+  <ApiWakeUp />; // Mantem a API desperta
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -72,9 +75,7 @@ export default function List() {
   const renderProduct = ({ item }: { item: Product }) => (
     <TouchableOpacity
       style={styles.card}
-     
-     onPress={() => screens.boardgame.gameProfile(item.id)} // Agora usa screens.boardgame.gameProfile
-  
+      onPress={() => screens.boardgame.gameProfile(item.id)} // Agora usa screens.boardgame.gameProfile
     >
       <Image
         source={item.capa ? { uri: item.capa } : images.unavailable}
@@ -114,7 +115,10 @@ export default function List() {
           <Text style={localStyles.noResultsText}>
             Jogo não encontrado. Deseja adicioná-lo?
           </Text>
-          <ButtonPrimary title="Adicionar" onPress={screens.boardgame.register} />
+          <ButtonPrimary
+            title="Adicionar"
+            onPress={screens.boardgame.register}
+          />
         </View>
       )}
     </View>
@@ -166,4 +170,3 @@ const localStyles = StyleSheet.create({
     textAlign: "center",
   },
 });
-
