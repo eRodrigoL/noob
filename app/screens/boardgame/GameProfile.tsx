@@ -19,11 +19,23 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens
 import styles from "@styles/Default";
-import { TextInputMask } from "react-native-masked-text";
+import { useLocalSearchParams } from "expo-router";
 import { images } from "@routes/Routes";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
 import ApiWakeUp from "@/components/AcordarAPI";
+
+// Define o tipo para os dados do jogo
+interface Game {
+  capa: string;
+  titulo: string;
+  ano: string; // Ajustado para string, conforme o modelo da API
+  idade: number;
+  designer: string;
+  artista: string;
+  editora: string;
+  descricao: string;
+}
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
@@ -42,94 +54,74 @@ const GameProfile: React.FC = () => {
   }));
   // TREHO PARA O PARALLAX -- FIM
 
-  const [user, setUser] = useState<any>(null);
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState<any>(null);
+  const [editedGame, seteditedGame] = useState<any>(null);
 
   // Função para buscar os dados do usuário
-  const fetchUserData = async () => {
+  const fetchGameData = async () => {
     try {
-      const userId = await AsyncStorage.getItem("userId");
-      const token = await AsyncStorage.getItem("token");
-
-      if (!userId || !token) {
-        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
+      if (!id) {
+        Alert.alert("Erro", "ID do jogo não encontrados.");
         return;
       }
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-
       const response = await axios.get(
-        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
-        config
+        `https://api-noob-react.onrender.com/api/jogos/${id}`
       );
 
-      setUser(response.data);
-      setEditedUser(response.data);
+      setGame(response.data);
+      seteditedGame(response.data);
     } catch (error) {
-      console.error("Erro ao buscar os dados do usuário:", error);
-      Alert.alert("Erro", "Não foi possível carregar os dados do usuário.");
+      console.error("Erro ao buscar os dados do jogo:", error);
+      Alert.alert("Erro", "Não foi possível carregar os dados do jogo.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Função para enviar os dados atualizados
-  const updateUserProfile = async () => {
-    if (!editedUser || !editedUser.nome || !editedUser.email) {
-      Alert.alert("Erro", "Nome e email são obrigatórios.");
+  // Função para enviar os dados atualizados do jogo
+  const updateGameProfile = async () => {
+    if (!editedGame || !editedGame.titulo) {
+      Alert.alert("Erro", "O nome do jogo é obrigatório.");
       return;
     }
 
     try {
-      const userId = await AsyncStorage.getItem("userId");
-      const token = await AsyncStorage.getItem("token");
-
-      if (!userId || !token) {
-        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
-        return;
-      }
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      };
-
       const formData = new FormData();
-      formData.append("nome", editedUser.nome);
-      formData.append("email", editedUser.email);
-      formData.append("nascimento", editedUser.nascimento);
+      formData.append("titulo", editedGame.titulo);
+      formData.append("ano", editedGame.ano);
+      formData.append("idade", editedGame.idade);
+      formData.append("designer", editedGame.designer);
+      formData.append("artista", editedGame.artista);
+      formData.append("editora", editedGame.editora);
+      formData.append("descricao", editedGame.descricao);
 
-      if (editedUser.foto) {
-        const localUri = editedUser.foto;
+      if (editedGame.capa) {
+        const localUri = editedGame.capa;
         const filename = localUri.split("/").pop();
         const match = /\.(\w+)$/.exec(filename ?? "");
         const fileType = match ? `image/${match[1]}` : `image`;
 
-        formData.append("foto", {
+        formData.append("capa", {
           uri: localUri,
-          name: filename ?? "profile.jpg",
+          name: filename ?? "game.jpg",
           type: fileType,
         } as any);
       }
 
+      // Faz a requisição para atualizar o jogo com o ID especificado
       await axios.put(
-        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
-        formData,
-        config
+        `https://api-noob-react.onrender.com/api/jogos/${editedGame.id}`,
+        formData
       );
 
-      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
+      Alert.alert("Sucesso", "Dados do jogo atualizados com sucesso!");
 
-      // Recarregar os dados do usuário após a atualização
-      fetchUserData();
+      // Recarregar os dados do jogo após a atualização
+      fetchGameData();
     } catch (error: any) {
       if (error.response) {
         console.error("Erro no servidor:", error.response.data);
@@ -138,23 +130,23 @@ const GameProfile: React.FC = () => {
       } else {
         console.error("Erro desconhecido:", error.message);
       }
-      Alert.alert("Erro", "Não foi possível atualizar o perfil.");
+      Alert.alert("Erro", "Não foi possível atualizar os dados do jogo.");
     }
   };
 
   useEffect(() => {
-    fetchUserData();
+    fetchGameData();
   }, []);
 
   // Função para alternar entre edição e exibição
   const handleEditToggle = () => {
     if (isEditing) {
-      updateUserProfile();
+      updateGameProfile();
     }
     setIsEditing(!isEditing);
   };
 
-  // Função para selecionar uma nova foto
+  // Função para selecionar uma nova capa
   const handleImagePick = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -180,18 +172,18 @@ const GameProfile: React.FC = () => {
     }
 
     const source = result.assets[0].uri;
-    setEditedUser((prevState: any) => ({ ...prevState, foto: source }));
+    seteditedGame((prevState: any) => ({ ...prevState, capa: source }));
   };
 
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text>Carregando dados do usuário...</Text>
+        <Text>Carregando dados do jogo...</Text>
       </View>
     );
   }
 
-  if (!user) {
+  if (!game) {
     return (
       <View style={styles.container}>
         <Text>Erro ao carregar os dados do usuário.</Text>
@@ -235,9 +227,9 @@ const GameProfile: React.FC = () => {
               {/* Imagem de Perfil */}
               <Image
                 source={{
-                  uri: editedUser.foto || "https://example.com/user-image.jpg",
+                  uri: editedGame.capa || "https://example.com/user-image.jpg",
                 }}
-                style={localStyles.foto}
+                style={localStyles.capa}
               />
               {isEditing && (
                 <TouchableOpacity
@@ -245,62 +237,113 @@ const GameProfile: React.FC = () => {
                   onPress={handleImagePick}
                 >
                   <Text style={styles.buttonPrimaryText}>
-                    Selecionar nova foto
+                    Selecionar nova capa
                   </Text>
                 </TouchableOpacity>
               )}
 
-              {/* Apelido (não editável) */}
-              <Text style={localStyles.headerTitle}>{user.apelido}</Text>
+              {/* Nome do jogo */}
+              <Text style={localStyles.headerTitle}>{game.titulo}</Text>
             </View>
 
             {/* Segundo container com conteúdo, ajustando o topo para começar após a imagem */}
             <View style={[localStyles.textContainer, { marginTop: 25 }]}>
-              {/* Nome */}
-              <Text style={localStyles.label}>Nome:</Text>
+              {/* Ano */}
+              <Text style={localStyles.label}>Ano:</Text>
               {isEditing ? (
                 <TextInput
-                  style={localStyles.userInfoTextEditable}
-                  value={editedUser.nome}
+                  style={localStyles.gameInfoTextEditable}
+                  value={editedGame.ano}
                   onChangeText={(text) =>
-                    setEditedUser((prevState: any) => ({
+                    seteditedGame((prevState: any) => ({
                       ...prevState,
-                      nome: text,
+                      ano: text,
                     }))
                   }
                 />
               ) : (
-                <Text style={localStyles.userInfoText}>{user.nome}</Text>
+                <Text style={localStyles.gameInfoText}>{game.ano}</Text>
               )}
 
-              {/* Email */}
-              <Text style={localStyles.label}>Email:</Text>
+              {/* Idade */}
+              <Text style={localStyles.label}>Idade:</Text>
               {isEditing ? (
                 <TextInput
-                  style={localStyles.userInfoTextEditable}
-                  value={editedUser.email}
+                  style={localStyles.gameInfoTextEditable}
+                  value={editedGame.idade}
                   onChangeText={(text) =>
-                    setEditedUser((prevState: any) => ({
+                    seteditedGame((prevState: any) => ({
                       ...prevState,
-                      email: text,
+                      idade: text,
                     }))
                   }
                 />
               ) : (
-                <Text style={localStyles.userInfoText}>{user.email}</Text>
+                <Text style={localStyles.gameInfoText}>{game.idade}</Text>
               )}
 
-              {/* Data de Nascimento */}
-              <Text style={localStyles.label}>Data de Nascimento:</Text>
+              {/* designer */}
+              <Text style={localStyles.label}>designer:</Text>
               {isEditing ? (
                 <TextInput
-                  style={localStyles.userInfoTextEditable}
-                  value={addOneDay(editedUser.nascimento)}
+                  style={localStyles.gameInfoTextEditable}
+                  value={addOneDay(editedGame.designer)}
                 />
               ) : (
-                <Text style={localStyles.userInfoText}>
-                  {addOneDay(user.nascimento)}
+                <Text style={localStyles.gameInfoText}>
+                  {addOneDay(game.designer)}
                 </Text>
+              )}
+
+              {/* Artista */}
+              <Text style={localStyles.label}>Artista:</Text>
+              {isEditing ? (
+                <TextInput
+                  style={localStyles.gameInfoTextEditable}
+                  value={editedGame.artista}
+                  onChangeText={(text) =>
+                    seteditedGame((prevState: any) => ({
+                      ...prevState,
+                      artista: text,
+                    }))
+                  }
+                />
+              ) : (
+                <Text style={localStyles.gameInfoText}>{game.artista}</Text>
+              )}
+
+              {/* Editora */}
+              <Text style={localStyles.label}>Editora:</Text>
+              {isEditing ? (
+                <TextInput
+                  style={localStyles.gameInfoTextEditable}
+                  value={editedGame.editora}
+                  onChangeText={(text) =>
+                    seteditedGame((prevState: any) => ({
+                      ...prevState,
+                      editora: text,
+                    }))
+                  }
+                />
+              ) : (
+                <Text style={localStyles.gameInfoText}>{game.editora}</Text>
+              )}
+
+              {/* Descrição */}
+              <Text style={localStyles.label}>Descrição:</Text>
+              {isEditing ? (
+                <TextInput
+                  style={localStyles.gameInfoTextEditable}
+                  value={editedGame.descricao}
+                  onChangeText={(text) =>
+                    seteditedGame((prevState: any) => ({
+                      ...prevState,
+                      descricao: text,
+                    }))
+                  }
+                />
+              ) : (
+                <Text style={localStyles.gameInfoText}>{game.descricao}</Text>
               )}
 
               {/* Botão de Editar/Salvar */}
@@ -312,10 +355,6 @@ const GameProfile: React.FC = () => {
                   {isEditing ? "Salvar" : "Editar Perfil"}
                 </Text>
               </TouchableOpacity>
-
-              <Text style={localStyles.content}>
-                Demais informações...{"\n\n"}
-              </Text>
             </View>
           </View>
         </Animated.ScrollView>
@@ -364,7 +403,7 @@ const localStyles = StyleSheet.create({
     flexDirection: "row", // Adiciona flexDirection para alinhar imagem e texto na horizontal
     alignItems: "center", // Centraliza verticalmente o conteúdo
   },
-  foto: {
+  capa: {
     width: 150,
     height: 150,
     borderWidth: 5,
@@ -391,14 +430,14 @@ const localStyles = StyleSheet.create({
     marginLeft: "10%",
     marginBottom: 8,
   },
-  userInfoText: {
+  gameInfoText: {
     fontSize: 16,
     color: Theme.light.text,
     marginBottom: 20,
     alignSelf: "flex-start",
     marginLeft: "10%",
   },
-  userInfoTextEditable: {
+  gameInfoTextEditable: {
     fontSize: 16,
     color: Theme.light.text,
     marginBottom: 20,

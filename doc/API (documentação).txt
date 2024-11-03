@@ -47,13 +47,13 @@ Descrição dos Campos:
 
 Link das Chamadas:
 
-|<Funções (controllers)>|<Método>|<Chamada>                                                                     |<Token>|
-|                       |        |                                                                              |       |
-|        Cadastrar jogo |   POST |           https://api-noob-react.onrender.com/api/jogos/passar dados do body |   Sim |
-|        Buscar um jogo |    GET |                           https://api-noob-react.onrender.com/api/jogos/{id} |   Não |
-| Buscar todos os jogos |    GET |                               https://api-noob-react.onrender.com/api/jogos/ |   Não |
-|          Excluir jogo | DELETE |                           https://api-noob-react.onrender.com/api/jogos/{id} |   Sim |
-|        Atualizar jogo |    PUT | https://api-noob-react.onrender.com/api/usuarios/{id} - passar dados do body |   Sim |
+|<Funções (controllers)>|<Método>|<Chamada>                                                                  |<Token>|
+|                       |        |                                                                           |       |
+|        Cadastrar jogo |   POST |        https://api-noob-react.onrender.com/api/jogos/passar dados do body |   Sim |
+|        Buscar um jogo |    GET |                        https://api-noob-react.onrender.com/api/jogos/{id} |   Não |
+| Buscar todos os jogos |    GET |                            https://api-noob-react.onrender.com/api/jogos/ |   Não |
+|          Excluir jogo | DELETE |                        https://api-noob-react.onrender.com/api/jogos/{id} |   Sim |
+|        Atualizar jogo |    PUT | https://api-noob-react.onrender.com/api/jogos/{id} - passar dados do body |   Sim |
 
 
 
