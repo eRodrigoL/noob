@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useRouter } from "expo-router";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Biblioteca de ícones
 import { Theme } from "@/app/styles/Theme";
 import SandwichMenu from "./SandwichMenu";
 import { useFocusEffect } from "@react-navigation/native"; // Importa o hook de navegação
+import { screens } from "@routes/Routes";
 
 // Definição do componente Header que recebe o título como prop
 const Header = ({ title }: { title: string }) => {
@@ -44,7 +46,7 @@ const Header = ({ title }: { title: string }) => {
       {/* Botão de configurações à direita */}
       <TouchableOpacity
         style={localStyles.settingsButton}
-        onPress={() => console.log("Configurações abertas")}
+        onPress={() => screens.matches.play()}
       >
         <Text style={localStyles.text}>🎲</Text>
       </TouchableOpacity>

@@ -3,7 +3,7 @@ import { View, Text, TextInput, Alert, TouchableOpacity } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "@styles/Default";
-import SCREENS from "@routes/Routes";
+import { screens } from "@routes/Routes";
 import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
@@ -13,11 +13,6 @@ const Login: React.FC = () => {
 
   const [apelido, setApelido] = useState(""); // Estado para armazenar o apelido do usuário
   const [senha, setSenha] = useState(""); // Estado para armazenar a senha do usuário
-
-  // Função para navegar para a tela de cadastro de usuário
-  const goToRegisterUser = () => {
-    SCREENS.SCREENS.user.register(router); // Chama a função de navegação para a tela de cadastro
-  };
 
   // Função de login, que verifica as credenciais do usuário
   const handleLogin = async () => {
@@ -47,8 +42,7 @@ const Login: React.FC = () => {
         Alert.alert("Sucesso", msg); // Exibe mensagem de sucesso
 
         // Redireciona para a tela inicial ou outra tela <{ARRUMAR: inserir tela desejada}>
-        SCREENS.SCREENS.boardgame.list(router);
-      
+        screens.boardgame.list();
       }
     } catch (error) {
       // Exibe um alerta de erro em caso de falha no login
@@ -89,7 +83,7 @@ const Login: React.FC = () => {
       {/* Texto e link para redirecionar para a tela de cadastro */}
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Text style={styles.signupText}>Ainda não tem uma conta? </Text>
-        <TouchableOpacity onPress={goToRegisterUser}>
+        <TouchableOpacity onPress={screens.user.register}>
           <Text style={styles.signupLink}> Cadastre-se</Text>
         </TouchableOpacity>
       </View>
