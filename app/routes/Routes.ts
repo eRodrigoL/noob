@@ -35,7 +35,7 @@ const screens = {
     register: () => router.push("/screens/boardgame/RegisterGame"),
 
     // Rota para o perfil dos jogos
-    gameProfile: () => router.push("/screens/boardgame/GameProfile"),
+    gameProfile: (id: string | number) => router.push(`/TESTE2?id=${id}`),
   },
 
   matches: {
