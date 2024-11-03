@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router"; // Alteração no hook para useLocalSearchParams
+import { useRouter, useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import { Theme } from "@/app/styles/Theme";
 
@@ -8,7 +8,7 @@ import { Theme } from "@/app/styles/Theme";
 interface Game {
   capa: string;
   titulo: string;
-  ano: number;
+  ano: string; // Ajustado para string, conforme o modelo da API
   idade: number;
   designer: string;
   artista: string;
@@ -24,22 +24,30 @@ export default function GameProfile() {
 
   // Função para buscar os dados completos do jogo usando o ID
   const fetchGameDetails = async () => {
-    if (!id) return; // Verifica se 'id' está presente antes de continuar
+    if (!id) {
+      console.warn("ID não fornecido!"); // Aviso para id ausente
+      return;
+    }
 
     try {
       const response = await axios.get(
-        `https://api-noob-react.onrender.com/api/jogos/${id}` // Requisição para buscar o jogo específico
+        `https://api-noob-react.onrender.com/api/jogos/${id}`
       );
-      setGame(response.data);
-      setLoading(false);
+
+      if (response.data) {
+        setGame(response.data);
+      } else {
+        console.warn("Nenhum dado encontrado para este ID.");
+      }
     } catch (error) {
       console.error("Erro ao buscar os dados do jogo:", error);
+    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchGameDetails(); // Carregar dados do jogo ao montar o componente
+    fetchGameDetails();
   }, [id]);
 
   if (loading) {
