@@ -37,6 +37,10 @@ const screens = {
     // Rota para o perfil dos jogos
     gameProfile: (id: string | number) =>
       router.push(`/screens/boardgame/GameProfile?id=${id}`),
+
+    // Rota para o avaliação dos jogos
+    rating: (id: string | number) =>
+      router.push(`/screens/boardgame/GameRating?id=${id}`),
   },
 
   matches: {

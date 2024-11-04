@@ -24,6 +24,8 @@ import { images } from "@routes/Routes";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
 import ApiWakeUp from "@/components/AcordarAPI";
+import ButtonPrimary from "@/components/ButtonPrimary";
+import { screens } from "@routes/Routes";
 
 // Define o tipo para os dados do jogo
 interface Game {
@@ -90,6 +92,21 @@ const GameProfile: React.FC = () => {
     }
 
     try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+
+      if (!userId || !token) {
+        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
+        return;
+      }
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      };
+
       const formData = new FormData();
       formData.append("titulo", editedGame.titulo);
       formData.append("ano", editedGame.ano);
@@ -115,7 +132,8 @@ const GameProfile: React.FC = () => {
       // Faz a requisição para atualizar o jogo com o ID especificado
       await axios.put(
         `https://api-noob-react.onrender.com/api/jogos/${editedGame.id}`,
-        formData
+        formData,
+        config
       );
 
       Alert.alert("Sucesso", "Dados do jogo atualizados com sucesso!");
@@ -355,6 +373,10 @@ const GameProfile: React.FC = () => {
                   {isEditing ? "Salvar" : "Editar Perfil"}
                 </Text>
               </TouchableOpacity>
+              <ButtonPrimary
+                title="Avaliar Jogo"
+                onPress={() => id && screens.boardgame.rating(id)}
+              />
             </View>
           </View>
         </Animated.ScrollView>
