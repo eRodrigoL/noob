@@ -1,73 +1,135 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
+import axios from "axios";
+import { Theme } from "@/app/styles/Theme";
 
-type Option = {
-  label: string;
-  value: string;
-};
+interface Avaliacao {
+  id: string; // ID da avaliação
+  usuario: string; // ID do usuário que fez a avaliação
+  jogo: string; // ID do jogo avaliado
+  beleza: number;
+  divertimento: number;
+  duracao: number;
+  preco: number;
+  armazenamento: number;
+  nota: number;
+}
 
-const options: Option[] = [
-  { label: "Opção 1", value: "opcao1" },
-  { label: "Opção 2", value: "opcao2" },
-  { label: "Opção 3", value: "opcao3" },
-];
+export default function AvaliacaoList() {
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-const RadioButtonGroup = () => {
-  const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  // Função para buscar as avaliações do banco de dados
+  const fetchAvaliacoes = async () => {
+    try {
+      const response = await axios.get(
+        "https://api-noob-react.onrender.com/api/avaliacoes/"
+      );
+      setAvaliacoes(response.data);
+    } catch (err) {
+      setError("Erro ao carregar as avaliações.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Selecione uma opção:</Text>
-      {options.map((option) => (
-        <TouchableOpacity
-          key={option.value}
-          style={styles.optionContainer}
-          onPress={() => setSelectedValue(option.value)}
-        >
-          <View style={styles.radioCircle}>
-            {selectedValue === option.value && (
-              <View style={styles.selectedDot} />
-            )}
-          </View>
-          <Text style={styles.optionLabel}>{option.label}</Text>
-        </TouchableOpacity>
-      ))}
+  useEffect(() => {
+    fetchAvaliacoes();
+  }, []);
+
+  // Renderiza cada avaliação na lista
+  const renderItem = ({ item }: { item: Avaliacao }) => (
+    <View style={localStyles.card}>
+      <Text style={localStyles.title}>Avaliação de ID: {item.id}</Text>
+      <Text>Beleza: {item.beleza}</Text>
+      <Text>Divertimento: {item.divertimento}</Text>
+      <Text>Duração: {item.duracao}</Text>
+      <Text>Preço: {item.preco}</Text>
+      <Text>Armazenamento: {item.armazenamento}</Text>
+      <Text>Nota Geral: {item.nota}</Text>
     </View>
   );
-};
 
-const styles = StyleSheet.create({
+  if (loading) {
+    return (
+      <View style={localStyles.loadingContainer}>
+        <ActivityIndicator size="large" color={Theme.light.background} />
+        <Text style={localStyles.loadingText}>Carregando avaliações...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={localStyles.errorContainer}>
+        <Text style={localStyles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={localStyles.container}>
+      <FlatList
+        data={avaliacoes}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => item.id || index.toString()}
+      />
+    </View>
+  );
+}
+
+// Estilos para a tela de avaliações
+const localStyles = StyleSheet.create({
   container: {
-    padding: 10,
+    flex: 1,
+    padding: 20,
+    backgroundColor: Theme.light.background,
+  },
+  card: {
+    padding: 15,
+    marginVertical: 10,
+    borderRadius: 8,
+    backgroundColor: Theme.light.backgroundCard,
+    elevation: 1, // Para Android
+    shadowColor: "#000", // Para iOS
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   title: {
-    fontSize: 16,
-    marginBottom: 10,
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5,
+    color: Theme.light.text,
   },
-  optionContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  radioCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#007AFF",
-    alignItems: "center",
+  loadingContainer: {
+    flex: 1,
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Theme.light.background,
   },
-  selectedDot: {
-    height: 10,
-    width: 10,
-    borderRadius: 5,
-    backgroundColor: "#007AFF",
+  loadingText: {
+    marginTop: 10,
+    color: Theme.light.text,
   },
-  optionLabel: {
-    marginLeft: 10,
-    fontSize: 16,
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Theme.light.background,
+  },
+  errorText: {
+    color: "#800000", // Cor vinho
   },
 });
-
-export default RadioButtonGroup;
