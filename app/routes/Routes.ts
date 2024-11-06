@@ -15,6 +15,7 @@ const screens = {
   testeDeRota: "/",
 
   teste: () => router.push("/TESTE"),
+  teste2: () => router.push("/TESTE2"),
 
   user: {
     // Rota para login do usuário
