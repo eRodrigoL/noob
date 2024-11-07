@@ -1,73 +1,186 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Switch,
+  ScrollView,
+} from "react-native";
+import styles from "@/app/styles/Default";
+import { Theme } from "@/app/styles/Theme";
+import ApiWakeUp from "@/components/AcordarAPI";
+import { screens } from "@/app/routes/Routes";
 
-type Option = {
-  label: string;
-  value: string;
-};
+const RegistroPartidaScreen = () => {
+  <ApiWakeUp />; // Mantém a API desperta
 
-const options: Option[] = [
-  { label: "Opção 1", value: "opcao1" },
-  { label: "Opção 2", value: "opcao2" },
-  { label: "Opção 3", value: "opcao3" },
-];
+  const [explicacao, setExplicacao] = useState(false);
+  const [tempoExplicacao, setTempoExplicacao] = useState("");
+  const [inputText, setInputText] = useState("");
+  const [participants, setParticipants] = useState<string[]>([]);
 
-const RadioButtonGroup = () => {
-  const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const addParticipant = () => {
+    if (inputText.trim()) {
+      setParticipants([...participants, inputText.trim()]);
+      setInputText("");
+    }
+  };
+
+  const removeParticipant = (index: number) => {
+    setParticipants(participants.filter((_, i) => i !== index));
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Selecione uma opção:</Text>
-      {options.map((option) => (
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={[styles.title, localStyles.header]}>
+          Registro de partida
+        </Text>
+
+        {/* Campo Participantes */}
+        <Text style={styles.label}>Participantes:</Text>
+        <TextInput
+          placeholder="Digite o jogador a adicionar e pressione Enter..."
+          style={[styles.input, localStyles.input]}
+          value={inputText}
+          onChangeText={setInputText}
+          onSubmitEditing={addParticipant}
+        />
         <TouchableOpacity
-          key={option.value}
-          style={styles.optionContainer}
-          onPress={() => setSelectedValue(option.value)}
+          style={localStyles.addButton}
+          onPress={addParticipant}
         >
-          <View style={styles.radioCircle}>
-            {selectedValue === option.value && (
-              <View style={styles.selectedDot} />
-            )}
-          </View>
-          <Text style={styles.optionLabel}>{option.label}</Text>
+          <Text style={localStyles.addButtonText}>Adicionar</Text>
         </TouchableOpacity>
-      ))}
-    </View>
+
+        {/* Exibição dos chips de participantes */}
+        <ScrollView horizontal style={localStyles.tagContainer}>
+          {participants.map((participant, index) => (
+            <View key={index} style={localStyles.tag}>
+              <Text style={localStyles.tagText}>{participant}</Text>
+              <TouchableOpacity onPress={() => removeParticipant(index)}>
+                <Text style={localStyles.removeButtonText}>×</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
+
+        {/* Campo Jogo */}
+        <Text style={styles.label}>Jogo:</Text>
+        <TextInput
+          placeholder="Digite o jogo a pesquisar..."
+          style={[styles.input, localStyles.input]}
+        />
+
+        {/* Explicação das Regras */}
+        <View style={localStyles.explicacaoContainer}>
+          <Switch
+            value={explicacao}
+            onValueChange={setExplicacao}
+            style={localStyles.switch}
+          />
+          <Text style={localStyles.switchLabel}>não houve</Text>
+          <Text style={styles.label}>Tempo de explicação:</Text>
+          <TextInput
+            placeholder="Minutos"
+            style={[styles.input, localStyles.inputTime]}
+            value={tempoExplicacao}
+            onChangeText={setTempoExplicacao}
+            editable={!explicacao}
+          />
+        </View>
+
+        {/* Horário de Início */}
+        <Text style={styles.label}>Início da partida:</Text>
+        <TextInput
+          placeholder="18:30"
+          style={[styles.input, localStyles.input]}
+        />
+
+        {/* Botão Registrar */}
+        <TouchableOpacity
+          style={styles.buttonPrimary}
+          onPress={screens.boardgame.list}
+        >
+          <Text style={styles.buttonPrimaryText}>Finalizar</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 10,
+const localStyles = StyleSheet.create({
+  header: {
+    color: Theme.light.backgroundButton,
+    textAlign: "center",
   },
-  title: {
-    fontSize: 16,
+  input: {
+    backgroundColor: Theme.light.backgroundCard,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  addButton: {
+    backgroundColor: Theme.light.secondary.background,
+    padding: 8,
+    borderRadius: 8,
+    alignItems: "center",
     marginBottom: 10,
   },
-  optionContainer: {
+  addButtonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  tagContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 20,
+  },
+  tag: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    backgroundColor: Theme.light.secondary.backgroundButton,
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginRight: 5,
+    marginBottom: 5,
   },
-  radioCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#007AFF",
+  tagText: {
+    color: Theme.light.textButton,
+    marginRight: 8,
+  },
+  removeButtonText: {
+    color: Theme.light.textButton,
+    fontWeight: "bold",
+  },
+  explicacaoContainer: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+    paddingHorizontal: 5,
   },
-  selectedDot: {
-    height: 10,
-    width: 10,
-    borderRadius: 5,
-    backgroundColor: "#007AFF",
+  switch: {
+    transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
+    marginRight: 10,
   },
-  optionLabel: {
-    marginLeft: 10,
+  switchLabel: {
     fontSize: 16,
+    color: Theme.light.textButton,
+  },
+  inputTime: {
+    backgroundColor: Theme.light.backgroundCard,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    width: 100,
+    textAlign: "center",
   },
 });
 
-export default RadioButtonGroup;
+export default RegistroPartidaScreen;

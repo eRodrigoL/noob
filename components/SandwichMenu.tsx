@@ -80,7 +80,10 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
                   onPress={() => screens.matches.play()}
                 />
                 <ButtonPrimary title="Teste" onPress={() => screens.teste()} />
-                <ButtonPrimary title="Teste" onPress={() => screens.teste2()} />
+                <ButtonPrimary
+                  title="Teste 2"
+                  onPress={() => screens.teste2()}
+                />
               </View>
             </Animated.View>
           </TouchableWithoutFeedback>

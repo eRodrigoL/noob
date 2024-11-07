@@ -10,12 +10,9 @@ import {
 import { RadioButton } from "react-native-paper";
 import styles from "@/app/styles/Default";
 import { Theme } from "@/app/styles/Theme";
-import ApiWakeUp from "@/components/AcordarAPI";
 import { screens } from "@/app/routes/Routes";
 
 const RegistroPartidaScreen = () => {
-  <ApiWakeUp />; // Mantem a API desperta
-
   const [victory, setVictory] = useState("");
   const [scoreType, setScoreType] = useState("");
 
@@ -88,7 +85,15 @@ const RegistroPartidaScreen = () => {
           style={styles.buttonPrimary}
           onPress={screens.boardgame.list}
         >
-          <Text style={styles.buttonPrimaryText}>Finalizar</Text>
+          <Text style={styles.buttonPrimaryText}>Finalizar partida</Text>
+        </TouchableOpacity>
+
+        {/* Botão Registrar */}
+        <TouchableOpacity
+          style={styles.buttonPrimary}
+          onPress={screens.boardgame.list}
+        >
+          <Text style={styles.buttonPrimaryText}>Finalizar depois</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
