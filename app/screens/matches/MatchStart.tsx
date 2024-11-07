@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,8 @@ import styles from "@/app/styles/Default";
 import { Theme } from "@/app/styles/Theme";
 import ApiWakeUp from "@/components/AcordarAPI";
 import { screens } from "@/app/routes/Routes";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const RegistroPartidaScreen = () => {
   <ApiWakeUp />; // Mantém a API desperta
@@ -20,11 +22,44 @@ const RegistroPartidaScreen = () => {
   const [tempoExplicacao, setTempoExplicacao] = useState("");
   const [inputText, setInputText] = useState("");
   const [participants, setParticipants] = useState<string[]>([]);
+  const [validNicknames, setValidNicknames] = useState<string[]>([]);
+
+  // Buscar apelidos válidos na API ao carregar o componente
+  useEffect(() => {
+    const fetchNicknames = async () => {
+      try {
+
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+
+      
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      };
+
+        const response = await axios.get("https://api-noob-react.onrender.com/api/usuarios",config);
+        const nicknames = response.data.map((usuario: any) => usuario.apelido);
+        setValidNicknames(nicknames);
+      } catch (error) {
+        console.error("Erro ao buscar apelidos:", error);
+      }
+    };
+
+    fetchNicknames();
+  }, []);
 
   const addParticipant = () => {
     if (inputText.trim()) {
-      setParticipants([...participants, inputText.trim()]);
-      setInputText("");
+      // Verifica se o apelido inserido está na lista de apelidos válidos
+      if (validNicknames.includes(inputText.trim())) {
+        setParticipants([...participants, inputText.trim()]);
+        setInputText("");
+      } else {
+        alert("Apelido não encontrado. Por favor, insira um apelido válido.");
+      }
     }
   };
 
@@ -184,4 +219,3 @@ const localStyles = StyleSheet.create({
 });
 
 export default RegistroPartidaScreen;
-
