@@ -8,12 +8,13 @@ import {
   Switch,
   ScrollView,
 } from "react-native";
-import styles from "@/app/styles/Default"; // Importa os estilos principais do seu projeto
+import styles from "@/app/styles/Default";
 import { Theme } from "@/app/styles/Theme";
 import ApiWakeUp from "@/components/AcordarAPI";
+import { screens } from "@/app/routes/Routes";
 
 const RegistroPartidaScreen = () => {
-  <ApiWakeUp />; // Mantem a API desperta
+  <ApiWakeUp />; // Mantém a API desperta
 
   const [explicacao, setExplicacao] = useState(false);
   const [tempoExplicacao, setTempoExplicacao] = useState("");
@@ -32,73 +33,81 @@ const RegistroPartidaScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.title, localStyles.header]}>
-        Registro de partida
-      </Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={[styles.title, localStyles.header]}>
+          Registro de partida
+        </Text>
 
-      {/* Campo Participantes */}
-      <Text style={styles.label}>Participantes:</Text>
-      <TextInput
-        placeholder="Digite o jogador a adicionar e pressione Enter..."
-        style={[styles.input, localStyles.input]}
-        value={inputText}
-        onChangeText={setInputText}
-        onSubmitEditing={addParticipant} // Adiciona o participante ao pressionar Enter
-      />
-      <TouchableOpacity style={localStyles.addButton} onPress={addParticipant}>
-        <Text style={localStyles.addButtonText}>Adicionar</Text>
-      </TouchableOpacity>
-
-      {/* Exibição dos chips de participantes */}
-      <ScrollView horizontal style={localStyles.tagContainer}>
-        {participants.map((participant, index) => (
-          <View key={index} style={localStyles.tag}>
-            <Text style={localStyles.tagText}>{participant}</Text>
-            <TouchableOpacity onPress={() => removeParticipant(index)}>
-              <Text style={localStyles.removeButtonText}>×</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </ScrollView>
-
-      {/* Campo Jogo */}
-      <Text style={styles.label}>Jogo:</Text>
-      <TextInput
-        placeholder="Digite o jogo a pesquisar..."
-        style={[styles.input, localStyles.input]}
-      />
-
-      {/* Explicação das Regras */}
-      <View style={localStyles.explicacaoContainer}>
-        <Switch
-          value={explicacao}
-          onValueChange={setExplicacao}
-          style={localStyles.switch}
-        />
-        <Text style={localStyles.switchLabel}>não houve</Text>
-        <Text style={styles.label}>Tempo de explicação:</Text>
+        {/* Campo Participantes */}
+        <Text style={styles.label}>Participantes:</Text>
         <TextInput
-          placeholder="Minutos"
-          style={[styles.input, localStyles.inputTime]}
-          value={tempoExplicacao}
-          onChangeText={setTempoExplicacao}
-          editable={!explicacao}
+          placeholder="Digite o jogador a adicionar e pressione Enter..."
+          style={[styles.input, localStyles.input]}
+          value={inputText}
+          onChangeText={setInputText}
+          onSubmitEditing={addParticipant}
         />
+        <TouchableOpacity
+          style={localStyles.addButton}
+          onPress={addParticipant}
+        >
+          <Text style={localStyles.addButtonText}>Adicionar</Text>
+        </TouchableOpacity>
+
+        {/* Exibição dos chips de participantes */}
+        <ScrollView horizontal style={localStyles.tagContainer}>
+          {participants.map((participant, index) => (
+            <View key={index} style={localStyles.tag}>
+              <Text style={localStyles.tagText}>{participant}</Text>
+              <TouchableOpacity onPress={() => removeParticipant(index)}>
+                <Text style={localStyles.removeButtonText}>×</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
+
+        {/* Campo Jogo */}
+        <Text style={styles.label}>Jogo:</Text>
+        <TextInput
+          placeholder="Digite o jogo a pesquisar..."
+          style={[styles.input, localStyles.input]}
+        />
+
+        {/* Explicação das Regras */}
+        <View style={localStyles.explicacaoContainer}>
+          <Switch
+            value={explicacao}
+            onValueChange={setExplicacao}
+            style={localStyles.switch}
+          />
+          <Text style={localStyles.switchLabel}>não houve</Text>
+          <Text style={styles.label}>Tempo de explicação:</Text>
+          <TextInput
+            placeholder="Minutos"
+            style={[styles.input, localStyles.inputTime]}
+            value={tempoExplicacao}
+            onChangeText={setTempoExplicacao}
+            editable={!explicacao}
+          />
+        </View>
+
+        {/* Horário de Início */}
+        <Text style={styles.label}>Início da partida:</Text>
+        <TextInput
+          placeholder="18:30"
+          style={[styles.input, localStyles.input]}
+        />
+
+        {/* Botão Registrar */}
+        <TouchableOpacity
+          style={styles.buttonPrimary}
+          onPress={screens.matches.finish}
+        >
+          <Text style={styles.buttonPrimaryText}>Avançar</Text>
+        </TouchableOpacity>
       </View>
-
-      {/* Horário de Início */}
-      <Text style={styles.label}>Início da partida:</Text>
-      <TextInput
-        placeholder="18:30"
-        style={[styles.input, localStyles.input]}
-      />
-
-      {/* Botão Registrar */}
-      <TouchableOpacity style={styles.buttonPrimary}>
-        <Text style={styles.buttonPrimaryText}>Iniciar</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -160,17 +169,19 @@ const localStyles = StyleSheet.create({
     marginRight: 10,
   },
   switchLabel: {
-    color: Theme.light.text,
-    marginLeft: 5,
-    marginRight: 20,
+    fontSize: 16,
+    color: Theme.light.textButton,
   },
   inputTime: {
-    width: "30%",
-    marginLeft: 10,
+    backgroundColor: Theme.light.backgroundCard,
+    marginBottom: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 8,
+    width: 100,
+    textAlign: "center",
   },
 });
 
 export default RegistroPartidaScreen;
+
