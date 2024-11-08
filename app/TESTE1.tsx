@@ -18,13 +18,14 @@ import styles from "@styles/Default"; // Estilos importados do projeto
 import { images } from "@routes/Routes"; // Importa imagens configuradas no projeto
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header"; // Componente de cabeçalho personalizado
+import ButtonPrimary from "@/components/ButtonPrimary";
 
 // Obtem as dimensões da tela para ajustar estilos responsivos
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 const heightPageCover = 200;
 const heightHeader = 90;
 
-const UserProfile: React.FC = () => {
+const ParallaxProfile: React.FC = () => {
   // Configuração do valor compartilhado scrollY, usado para controlar o efeito de parallax
   const scrollY = useSharedValue(0);
 
@@ -33,10 +34,29 @@ const UserProfile: React.FC = () => {
     scrollY.value = event.contentOffset.y;
   });
 
-  // Estilo animado para deslocar o cabeçalho
+  // Estilo animado para deslocar o cabeçalho e ajustar a margem superior do bodyContainer
   const animatedHeaderStyle = useAnimatedStyle(() => {
+    // Interpolação de altura entre 90 e 180 baseado no valor de scrollY
+    const height =
+      scrollY.value < heightPageCover
+        ? 90 + (scrollY.value / heightPageCover) * 90 // altura interpolada de 90 a 180
+        : 180; // Altura máxima é 180
+
     return {
-      transform: [{ translateY: Math.max(scrollY.value, heightPageCover) }], // O cabeçalho se move para cima com o scroll
+      height,
+      transform: [{ translateY: Math.max(scrollY.value, heightPageCover) }],
+    };
+  });
+
+  // Estilo animado para o bodyContainer sem o salto indesejado
+  const animatedBodyContainerStyle = useAnimatedStyle(() => {
+    const marginTop =
+      scrollY.value < heightPageCover
+        ? (scrollY.value / heightPageCover) * 90 // marginTop cresce conforme scrollY
+        : 90; // Mantém o valor máximo de 90 após ultrapassar o limite
+
+    return {
+      marginTop,
     };
   });
 
@@ -73,21 +93,29 @@ const UserProfile: React.FC = () => {
             <View style={[{ marginTop: heightPageCover + heightHeader }]}>
               <ScrollView contentContainerStyle={localStyles.scrollContent}>
                 <View style={localStyles.bodyContainer}>
-                  <View style={[localStyles.textContainer, { marginTop: 25 }]}>
-                    <Text style={localStyles.content}>
-                      A{"\n\n"}B{"\n\n"}C{"\n\n"}D{"\n\n"}E{"\n\n"}F{"\n\n"}G
-                      {"\n\n"}H{"\n\n"}I{"\n\n"}J{"\n\n"}K{"\n\n"}L{"\n\n"}M
-                      {"\n\n"}N{"\n\n"}O{"\n\n"}P{"\n\n"}Q{"\n\n"}R{"\n\n"}S
-                      {"\n\n"}T{"\n\n"}U{"\n\n"}V{"\n\n"}W{"\n\n"}X{"\n\n"}Y
-                      {"\n\n"}Z
-                    </Text>
-                  </View>
+                  <Animated.View
+                    style={[
+                      localStyles.bodyContainer,
+                      animatedBodyContainerStyle,
+                    ]}
+                  >
+                    <View style={localStyles.textContainer}>
+                      <Text style={localStyles.content}>
+                        A{"\n\n"}B{"\n\n"}C{"\n\n"}D{"\n\n"}E{"\n\n"}F{"\n\n"}G
+                        {"\n\n"}H{"\n\n"}I{"\n\n"}J{"\n\n"}K{"\n\n"}L{"\n\n"}M
+                        {"\n\n"}N{"\n\n"}O{"\n\n"}P{"\n\n"}Q{"\n\n"}R{"\n\n"}S
+                        {"\n\n"}T{"\n\n"}U{"\n\n"}V{"\n\n"}W{"\n\n"}X{"\n\n"}Y
+                        {"\n\n"}Z
+                      </Text>
+                    </View>
+                  </Animated.View>
                 </View>
               </ScrollView>
             </View>
           </View>
         </Animated.ScrollView>
       </View>
+      <ButtonPrimary title="Mudar" onPress={() => {}}></ButtonPrimary>
     </View>
   );
 };
@@ -99,7 +127,7 @@ const localStyles = StyleSheet.create({
     padding: 0,
   },
   header: {
-    backgroundColor: "#b7fffb",
+    backgroundColor: Theme.light.background,
     position: "absolute",
     top: 0,
     width: "100%",
@@ -135,7 +163,7 @@ const localStyles = StyleSheet.create({
     paddingTop: 0,
     flex: 1,
     padding: 16,
-    backgroundColor: "white",
+    backgroundColor: Theme.light.background,
   },
   textContainer: {
     paddingLeft: 16,
@@ -164,4 +192,4 @@ const localStyles = StyleSheet.create({
   },
 });
 
-export default UserProfile;
+export default ParallaxProfile;
