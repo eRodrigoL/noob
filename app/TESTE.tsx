@@ -21,6 +21,8 @@ import Header from "@/components/Header"; // Componente de cabeçalho personaliz
 
 // Obtem as dimensões da tela para ajustar estilos responsivos
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
+const heightPageCover = 200;
+const heightHeader = 90;
 
 const UserProfile: React.FC = () => {
   // Configuração do valor compartilhado scrollY, usado para controlar o efeito de parallax
@@ -31,17 +33,19 @@ const UserProfile: React.FC = () => {
     scrollY.value = event.contentOffset.y;
   });
 
-  // Estilo animado para o fundo, aplicando o efeito de parallax
-  const backgroundStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: scrollY.value * 0.3 }], // Parallax com base na posição do scroll
-  }));
+  // Estilo animado para deslocar o cabeçalho
+  const animatedHeaderStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: Math.max(scrollY.value, heightPageCover) }], // O cabeçalho se move para cima com o scroll
+    };
+  });
 
   return (
     <View style={{ flex: 1 }}>
       {/* Componente de cabeçalho com o título "Perfil" */}
       <Header title="Perfil" />
       <View style={localStyles.container}>
-        <View style={localStyles.header}>
+        <View style={localStyles.PageCover}>
           {/* Imagem de fundo com efeito de parallax */}
           <ImageBackground
             source={images.fundo} // Define a imagem de fundo
@@ -55,31 +59,32 @@ const UserProfile: React.FC = () => {
           onScroll={scrollHandler} // Configura o handler para atualizar a posição do scroll
           scrollEventThrottle={16} // Define a taxa de atualização do evento de scroll para 60 fps
         >
-          <View style={localStyles.container}>
-            {/* Cabeçalho fixo */}
-            <View style={localStyles.headerContainer}>
+          <View style={[localStyles.container]}>
+            {/* Cabeçalho fixo com animação de deslocamento */}
+            <Animated.View style={[localStyles.header, animatedHeaderStyle]}>
               <Image
                 source={{ uri: "https://example.com/user-image.jpg" }}
                 style={localStyles.foto}
               />
-
               <Text style={localStyles.headerTitle}>Nome</Text>
-            </View>
+            </Animated.View>
 
             {/* Conteúdo rolável */}
-            <ScrollView contentContainerStyle={localStyles.scrollContent}>
-              <View style={localStyles.bodyContainer}>
-                <View style={[localStyles.textContainer, { marginTop: 25 }]}>
-                  <Text style={localStyles.content}>
-                    A{"\n\n"}B{"\n\n"}C{"\n\n"}D{"\n\n"}E{"\n\n"}F{"\n\n"}G
-                    {"\n\n"}H{"\n\n"}I{"\n\n"}J{"\n\n"}K{"\n\n"}L{"\n\n"}M
-                    {"\n\n"}N{"\n\n"}O{"\n\n"}P{"\n\n"}Q{"\n\n"}R{"\n\n"}S
-                    {"\n\n"}T{"\n\n"}U{"\n\n"}V{"\n\n"}W{"\n\n"}X{"\n\n"}Y
-                    {"\n\n"}Z
-                  </Text>
+            <View style={[{ marginTop: heightPageCover + heightHeader }]}>
+              <ScrollView contentContainerStyle={localStyles.scrollContent}>
+                <View style={localStyles.bodyContainer}>
+                  <View style={[localStyles.textContainer, { marginTop: 25 }]}>
+                    <Text style={localStyles.content}>
+                      A{"\n\n"}B{"\n\n"}C{"\n\n"}D{"\n\n"}E{"\n\n"}F{"\n\n"}G
+                      {"\n\n"}H{"\n\n"}I{"\n\n"}J{"\n\n"}K{"\n\n"}L{"\n\n"}M
+                      {"\n\n"}N{"\n\n"}O{"\n\n"}P{"\n\n"}Q{"\n\n"}R{"\n\n"}S
+                      {"\n\n"}T{"\n\n"}U{"\n\n"}V{"\n\n"}W{"\n\n"}X{"\n\n"}Y
+                      {"\n\n"}Z
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            </ScrollView>
+              </ScrollView>
+            </View>
           </View>
         </Animated.ScrollView>
       </View>
@@ -91,14 +96,15 @@ const UserProfile: React.FC = () => {
 const localStyles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 0,
   },
-  headerContainer: {
+  header: {
     backgroundColor: "#b7fffb",
     position: "absolute",
     top: 0,
     width: "100%",
     zIndex: 1,
-    height: 85, // Define o tamanho do headerContainer para 50
+    height: heightHeader,
     justifyContent: "center", // Centraliza o headerTitle verticalmente
   },
   imageContainer: {
@@ -113,7 +119,8 @@ const localStyles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: "white",
     position: "absolute",
-    bottom: 10,
+    bottom: 15,
+    left: 15,
   },
   headerTitle: {
     fontSize: 30,
@@ -122,9 +129,10 @@ const localStyles = StyleSheet.create({
     marginLeft: 180,
   },
   scrollContent: {
-    paddingTop: 70, // Altere este valor para corresponder exatamente à altura desejada do headerContainer
+    paddingTop: 0, // Altere este valor para corresponder exatamente à altura desejada do header
   },
   bodyContainer: {
+    paddingTop: 0,
     flex: 1,
     padding: 16,
     backgroundColor: "white",
@@ -145,11 +153,11 @@ const localStyles = StyleSheet.create({
     width: "100%", // Largura total da tela
     height: "100%", // Altura total da tela
   },
-  header: {
+  PageCover: {
     position: "absolute",
     top: 0,
     width: screenWidth, // Largura total da tela
-    height: 200, // Altura do cabeçalho
+    height: heightPageCover, // Altura do cabeçalho
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(255, 255, 255, 0.6)", // Fundo semitransparente
