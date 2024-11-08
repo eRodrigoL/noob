@@ -79,8 +79,8 @@ const RegisterUser: React.FC = () => {
 
     try {
       const formData = new FormData();
-      formData.append("nome", nome);
-      formData.append("apelido", apelido);
+      formData.append("nome",nome);
+      formData.append("apelido", `@${apelido}`);
       formData.append("nascimento", nascimento);
       formData.append("email", email);
       formData.append("senha", senha);
