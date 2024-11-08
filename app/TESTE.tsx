@@ -1,135 +1,159 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
-  FlatList,
   StyleSheet,
-  ActivityIndicator,
-} from "react-native";
-import axios from "axios";
-import { Theme } from "@/app/styles/Theme";
+  Dimensions,
+  Image,
+  ImageBackground,
+  ScrollView,
+} from "react-native"; // Importação dos componentes do React Native
+import Animated, {
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated"; // Importação de animações do react-native-reanimated
+import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens do Expo
+import styles from "@styles/Default"; // Estilos importados do projeto
+import { images } from "@routes/Routes"; // Importa imagens configuradas no projeto
+import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
+import Header from "@/components/Header"; // Componente de cabeçalho personalizado
 
-interface Avaliacao {
-  id: string; // ID da avaliação
-  usuario: string; // ID do usuário que fez a avaliação
-  jogo: string; // ID do jogo avaliado
-  beleza: number;
-  divertimento: number;
-  duracao: number;
-  preco: number;
-  armazenamento: number;
-  nota: number;
-}
+// Obtem as dimensões da tela para ajustar estilos responsivos
+const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
-export default function AvaliacaoList() {
-  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const UserProfile: React.FC = () => {
+  // Configuração do valor compartilhado scrollY, usado para controlar o efeito de parallax
+  const scrollY = useSharedValue(0);
 
-  // Função para buscar as avaliações do banco de dados
-  const fetchAvaliacoes = async () => {
-    try {
-      const response = await axios.get(
-        "https://api-noob-react.onrender.com/api/avaliacoes/"
-      );
-      setAvaliacoes(response.data);
-    } catch (err) {
-      setError("Erro ao carregar as avaliações.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Função que detecta o scroll da tela e atualiza scrollY com a posição do scroll
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    scrollY.value = event.contentOffset.y;
+  });
 
-  useEffect(() => {
-    fetchAvaliacoes();
-  }, []);
-
-  // Renderiza cada avaliação na lista
-  const renderItem = ({ item }: { item: Avaliacao }) => (
-    <View style={localStyles.card}>
-      <Text style={localStyles.title}>Avaliação de ID: {item.id}</Text>
-      <Text>Beleza: {item.beleza}</Text>
-      <Text>Divertimento: {item.divertimento}</Text>
-      <Text>Duração: {item.duracao}</Text>
-      <Text>Preço: {item.preco}</Text>
-      <Text>Armazenamento: {item.armazenamento}</Text>
-      <Text>Nota Geral: {item.nota}</Text>
-    </View>
-  );
-
-  if (loading) {
-    return (
-      <View style={localStyles.loadingContainer}>
-        <ActivityIndicator size="large" color={Theme.light.background} />
-        <Text style={localStyles.loadingText}>Carregando avaliações...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={localStyles.errorContainer}>
-        <Text style={localStyles.errorText}>{error}</Text>
-      </View>
-    );
-  }
+  // Estilo animado para o fundo, aplicando o efeito de parallax
+  const backgroundStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: scrollY.value * 0.3 }], // Parallax com base na posição do scroll
+  }));
 
   return (
-    <View style={localStyles.container}>
-      <FlatList
-        data={avaliacoes}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => item.id || index.toString()}
-      />
+    <View style={{ flex: 1 }}>
+      {/* Componente de cabeçalho com o título "Perfil" */}
+      <Header title="Perfil" />
+      <View style={localStyles.container}>
+        <View style={localStyles.header}>
+          {/* Imagem de fundo com efeito de parallax */}
+          <ImageBackground
+            source={images.fundo} // Define a imagem de fundo
+            style={localStyles.backgroundImage} // Aplica estilos de tamanho e posição à imagem de fundo
+          ></ImageBackground>
+        </View>
+
+        {/* Scroll animado para permitir o efeito de parallax */}
+        <Animated.ScrollView
+          contentContainerStyle={localStyles.scrollContent} // Estilo de conteúdo no ScrollView
+          onScroll={scrollHandler} // Configura o handler para atualizar a posição do scroll
+          scrollEventThrottle={16} // Define a taxa de atualização do evento de scroll para 60 fps
+        >
+          <View style={localStyles.container}>
+            {/* Cabeçalho fixo */}
+            <View style={localStyles.headerContainer}>
+              <Image
+                source={{ uri: "https://example.com/user-image.jpg" }}
+                style={localStyles.foto}
+              />
+
+              <Text style={localStyles.headerTitle}>Nome</Text>
+            </View>
+
+            {/* Conteúdo rolável */}
+            <ScrollView contentContainerStyle={localStyles.scrollContent}>
+              <View style={localStyles.bodyContainer}>
+                <View style={[localStyles.textContainer, { marginTop: 25 }]}>
+                  <Text style={localStyles.content}>
+                    A{"\n\n"}B{"\n\n"}C{"\n\n"}D{"\n\n"}E{"\n\n"}F{"\n\n"}G
+                    {"\n\n"}H{"\n\n"}I{"\n\n"}J{"\n\n"}K{"\n\n"}L{"\n\n"}M
+                    {"\n\n"}N{"\n\n"}O{"\n\n"}P{"\n\n"}Q{"\n\n"}R{"\n\n"}S
+                    {"\n\n"}T{"\n\n"}U{"\n\n"}V{"\n\n"}W{"\n\n"}X{"\n\n"}Y
+                    {"\n\n"}Z
+                  </Text>
+                </View>
+              </View>
+            </ScrollView>
+          </View>
+        </Animated.ScrollView>
+      </View>
     </View>
   );
-}
+};
 
-// Estilos para a tela de avaliações
+// Estilos personalizados para os componentes
 const localStyles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: Theme.light.background,
   },
-  card: {
-    padding: 15,
-    marginVertical: 10,
-    borderRadius: 8,
-    backgroundColor: Theme.light.backgroundCard,
-    elevation: 1, // Para Android
-    shadowColor: "#000", // Para iOS
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+  headerContainer: {
+    backgroundColor: "#b7fffb",
+    position: "absolute",
+    top: 0,
+    width: "100%",
+    zIndex: 1,
+    height: 85, // Define o tamanho do headerContainer para 50
+    justifyContent: "center", // Centraliza o headerTitle verticalmente
   },
-  title: {
-    fontSize: 18,
+  imageContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  foto: {
+    width: 150,
+    height: 150,
+    borderWidth: 5,
+    borderColor: "#333",
+    borderRadius: 15,
+    backgroundColor: "white",
+    position: "absolute",
+    bottom: 10,
+  },
+  headerTitle: {
+    fontSize: 30,
     fontWeight: "bold",
-    marginBottom: 5,
-    color: Theme.light.text,
+    color: "#333",
+    marginLeft: 180,
   },
-  loadingContainer: {
+  scrollContent: {
+    paddingTop: 70, // Altere este valor para corresponder exatamente à altura desejada do headerContainer
+  },
+  bodyContainer: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "white",
+  },
+  textContainer: {
+    paddingLeft: 16,
+  },
+  content: {
+    fontSize: 16,
+    color: "#555",
+  },
+
+  backgroundImage: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Theme.light.background,
+    position: "absolute", // Faz com que a imagem fique fixa em relação ao container
+    width: "100%", // Largura total da tela
+    height: "100%", // Altura total da tela
   },
-  loadingText: {
-    marginTop: 10,
-    color: Theme.light.text,
-  },
-  errorContainer: {
-    flex: 1,
+  header: {
+    position: "absolute",
+    top: 0,
+    width: screenWidth, // Largura total da tela
+    height: 200, // Altura do cabeçalho
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Theme.light.background,
-  },
-  errorText: {
-    color: "#800000", // Cor vinho
+    backgroundColor: "rgba(255, 255, 255, 0.6)", // Fundo semitransparente
   },
 });
+
+export default UserProfile;

@@ -2,185 +2,177 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
-  Switch,
-  ScrollView,
-} from "react-native";
-import styles from "@/app/styles/Default";
-import { Theme } from "@/app/styles/Theme";
-import ApiWakeUp from "@/components/AcordarAPI";
-import { screens } from "@/app/routes/Routes";
+  Dimensions,
+  Image,
+  ImageBackground,
+} from "react-native"; // Importação dos componentes do React Native
+import Animated, {
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated"; // Importação de animações do react-native-reanimated
+import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens do Expo
+import styles from "@styles/Default"; // Estilos importados do projeto
+import { images } from "@routes/Routes"; // Importa imagens configuradas no projeto
+import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
+import Header from "@/components/Header"; // Componente de cabeçalho personalizado
 
-const RegistroPartidaScreen = () => {
-  <ApiWakeUp />; // Mantém a API desperta
+// Obtem as dimensões da tela para ajustar estilos responsivos
+const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
-  const [explicacao, setExplicacao] = useState(false);
-  const [tempoExplicacao, setTempoExplicacao] = useState("");
-  const [inputText, setInputText] = useState("");
-  const [participants, setParticipants] = useState<string[]>([]);
+const UserProfile: React.FC = () => {
+  // Configuração do valor compartilhado scrollY, usado para controlar o efeito de parallax
+  const scrollY = useSharedValue(0);
 
-  const addParticipant = () => {
-    if (inputText.trim()) {
-      setParticipants([...participants, inputText.trim()]);
-      setInputText("");
-    }
-  };
+  // Função que detecta o scroll da tela e atualiza scrollY com a posição do scroll
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    scrollY.value = event.contentOffset.y;
+  });
 
-  const removeParticipant = (index: number) => {
-    setParticipants(participants.filter((_, i) => i !== index));
-  };
+  // Estilo animado para o fundo, aplicando o efeito de parallax
+  const backgroundStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: scrollY.value * 0.3 }], // Parallax com base na posição do scroll
+  }));
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <Text style={[styles.title, localStyles.header]}>
-          Registro de partida
-        </Text>
-
-        {/* Campo Participantes */}
-        <Text style={styles.label}>Participantes:</Text>
-        <TextInput
-          placeholder="Digite o jogador a adicionar e pressione Enter..."
-          style={[styles.input, localStyles.input]}
-          value={inputText}
-          onChangeText={setInputText}
-          onSubmitEditing={addParticipant}
-        />
-        <TouchableOpacity
-          style={localStyles.addButton}
-          onPress={addParticipant}
-        >
-          <Text style={localStyles.addButtonText}>Adicionar</Text>
-        </TouchableOpacity>
-
-        {/* Exibição dos chips de participantes */}
-        <ScrollView horizontal style={localStyles.tagContainer}>
-          {participants.map((participant, index) => (
-            <View key={index} style={localStyles.tag}>
-              <Text style={localStyles.tagText}>{participant}</Text>
-              <TouchableOpacity onPress={() => removeParticipant(index)}>
-                <Text style={localStyles.removeButtonText}>×</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </ScrollView>
-
-        {/* Campo Jogo */}
-        <Text style={styles.label}>Jogo:</Text>
-        <TextInput
-          placeholder="Digite o jogo a pesquisar..."
-          style={[styles.input, localStyles.input]}
-        />
-
-        {/* Explicação das Regras */}
-        <View style={localStyles.explicacaoContainer}>
-          <Switch
-            value={explicacao}
-            onValueChange={setExplicacao}
-            style={localStyles.switch}
-          />
-          <Text style={localStyles.switchLabel}>não houve</Text>
-          <Text style={styles.label}>Tempo de explicação:</Text>
-          <TextInput
-            placeholder="Minutos"
-            style={[styles.input, localStyles.inputTime]}
-            value={tempoExplicacao}
-            onChangeText={setTempoExplicacao}
-            editable={!explicacao}
-          />
+    <View style={{ flex: 1 }}>
+      {/* Componente de cabeçalho com o título "Perfil" */}
+      <Header title="Perfil" />
+      <View style={localStyles.container}>
+        <View style={localStyles.header}>
+          {/* Imagem de fundo com efeito de parallax */}
+          <ImageBackground
+            source={images.fundo} // Define a imagem de fundo
+            style={localStyles.backgroundImage} // Aplica estilos de tamanho e posição à imagem de fundo
+          ></ImageBackground>
         </View>
 
-        {/* Horário de Início */}
-        <Text style={styles.label}>Início da partida:</Text>
-        <TextInput
-          placeholder="18:30"
-          style={[styles.input, localStyles.input]}
-        />
-
-        {/* Botão Registrar */}
-        <TouchableOpacity
-          style={styles.buttonPrimary}
-          onPress={screens.boardgame.list}
+        {/* Scroll animado para permitir o efeito de parallax */}
+        <Animated.ScrollView
+          contentContainerStyle={localStyles.scrollContent} // Estilo de conteúdo no ScrollView
+          onScroll={scrollHandler} // Configura o handler para atualizar a posição do scroll
+          scrollEventThrottle={16} // Define a taxa de atualização do evento de scroll para 60 fps
         >
-          <Text style={styles.buttonPrimaryText}>Finalizar</Text>
-        </TouchableOpacity>
+          <View style={localStyles.container}>
+            <View style={{ backgroundColor: "#b7fffb" }}>
+              {/* Container para a imagem do usuário e nome */}
+              <View style={[localStyles.imageContainer, { height: 50 }]}>
+                <Image
+                  source={{
+                    uri: "https://example.com/user-image.jpg", // URL da imagem do perfil do usuário
+                  }}
+                  style={localStyles.foto} // Estilo da imagem do perfil
+                />
+                {/* Nome do usuário */}
+                <Text style={localStyles.headerTitle}>Nome</Text>
+              </View>
+            </View>
+
+            {/* Container com informações adicionais do perfil */}
+            <View style={localStyles.bodyContainer}>
+              <View style={[localStyles.textContainer, { marginTop: 25 }]}>
+                <Text style={localStyles.content}>
+                  {/* Informações adicionais */}A{"\n\n"}B{"\n\n"}C{"\n\n"}D
+                  {"\n\n"}E{"\n\n"}F{"\n\n"}G{"\n\n"}H{"\n\n"}I{"\n\n"}J{"\n\n"}
+                  K{"\n\n"}L{"\n\n"}M{"\n\n"}N{"\n\n"}O{"\n\n"}P{"\n\n"}Q
+                  {"\n\n"}R{"\n\n"}S{"\n\n"}T{"\n\n"}U{"\n\n"}V{"\n\n"}W{"\n\n"}
+                  X{"\n\n"}Y{"\n\n"}Z
+                </Text>
+              </View>
+            </View>
+          </View>
+        </Animated.ScrollView>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
+// Estilos personalizados para os componentes
 const localStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Theme.light.background, // Cor de fundo do tema
+  },
+  backgroundImage: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute", // Faz com que a imagem fique fixa em relação ao container
+    width: "100%", // Largura total da tela
+    height: "100%", // Altura total da tela
+  },
   header: {
-    color: Theme.light.backgroundButton,
-    textAlign: "center",
-  },
-  input: {
-    backgroundColor: Theme.light.backgroundCard,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  addButton: {
-    backgroundColor: Theme.light.secondary.background,
-    padding: 8,
-    borderRadius: 8,
+    position: "absolute",
+    top: 0,
+    width: screenWidth, // Largura total da tela
+    height: 200, // Altura do cabeçalho
+    justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.6)", // Fundo semitransparente
   },
-  addButtonText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  tagContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 20,
-  },
-  tag: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: Theme.light.secondary.backgroundButton,
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginRight: 5,
-    marginBottom: 5,
-  },
-  tagText: {
-    color: Theme.light.textButton,
-    marginRight: 8,
-  },
-  removeButtonText: {
-    color: Theme.light.textButton,
+  headerTitle: {
+    fontSize: 30,
     fontWeight: "bold",
+    color: "#333", // Cor do texto
+    marginLeft: 180, // Distância do início da tela
   },
-  explicacaoContainer: {
-    flexDirection: "row",
+  scrollContent: {
+    paddingTop: 200, // Espaço no topo para ajustar o conteúdo ao cabeçalho
+  },
+  bodyContainer: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: Theme.light.background, // Cor de fundo do tema
+  },
+  imageContainer: {
+    flexDirection: "row", // Organiza imagem e nome em linha
     alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 20,
-    paddingHorizontal: 5,
   },
-  switch: {
-    transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
-    marginRight: 10,
+  foto: {
+    width: 150, // Largura da foto do usuário
+    height: 150, // Altura da foto do usuário
+    borderWidth: 5,
+    borderColor: "#333", // Borda escura ao redor da imagem
+    borderRadius: 15, // Bordas arredondadas
+    marginLeft: 15,
+    marginBottom: 16,
+    backgroundColor: "white", // Fundo branco na foto do usuário
+    position: "absolute", // Posição fixa em relação ao container
+    top: -90, // Move a imagem para cima
   },
-  switchLabel: {
+  textContainer: {
+    paddingLeft: 16,
+    flex: 1,
+    backgroundColor: Theme.light.background,
+  },
+  content: {
     fontSize: 16,
-    color: Theme.light.textButton,
+    color: "#555", // Cor do texto
   },
-  inputTime: {
-    backgroundColor: Theme.light.backgroundCard,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 8,
-    width: 100,
-    textAlign: "center",
+  label: {
+    fontSize: 18,
+    color: Theme.light.text, // Cor de texto do tema
+    alignSelf: "flex-start",
+    marginLeft: "10%", // Margem à esquerda
+    marginBottom: 8,
+  },
+  userInfoText: {
+    fontSize: 16,
+    color: Theme.light.text, // Cor do texto
+    marginBottom: 20,
+    alignSelf: "flex-start",
+    marginLeft: "10%",
+  },
+  userInfoTextEditable: {
+    fontSize: 16,
+    color: Theme.light.text, // Cor do texto
+    marginBottom: 20,
+    alignSelf: "flex-start",
+    marginLeft: "10%",
+    borderBottomWidth: 1, // Linha inferior para indicar campo editável
+    borderBottomColor: "#ccc", // Cor da linha inferior
   },
 });
 
-export default RegistroPartidaScreen;
+export default UserProfile;
