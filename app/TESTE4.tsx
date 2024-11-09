@@ -8,51 +8,29 @@ import {
   Image,
   ImageBackground,
   ScrollView,
-  TouchableOpacity,
+  TouchableOpacity, // Importar TouchableOpacity para capturar toques na imagem
 } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import * as ImagePicker from "expo-image-picker";
+import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens do Expo
 import styles from "@styles/Default";
 import { images } from "@routes/Routes";
 import { Theme } from "@/app/styles/Theme";
 import Header from "@/components/Header";
+import ButtonPrimary from "@/components/ButtonPrimary";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 const heightPageCover = 200;
 const heightHeader = 90;
 
-interface ParallaxProfileProps {
-  id?: string;
-  initialIsEditing?: boolean;
-  initialIsRegisting?: boolean;
-  children?: React.ReactNode;
-}
-
-const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
-  id,
-  initialIsEditing = false,
-  initialIsRegisting = false,
-  children,
-}) => {
-  const [isEditing, setIsEditing] = useState(
-    id ? initialIsEditing : false
-  );
-  const [isRegisting, setIsRegisting] = useState(
-    !id || initialIsRegisting
-  );
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [name, setName] = useState("");
-
-  useEffect(() => {
-    if (!id) {
-      setIsRegisting(true);
-      setIsEditing(false);
-    }
-  }, [id]);
+const ParallaxProfile: React.FC = () => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [isRegisting, setIsRegisting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null); // Estado para guardar a imagem selecionada
+  const [name, setName] = useState(""); // Estado para armazenar o nome digitado
 
   const handleButtonPress = () => {
     if (isEditing) {
@@ -67,8 +45,14 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
     }
   };
 
+  useEffect(() => {
+    console.log("isEditing: " + isEditing);
+    console.log("isRegisting: " + isRegisting);
+  }, [isEditing, isRegisting]);
+
   const pickImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
       alert("Permissão para acessar a galeria é necessária!");
       return;
@@ -76,13 +60,13 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
+      allowsEditing: true, // Ativa a edição para cortar a imagem
+      aspect: [1, 1], // Configura a proporção 1:1
       quality: 1,
     });
 
     if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
+      setSelectedImage(result.assets[0].uri); // Guarda a URI da imagem selecionada
     }
   };
 
@@ -93,9 +77,10 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   });
 
   const animatedHeaderStyle = useAnimatedStyle(() => {
-    const height = scrollY.value < heightPageCover
-      ? 90 + (scrollY.value / heightPageCover) * 90
-      : 180;
+    const height =
+      scrollY.value < heightPageCover
+        ? 90 + (scrollY.value / heightPageCover) * 90
+        : 180;
 
     return {
       height,
@@ -104,9 +89,10 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   });
 
   const animatedBodyContainerStyle = useAnimatedStyle(() => {
-    const marginTop = scrollY.value < heightPageCover
-      ? (scrollY.value / heightPageCover) * 90
-      : 90;
+    const marginTop =
+      scrollY.value < heightPageCover
+        ? (scrollY.value / heightPageCover) * 90
+        : 90;
 
     return {
       marginTop,
@@ -121,7 +107,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
           <ImageBackground
             source={images.fundo}
             style={localStyles.backgroundImage}
-          />
+          ></ImageBackground>
         </View>
 
         <Animated.ScrollView
@@ -131,7 +117,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
         >
           <View style={[localStyles.container]}>
             <Animated.View style={[localStyles.header, animatedHeaderStyle]}>
-              {(isEditing || isRegisting) && (
+              {isEditing || isRegisting ? (
                 <TouchableOpacity
                   onPress={pickImage}
                   style={localStyles.fotoContainer}
@@ -145,8 +131,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
                     style={localStyles.foto}
                   />
                 </TouchableOpacity>
-              )}
-              {!(isEditing || isRegisting) && (
+              ) : (
                 <Image
                   source={{
                     uri: selectedImage
@@ -156,17 +141,18 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
                   style={localStyles.foto}
                 />
               )}
-
-              {(isEditing || isRegisting) ? (
+              {/* Renderiza TextInput se for editing ou registering, senão mostra o nome */}
+              {isEditing || isRegisting ? (
                 <TextInput
                   style={localStyles.headerTitleInput}
                   placeholder="Digite o nome aqui..."
                   value={name}
-                  onChangeText={setName}
+                  onChangeText={setName} // Atualiza o nome conforme o usuário digita
                 />
               ) : (
                 <Text style={localStyles.headerTitle}>{name || "Nome"}</Text>
               )}
+              <TextInput placeholder=""></TextInput>
             </Animated.View>
 
             <View style={[{ marginTop: heightPageCover + heightHeader }]}>
@@ -178,7 +164,15 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
                       animatedBodyContainerStyle,
                     ]}
                   >
-                    {children}
+                    <View style={localStyles.textContainer}>
+                      <Text style={localStyles.content}>
+                        A{"\n\n"}B{"\n\n"}C{"\n\n"}D{"\n\n"}E{"\n\n"}F{"\n\n"}G
+                        {"\n\n"}H{"\n\n"}I{"\n\n"}J{"\n\n"}K{"\n\n"}L{"\n\n"}M
+                        {"\n\n"}N{"\n\n"}O{"\n\n"}P{"\n\n"}Q{"\n\n"}R{"\n\n"}S
+                        {"\n\n"}T{"\n\n"}U{"\n\n"}V{"\n\n"}W{"\n\n"}X{"\n\n"}Y
+                        {"\n\n"}Z
+                      </Text>
+                    </View>
                   </Animated.View>
                 </View>
               </ScrollView>
@@ -186,12 +180,19 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
           </View>
         </Animated.ScrollView>
       </View>
+      <ButtonPrimary
+        title={isEditing ? "Editando" : isRegisting ? "Registrando" : "Nada"}
+        onPress={handleButtonPress}
+      />
     </View>
   );
 };
 
 const localStyles = StyleSheet.create({
-  container: { flex: 1, padding: 0 },
+  container: {
+    flex: 1,
+    padding: 0,
+  },
   header: {
     backgroundColor: Theme.light.background,
     position: "absolute",
@@ -234,12 +235,21 @@ const localStyles = StyleSheet.create({
     color: "#333",
     marginLeft: 180,
   },
-  scrollContent: { paddingTop: 0 },
+  scrollContent: {
+    paddingTop: 0,
+  },
   bodyContainer: {
     paddingTop: 0,
     flex: 1,
     padding: 16,
     backgroundColor: Theme.light.background,
+  },
+  textContainer: {
+    paddingLeft: 16,
+  },
+  content: {
+    fontSize: 16,
+    color: "#555",
   },
   backgroundImage: {
     flex: 1,

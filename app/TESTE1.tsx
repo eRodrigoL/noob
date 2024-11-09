@@ -1,46 +1,96 @@
-import React, { useState } from "react";
+// Importa as bibliotecas e componentes necessários
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
+  TextInput,
   StyleSheet,
   Dimensions,
   Image,
   ImageBackground,
   ScrollView,
-} from "react-native"; // Importação dos componentes do React Native
+  TouchableOpacity,
+} from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-} from "react-native-reanimated"; // Importação de animações do react-native-reanimated
-import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens do Expo
-import styles from "@styles/Default"; // Estilos importados do projeto
-import { images } from "@routes/Routes"; // Importa imagens configuradas no projeto
-import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
-import Header from "@/components/Header"; // Componente de cabeçalho personalizado
-import ButtonPrimary from "@/components/ButtonPrimary";
+} from "react-native-reanimated";
+import * as ImagePicker from "expo-image-picker";
+import styles from "@styles/Default";
+import { images } from "@routes/Routes";
+import { Theme } from "@/app/styles/Theme";
+import Header from "@/components/Header";
 
-// Obtem as dimensões da tela para ajustar estilos responsivos
+// Obtém as dimensões da tela para uso nos estilos
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 const heightPageCover = 200;
 const heightHeader = 90;
 
-const ParallaxProfile: React.FC = () => {
-  // Configuração do valor compartilhado scrollY, usado para controlar o efeito de parallax
+// Define as propriedades aceitas pelo componente ParallaxProfile
+interface ParallaxProfileProps {
+  id?: string | null;
+  initialIsEditing?: boolean;
+  initialIsRegisting?: boolean;
+  children?: React.ReactNode;
+}
+
+// Componente principal ParallaxProfile
+const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
+  id,
+  initialIsEditing = false,
+  initialIsRegisting = false,
+  children,
+}) => {
+  // Estados para controlar o modo de edição, registro, imagem selecionada e nome
+  const [isEditing, setIsEditing] = useState(id ? initialIsEditing : false);
+  const [isRegisting, setIsRegisting] = useState(!id || initialIsRegisting);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [name, setName] = useState("");
+
+  // Efeito para atualizar os estados de edição e registro com base no id
+  useEffect(() => {
+    if (!id) {
+      setIsRegisting(true);
+      setIsEditing(false);
+    }
+  }, [id]);
+
+  // Função para selecionar uma imagem a partir da galeria
+  const pickImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("Permissão para acessar a galeria é necessária!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+    }
+  };
+
+  // Define uma variável animada para a rolagem da página
   const scrollY = useSharedValue(0);
 
-  // Função que detecta o scroll da tela e atualiza scrollY com a posição do scroll
+  // Handler para atualizar o valor de scrollY durante a rolagem
   const scrollHandler = useAnimatedScrollHandler((event) => {
     scrollY.value = event.contentOffset.y;
   });
 
-  // Estilo animado para deslocar o cabeçalho e ajustar a margem superior do bodyContainer
+  // Estilo animado para o cabeçalho, que muda com base na rolagem
   const animatedHeaderStyle = useAnimatedStyle(() => {
-    // Interpolação de altura entre 90 e 180 baseado no valor de scrollY
     const height =
       scrollY.value < heightPageCover
-        ? 90 + (scrollY.value / heightPageCover) * 90 // altura interpolada de 90 a 180
-        : 180; // Altura máxima é 180
+        ? 90 + (scrollY.value / heightPageCover) * 90
+        : 180;
 
     return {
       height,
@@ -48,12 +98,12 @@ const ParallaxProfile: React.FC = () => {
     };
   });
 
-  // Estilo animado para o bodyContainer sem o salto indesejado
+  // Estilo animado para o conteúdo do corpo da página
   const animatedBodyContainerStyle = useAnimatedStyle(() => {
     const marginTop =
       scrollY.value < heightPageCover
-        ? (scrollY.value / heightPageCover) * 90 // marginTop cresce conforme scrollY
-        : 90; // Mantém o valor máximo de 90 após ultrapassar o limite
+        ? (scrollY.value / heightPageCover) * 90
+        : 90;
 
     return {
       marginTop,
@@ -62,70 +112,86 @@ const ParallaxProfile: React.FC = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Componente de cabeçalho com o título "Perfil" */}
-      <Header title="Perfil" />
-      <View style={localStyles.container}>
-        <View style={localStyles.PageCover}>
-          {/* Imagem de fundo com efeito de parallax */}
-          <ImageBackground
-            source={images.fundo} // Define a imagem de fundo
-            style={localStyles.backgroundImage} // Aplica estilos de tamanho e posição à imagem de fundo
-          ></ImageBackground>
-        </View>
+      {/* Imagem de fundo da página */}
+      <View style={localStyles.PageCover}>
+        <ImageBackground
+          source={images.fundo}
+          style={localStyles.backgroundImage}
+        />
+      </View>
 
-        {/* Scroll animado para permitir o efeito de parallax */}
-        <Animated.ScrollView
-          contentContainerStyle={localStyles.scrollContent} // Estilo de conteúdo no ScrollView
-          onScroll={scrollHandler} // Configura o handler para atualizar a posição do scroll
-          scrollEventThrottle={16} // Define a taxa de atualização do evento de scroll para 60 fps
-        >
-          <View style={[localStyles.container]}>
-            {/* Cabeçalho fixo com animação de deslocamento */}
-            <Animated.View style={[localStyles.header, animatedHeaderStyle]}>
+      {/* ScrollView animado para o conteúdo da página */}
+      <Animated.ScrollView
+        contentContainerStyle={localStyles.scrollContent}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+      >
+        <View style={[localStyles.container]}>
+          {/* Cabeçalho animado que exibe a imagem de perfil e o nome */}
+          <Animated.View style={[localStyles.header, animatedHeaderStyle]}>
+            {(isEditing || isRegisting) && (
+              <TouchableOpacity
+                onPress={pickImage}
+                style={localStyles.fotoContainer}
+              >
+                <Image
+                  source={{
+                    uri: selectedImage
+                      ? selectedImage
+                      : "https://example.com/user-image.jpg",
+                  }}
+                  style={localStyles.foto}
+                />
+              </TouchableOpacity>
+            )}
+            {!(isEditing || isRegisting) && (
               <Image
-                source={{ uri: "https://example.com/user-image.jpg" }}
+                source={{
+                  uri: selectedImage
+                    ? selectedImage
+                    : "https://example.com/user-image.jpg",
+                }}
                 style={localStyles.foto}
               />
-              <Text style={localStyles.headerTitle}>Nome</Text>
-            </Animated.View>
+            )}
 
-            {/* Conteúdo rolável */}
-            <View style={[{ marginTop: heightPageCover + heightHeader }]}>
-              <ScrollView contentContainerStyle={localStyles.scrollContent}>
-                <View style={localStyles.bodyContainer}>
-                  <Animated.View
-                    style={[
-                      localStyles.bodyContainer,
-                      animatedBodyContainerStyle,
-                    ]}
-                  >
-                    <View style={localStyles.textContainer}>
-                      <Text style={localStyles.content}>
-                        A{"\n\n"}B{"\n\n"}C{"\n\n"}D{"\n\n"}E{"\n\n"}F{"\n\n"}G
-                        {"\n\n"}H{"\n\n"}I{"\n\n"}J{"\n\n"}K{"\n\n"}L{"\n\n"}M
-                        {"\n\n"}N{"\n\n"}O{"\n\n"}P{"\n\n"}Q{"\n\n"}R{"\n\n"}S
-                        {"\n\n"}T{"\n\n"}U{"\n\n"}V{"\n\n"}W{"\n\n"}X{"\n\n"}Y
-                        {"\n\n"}Z
-                      </Text>
-                    </View>
-                  </Animated.View>
-                </View>
-              </ScrollView>
-            </View>
+            {/* Exibe um campo de entrada ou um texto para o nome com base no estado */}
+            {isEditing || isRegisting ? (
+              <TextInput
+                style={localStyles.headerTitleInput}
+                placeholder="Digite o nome aqui..."
+                value={name}
+                onChangeText={setName}
+              />
+            ) : (
+              <Text style={localStyles.headerTitle}>{name || "Nome"}</Text>
+            )}
+          </Animated.View>
+
+          {/* Conteúdo principal da página com suporte a rolagem */}
+          <View style={[{ marginTop: heightPageCover + heightHeader }]}>
+            <ScrollView contentContainerStyle={localStyles.scrollContent}>
+              <View style={localStyles.bodyContainer}>
+                <Animated.View
+                  style={[
+                    localStyles.bodyContainer,
+                    animatedBodyContainerStyle,
+                  ]}
+                >
+                  {children}
+                </Animated.View>
+              </View>
+            </ScrollView>
           </View>
-        </Animated.ScrollView>
-      </View>
-      <ButtonPrimary title="Mudar" onPress={() => {}}></ButtonPrimary>
+        </View>
+      </Animated.ScrollView>
     </View>
   );
 };
 
-// Estilos personalizados para os componentes
+// Estilos locais do componente
 const localStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 0,
-  },
+  container: { flex: 1, padding: 0 },
   header: {
     backgroundColor: Theme.light.background,
     position: "absolute",
@@ -133,11 +199,16 @@ const localStyles = StyleSheet.create({
     width: "100%",
     zIndex: 1,
     height: heightHeader,
-    justifyContent: "center", // Centraliza o headerTitle verticalmente
+    justifyContent: "center",
   },
-  imageContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  fotoContainer: {
+    width: 150,
+    height: 150,
+    borderColor: "#333",
+    borderRadius: 15,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
   },
   foto: {
     width: 150,
@@ -150,45 +221,41 @@ const localStyles = StyleSheet.create({
     bottom: 15,
     left: 15,
   },
+  headerTitleInput: {
+    fontSize: 30,
+    color: "#333",
+    marginLeft: 195,
+    borderWidth: 1,
+    right: 15,
+  },
   headerTitle: {
     fontSize: 30,
     fontWeight: "bold",
     color: "#333",
     marginLeft: 180,
   },
-  scrollContent: {
-    paddingTop: 0, // Altere este valor para corresponder exatamente à altura desejada do header
-  },
+  scrollContent: { paddingTop: 0 },
   bodyContainer: {
     paddingTop: 0,
     flex: 1,
     padding: 16,
     backgroundColor: Theme.light.background,
   },
-  textContainer: {
-    paddingLeft: 16,
-  },
-  content: {
-    fontSize: 16,
-    color: "#555",
-  },
-
   backgroundImage: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    position: "absolute", // Faz com que a imagem fique fixa em relação ao container
-    width: "100%", // Largura total da tela
-    height: "100%", // Altura total da tela
+    position: "absolute",
+    width: "100%",
+    height: "100%",
   },
   PageCover: {
     position: "absolute",
     top: 0,
-    width: screenWidth, // Largura total da tela
-    height: heightPageCover, // Altura do cabeçalho
+    width: screenWidth,
+    height: heightPageCover,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.6)", // Fundo semitransparente
   },
 });
 
