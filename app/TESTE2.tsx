@@ -1,366 +1,186 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
-  Dimensions,
-  Image,
-  ImageBackground,
   TextInput,
   TouchableOpacity,
-  Alert,
+  StyleSheet,
+  Switch,
+  ScrollView,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens
-import styles from "@styles/Default";
-import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
-import Header from "@/components/Header";
-import ParallaxProfile from "@/components/ParallaxProfile";
-import ApiWakeUp from "@/app/services/AcordarAPI";
+import styles from "@/app/styles/Default";
+import { Theme } from "@/app/styles/Theme";
+import ApiWakeUp from "./services/AcordarAPI";
+import { screens } from "@/app/routes/Routes";
 
-const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
+const RegistroPartidaScreen = () => {
+  <ApiWakeUp />; // Mantém a API desperta
 
-const UserProfile: React.FC = () => {
-  <ApiWakeUp />; // Mantem a API desperta
+  const [explicacao, setExplicacao] = useState(false);
+  const [tempoExplicacao, setTempoExplicacao] = useState("");
+  const [inputText, setInputText] = useState("");
+  const [participants, setParticipants] = useState<string[]>([]);
 
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState<any>(null);
-
-  // Função para buscar os dados do usuário
-  const fetchUserData = async () => {
-    try {
-      const userId = await AsyncStorage.getItem("userId");
-      const token = await AsyncStorage.getItem("token");
-
-      if (!userId || !token) {
-        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
-        return;
-      }
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-
-      const response = await axios.get(
-        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
-        config
-      );
-
-      setUser(response.data);
-      setEditedUser(response.data);
-    } catch (error) {
-      console.error("Erro ao buscar os dados do usuário:", error);
-      Alert.alert("Erro", "Não foi possível carregar os dados do usuário.");
-    } finally {
-      setLoading(false);
+  const addParticipant = () => {
+    if (inputText.trim()) {
+      setParticipants([...participants, inputText.trim()]);
+      setInputText("");
     }
   };
 
-  // Função para enviar os dados atualizados
-  const updateUserProfile = async () => {
-    if (!editedUser || !editedUser.nome || !editedUser.email) {
-      Alert.alert("Erro", "Nome e email são obrigatórios.");
-      return;
-    }
-
-    try {
-      const userId = await AsyncStorage.getItem("userId");
-      const token = await AsyncStorage.getItem("token");
-
-      if (!userId || !token) {
-        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
-        return;
-      }
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      };
-
-      const formData = new FormData();
-      formData.append("nome", editedUser.nome);
-      formData.append("email", editedUser.email);
-      formData.append("nascimento", editedUser.nascimento);
-
-      if (editedUser.foto) {
-        const localUri = editedUser.foto;
-        const filename = localUri.split("/").pop();
-        const match = /\.(\w+)$/.exec(filename ?? "");
-        const fileType = match ? `image/${match[1]}` : `image`;
-
-        formData.append("foto", {
-          uri: localUri,
-          name: filename ?? "profile.jpg",
-          type: fileType,
-        } as any);
-      }
-
-      await axios.put(
-        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
-        formData,
-        config
-      );
-
-      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
-
-      // Recarregar os dados do usuário após a atualização
-      fetchUserData();
-    } catch (error: any) {
-      if (error.response) {
-        console.error("Erro no servidor:", error.response.data);
-      } else if (error.request) {
-        console.error("Erro de rede:", error.request);
-      } else {
-        console.error("Erro desconhecido:", error.message);
-      }
-      Alert.alert("Erro", "Não foi possível atualizar o perfil.");
-    }
+  const removeParticipant = (index: number) => {
+    setParticipants(participants.filter((_, i) => i !== index));
   };
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  // Função para alternar entre edição e exibição
-  const handleEditToggle = () => {
-    if (isEditing) {
-      updateUserProfile();
-    }
-    setIsEditing(!isEditing);
-  };
-
-  // Função para selecionar uma nova foto
-  const handleImagePick = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-      Alert.alert(
-        "Erro",
-        "Você precisa permitir o acesso à galeria de imagens!"
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (result.canceled) {
-      console.log("Usuário cancelou a seleção da imagem.");
-      return;
-    }
-
-    const source = result.assets[0].uri;
-    setEditedUser((prevState: any) => ({ ...prevState, foto: source }));
-  };
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text>Carregando dados do usuário...</Text>
-      </View>
-    );
-  }
-
-  if (!user) {
-    return (
-      <View style={styles.container}>
-        <Text>Erro ao carregar os dados do usuário.</Text>
-      </View>
-    );
-  }
-
-  const addOneDay = (dateString: string) => {
-    const date = new Date(dateString);
-    date.setDate(date.getDate() + 1); // Adiciona 1 dia
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
-  // TRECHO API -- FIM
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* Exibe o cabeçalho com título */}
-      <Header title="Perfil" />
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={[styles.title, localStyles.header]}>
+          Registro de partida
+        </Text>
 
-      <ParallaxProfile
-        id={user._id}
-        name={user.nome}
-        photo={user.foto}
-        initialIsEditing={false}
-        initialIsRegisting={false}
-      >
-        {/* Conteúdo visual enviado ao ParallaxProfile */}
-        <Text style={styles.label}>Apelido:</Text>
-        {isEditing ? (
-          <TextInput
-            style={styles.input}
-            value={editedUser.apelido}
-            onChangeText={(text) =>
-              setEditedUser((prevState: any) => ({
-                ...prevState,
-                apelido: text,
-              }))
-            }
-          />
-        ) : (
-          <Text style={styles.label}>@{user.apelido}</Text>
-        )}
-        {/* Email */}
-        <Text style={styles.label}>Email:</Text>
-        {isEditing ? (
-          <TextInput
-            style={styles.input}
-            value={editedUser.email}
-            onChangeText={(text) =>
-              setEditedUser((prevState: any) => ({
-                ...prevState,
-                email: text,
-              }))
-            }
-          />
-        ) : (
-          <Text style={styles.label}>{user.email}</Text>
-        )}
-        {/* Data de Nascimento */}
-        <Text style={styles.label}>Data de Nascimento:</Text>
-        {isEditing ? (
-          <TextInput
-            style={styles.input}
-            value={addOneDay(editedUser.nascimento)}
-          />
-        ) : (
-          <Text style={styles.label}>{addOneDay(user.nascimento)}</Text>
-        )}
-
-        {/* Botão de Editar/Salvar */}
+        {/* Campo Participantes */}
+        <Text style={styles.label}>Participantes:</Text>
+        <TextInput
+          placeholder="Digite o jogador a adicionar e pressione Enter..."
+          style={[styles.input, localStyles.input]}
+          value={inputText}
+          onChangeText={setInputText}
+          onSubmitEditing={addParticipant}
+        />
         <TouchableOpacity
-          style={styles.buttonPrimary}
-          onPress={handleEditToggle}
+          style={localStyles.addButton}
+          onPress={addParticipant}
         >
-          <Text style={styles.buttonPrimaryText}>
-            {isEditing ? "Salvar" : "Editar Perfil"}
-          </Text>
+          <Text style={localStyles.addButtonText}>Adicionar</Text>
         </TouchableOpacity>
 
-        {/* Botão Cancelar visível apenas se isEditing for true */}
-        {isEditing && (
-          <TouchableOpacity
-            style={styles.buttonSecondary} // Você pode criar um estilo separado para o botão Cancelar
-            onPress={() => setIsEditing(false)} // Muda isEditing para false quando pressionado
-          >
-            <Text style={styles.buttonSecondaryText}>Cancelar</Text>
-          </TouchableOpacity>
-        )}
-      </ParallaxProfile>
-    </View>
+        {/* Exibição dos chips de participantes */}
+        <ScrollView horizontal style={localStyles.tagContainer}>
+          {participants.map((participant, index) => (
+            <View key={index} style={localStyles.tag}>
+              <Text style={localStyles.tagText}>{participant}</Text>
+              <TouchableOpacity onPress={() => removeParticipant(index)}>
+                <Text style={localStyles.removeButtonText}>×</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
+
+        {/* Campo Jogo */}
+        <Text style={styles.label}>Jogo:</Text>
+        <TextInput
+          placeholder="Digite o jogo a pesquisar..."
+          style={[styles.input, localStyles.input]}
+        />
+
+        {/* Explicação das Regras */}
+        <View style={localStyles.explicacaoContainer}>
+          <Switch
+            value={explicacao}
+            onValueChange={setExplicacao}
+            style={localStyles.switch}
+          />
+          <Text style={localStyles.switchLabel}>não houve</Text>
+          <Text style={styles.label}>Tempo de explicação:</Text>
+          <TextInput
+            placeholder="Minutos"
+            style={[styles.input, localStyles.inputTime]}
+            value={tempoExplicacao}
+            onChangeText={setTempoExplicacao}
+            editable={!explicacao}
+          />
+        </View>
+
+        {/* Horário de Início */}
+        <Text style={styles.label}>Início da partida:</Text>
+        <TextInput
+          placeholder="18:30"
+          style={[styles.input, localStyles.input]}
+        />
+
+        {/* Botão Registrar */}
+        <TouchableOpacity
+          style={styles.buttonPrimary}
+          onPress={screens.boardgame.list}
+        >
+          <Text style={styles.buttonPrimaryText}>Finalizar</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
 const localStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Theme.light.background,
-  },
-  backgroundImage: {
-    flex: 1, // Faz a imagem ocupar toda a área disponível
-    justifyContent: "center", // Centraliza o conteúdo verticalmente
-    alignItems: "center", // Centraliza o conteúdo horizontalmente
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-  },
   header: {
-    position: "absolute",
-    top: 0,
-    width: screenWidth,
-    height: 200,
-    justifyContent: "center",
+    color: Theme.light.backgroundButton,
+    textAlign: "center",
+  },
+  input: {
+    backgroundColor: Theme.light.backgroundCard,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  addButton: {
+    backgroundColor: Theme.light.secondary.background,
+    padding: 8,
+    borderRadius: 8,
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.6)", // Fundo semi-transparente
+    marginBottom: 10,
   },
-  headerTitle: {
-    fontSize: 30, // Aumenta o tamanho do texto
-    fontWeight: "bold",
-    color: "#333",
-    marginLeft: 180, // Margem esquerda ajustada
+  addButtonText: {
+    color: "#fff",
+    fontSize: 16,
   },
-  scrollContent: {
-    paddingTop: 200, // Espaço para exibir o cabeçalho
+  tagContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 20,
   },
-  bodyContainer: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: Theme.light.background,
-  },
-  imageContainer: {
-    flexDirection: "row", // Adiciona flexDirection para alinhar imagem e texto na horizontal
-    alignItems: "center", // Centraliza verticalmente o conteúdo
-  },
-  foto: {
-    width: 150,
-    height: 150,
-    borderWidth: 5,
-    borderColor: "#333",
+  tag: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Theme.light.secondary.backgroundButton,
     borderRadius: 15,
-    marginLeft: 15,
-    marginBottom: 16,
-    backgroundColor: "white",
-    position: "absolute",
-    top: -90,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginRight: 5,
+    marginBottom: 5,
   },
-  textContainer: {
-    paddingLeft: 16,
-    flex: 1, // Permite que o container ocupe o espaço restante
+  tagText: {
+    color: Theme.light.textButton,
+    marginRight: 8,
   },
-  content: {
-    fontSize: 16,
-    color: "#555",
+  removeButtonText: {
+    color: Theme.light.textButton,
+    fontWeight: "bold",
   },
-  label: {
-    fontSize: 18,
-    color: Theme.light.text,
-    alignSelf: "flex-start",
-    marginLeft: "10%",
-    marginBottom: 8,
-  },
-  textInput: {
-    fontSize: 16,
-    color: Theme.light.text,
-    marginLeft: 195,
-    borderWidth: 1,
-    right: 15,
-  },
-  userInfoText: {
-    fontSize: 16,
-    color: Theme.light.text,
+  explicacaoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 20,
-    alignSelf: "flex-start",
-    marginLeft: "10%",
+    paddingHorizontal: 5,
   },
-  userInfoTextEditable: {
+  switch: {
+    transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
+    marginRight: 10,
+  },
+  switchLabel: {
     fontSize: 16,
-    color: Theme.light.text,
-    marginBottom: 20,
-    alignSelf: "flex-start",
-    marginLeft: "10%",
-    borderBottomWidth: 1,
-    borderBottomColor: Theme.light.text,
+    color: Theme.light.textButton,
+  },
+  inputTime: {
+    backgroundColor: Theme.light.backgroundCard,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    width: 100,
+    textAlign: "center",
   },
 });
 
-export default UserProfile;
+export default RegistroPartidaScreen;

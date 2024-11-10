@@ -17,6 +17,7 @@ const Login: React.FC = () => {
   const [apelido, setApelido] = useState(""); // Estado para armazenar o apelido do usuário
   const [senha, setSenha] = useState(""); // Estado para armazenar a senha do usuário
 
+
   // Função de login, que verifica as credenciais do usuário
   const handleLogin = async () => {
     // Verifica se os campos de apelido e senha foram preenchidos
@@ -25,11 +26,14 @@ const Login: React.FC = () => {
       return;
     }
 
+    
+  const apelidoCorrigido = `@${apelido}`
+
     try {
       // Faz uma requisição para o backend para autenticação
       const response = await axios.post(
         "https://api-noob-react.onrender.com/api/login",
-        { apelido, senha }
+        { apelido: apelidoCorrigido, senha }
       );
 
       // Se o status da resposta for 200, login é bem-sucedido
