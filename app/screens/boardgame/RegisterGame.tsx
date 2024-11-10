@@ -15,7 +15,7 @@ import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ApiWakeUp from "@/components/AcordarAPI";
+import ApiWakeUp from "@/app/services/AcordarAPI";
 import { screens } from "@routes/Routes";
 
 const RegisterGame: React.FC = () => {

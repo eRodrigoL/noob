@@ -17,7 +17,7 @@ import styles from "@styles/Default";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
 import ParallaxProfile from "@/components/ParallaxProfile";
-import ApiWakeUp from "@/components/AcordarAPI";
+import ApiWakeUp from "@/app/services/AcordarAPI";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 

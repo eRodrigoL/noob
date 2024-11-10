@@ -7,7 +7,7 @@ import { screens } from "@routes/Routes";
 import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
-import ApiWakeUp from "@/components/AcordarAPI";
+import ApiWakeUp from "@/app/services/AcordarAPI";
 
 const Login: React.FC = () => {
   <ApiWakeUp />; // Mantem a API desperta

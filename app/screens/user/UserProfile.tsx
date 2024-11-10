@@ -10,12 +10,11 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens
 import styles from "@styles/Default";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
 import ParallaxProfile from "@/components/ParallaxProfile";
-import ApiWakeUp from "@/components/AcordarAPI";
+import ApiWakeUp from "@/app/services/AcordarAPI";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
@@ -129,38 +128,10 @@ const UserProfile: React.FC = () => {
   // Função para alternar entre edição e exibição
   const handleEditToggle = () => {
     if (isEditing) {
+      // Salva as alterações ao sair do modo de edição
       updateUserProfile();
     }
     setIsEditing(!isEditing);
-  };
-
-  // Função para selecionar uma nova foto
-  const handleImagePick = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-      Alert.alert(
-        "Erro",
-        "Você precisa permitir o acesso à galeria de imagens!"
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (result.canceled) {
-      console.log("Usuário cancelou a seleção da imagem.");
-      return;
-    }
-
-    const source = result.assets[0].uri;
-    setEditedUser((prevState: any) => ({ ...prevState, foto: source }));
   };
 
   if (loading) {
@@ -190,10 +161,6 @@ const UserProfile: React.FC = () => {
   };
   // TRECHO API -- FIM
 
-  const handleEditChange = () => {
-    setIsEditing((prevState) => !prevState); // Alterna entre true e false
-  };
-
   return (
     <View style={{ flex: 1 }}>
       {/* Exibe o cabeçalho com título */}
@@ -205,6 +172,7 @@ const UserProfile: React.FC = () => {
         photo={user.foto}
         initialIsEditing={false}
         initialIsRegisting={false}
+        isEditing={isEditing}
         onEditChange={setIsEditing}
       >
         {/* Conteúdo visual enviado ao ParallaxProfile */}
@@ -263,8 +231,11 @@ const UserProfile: React.FC = () => {
         {/* Botão Cancelar visível apenas se isEditing for true */}
         {isEditing && (
           <TouchableOpacity
-            style={styles.buttonSecondary} // Você pode criar um estilo separado para o botão Cancelar
-            onPress={() => setIsEditing(false)} // Muda isEditing para false quando pressionado
+            style={styles.buttonSecondary}
+            onPress={() => {
+              setIsEditing(false); // Sai do modo de edição
+              setEditedUser(user); // Reverte as mudanças, restaurando os dados originais
+            }}
           >
             <Text style={styles.buttonSecondaryText}>Cancelar</Text>
           </TouchableOpacity>

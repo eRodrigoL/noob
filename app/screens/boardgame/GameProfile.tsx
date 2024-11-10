@@ -23,7 +23,7 @@ import { useLocalSearchParams } from "expo-router";
 import { images } from "@routes/Routes";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
-import ApiWakeUp from "@/components/AcordarAPI";
+import ApiWakeUp from "@/app/services/AcordarAPI";
 import ButtonPrimary from "@/components/ButtonPrimary";
 import { screens } from "@routes/Routes";
 

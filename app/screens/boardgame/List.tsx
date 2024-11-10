@@ -16,7 +16,7 @@ import Header from "@/components/Header";
 import ButtonPrimary from "@components/ButtonPrimary";
 import { useRouter } from "expo-router"; // Hook de navegação
 import { screens } from "@routes/Routes";
-import ApiWakeUp from "@/components/AcordarAPI";
+import ApiWakeUp from "@/app/services/AcordarAPI";
 
 interface Product {
   id: number;

@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import styles from "@/app/styles/Default";
 import { Theme } from "@/app/styles/Theme";
-import ApiWakeUp from "@/components/AcordarAPI";
+import ApiWakeUp from "@/app/services/AcordarAPI";
 import { screens } from "@/app/routes/Routes";
 
 const RegistroPartidaScreen = () => {

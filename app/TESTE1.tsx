@@ -10,12 +10,11 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens
 import styles from "@styles/Default";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
 import ParallaxProfile from "@/components/ParallaxProfile";
-import ApiWakeUp from "@/components/AcordarAPI";
+import ApiWakeUp from "@/app/services/AcordarAPI";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
