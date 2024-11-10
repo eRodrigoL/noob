@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import {
   Modal,
@@ -9,6 +9,8 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { screens } from "@/app/routes/Routes";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from "axios";
 import ButtonPrimary from "./ButtonPrimary";
 import { Theme } from "@styles/Theme"; // Importa o Theme com as cores
 
@@ -21,9 +23,37 @@ const { width } = Dimensions.get("window");
 
 const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
   const slideAnim = React.useRef(new Animated.Value(-width)).current;
+  const [hasOpenMatch, setHasOpenMatch] = useState(false);
 
-  React.useEffect(() => {
+  // Função para verificar se há partidas em aberto
+  const checkOpenMatches = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+
+      if (userId && token) {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        };
+
+        const response = await axios.get(
+          `https://api-noob-react.onrender.com/api/partidas?registrador=${userId}&fim=null`,
+          config
+        );
+        setHasOpenMatch(response.data.length > 0);
+      }
+    } catch (error) {
+      console.error("Erro ao verificar partidas em aberto:", error);
+    }
+  };
+
+  // Verifica as partidas em aberto ao abrir o modal
+  useEffect(() => {
     if (visible) {
+      checkOpenMatches();
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: 500,
@@ -36,7 +66,7 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
         useNativeDriver: true,
       }).start(() => onClose());
     }
-  }, [visible, slideAnim]);
+  }, [visible]);
 
   const handleClose = () => {
     Animated.timing(slideAnim, {
@@ -44,6 +74,15 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
       duration: 500,
       useNativeDriver: true,
     }).start(() => onClose());
+  };
+
+  // Função para decidir qual tela abrir ao clicar em "Jogar"
+  const handlePlayPress = () => {
+    if (hasOpenMatch) {
+      screens.matches.finish();
+    } else {
+      screens.matches.play();
+    }
   };
 
   return (
@@ -77,7 +116,7 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
                 />
                 <ButtonPrimary
                   title="Jogar"
-                  onPress={() => screens.matches.play()}
+                  onPress={handlePlayPress}
                 />
                 <ButtonPrimary title="Teste" onPress={() => screens.teste()} />
                 <ButtonPrimary
@@ -124,3 +163,4 @@ const styles = StyleSheet.create({
 });
 
 export default SandwichMenu;
+

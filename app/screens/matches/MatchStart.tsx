@@ -73,15 +73,28 @@ const RegistroPartidaScreen = () => {
   }, []);
 
   const addParticipant = () => {
-    if (inputText.trim()) {
-      if (validNicknames.includes(inputText.trim())) {
-        setParticipants([...participants, inputText.trim()]);
+    const trimmedInput = inputText.trim();
+  
+    if (!trimmedInput) return; // Evita inclusão se o campo estiver vazio
+  
+    // Verifica se o apelido começa com "@"
+    if (trimmedInput.startsWith("@")) {
+      // Remove o "@" para verificar na lista de apelidos válidos
+      //const nickname = trimmedInput.slice(1); // apelido sem "@"
+  
+      if (validNicknames.includes(trimmedInput)) {
+        setParticipants([...participants, trimmedInput]); // Inclui com "@"
         setInputText("");
       } else {
         alert("Apelido não encontrado. Por favor, insira um apelido válido.");
       }
+    } else {
+      // Caso o apelido não comece com "@", simplesmente adiciona sem verificação
+      setParticipants([...participants, trimmedInput]);
+      setInputText("");
     }
   };
+  
 
   const validateGame = () => {
     const selectedGame = validGames.find((game) => game.titulo === inputJogo.trim());
@@ -144,6 +157,8 @@ const RegistroPartidaScreen = () => {
         setTempoExplicacao("");
         setInicioPartida("");
         setExplicacao(false);
+
+        screens.matches.finish();
       }
     } catch (error) {
       console.error("Erro ao registrar a partida:", error);
