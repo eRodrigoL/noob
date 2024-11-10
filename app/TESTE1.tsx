@@ -1,218 +1,290 @@
-// Importa as bibliotecas e componentes necessários
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   Dimensions,
-  Image,
-  ImageBackground,
-  ScrollView,
+  TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
-import Animated, {
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-} from "react-native-reanimated";
-import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens
 import styles from "@styles/Default";
-import { images } from "@routes/Routes";
-import { Theme } from "@/app/styles/Theme";
+import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
+import ParallaxProfile from "@/components/ParallaxProfile";
+import ApiWakeUp from "@/components/AcordarAPI";
 
-// Obtém as dimensões da tela para uso nos estilos
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
-const heightPageCover = 200;
-const heightHeader = 90;
 
-// Define as propriedades aceitas pelo componente ParallaxProfile
-interface ParallaxProfileProps {
-  id?: string | null;
-  initialIsEditing?: boolean;
-  initialIsRegisting?: boolean;
-  name?: string | null;
-  children?: React.ReactNode;
-}
+const UserProfile: React.FC = () => {
+  <ApiWakeUp />; // Mantem a API desperta
 
-// Componente principal ParallaxProfile
-const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
-  id,
-  initialIsEditing = false,
-  initialIsRegisting = false,
-  name: initialName = null,
-  children,
-}) => {
-  // Estados para controlar o modo de edição, registro, imagem selecionada e nome
-  const [isEditing, setIsEditing] = useState(id ? initialIsEditing : false);
-  const [isRegisting, setIsRegisting] = useState(!id || initialIsRegisting);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [name, setName] = useState(initialName);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedUser, setEditedUser] = useState<any>(null);
 
-  // Efeito para atualizar os estados de edição e registro com base no id
-  useEffect(() => {
-    if (!id) {
-      setIsRegisting(true);
-      setIsEditing(false);
-    }
-  }, [id]);
+  // Função para buscar os dados do usuário
+  const fetchUserData = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
 
-  // Função para selecionar uma imagem a partir da galeria
-  const pickImage = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      alert("Permissão para acessar a galeria é necessária!");
-      return;
-    }
+      if (!userId || !token) {
+        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
+        return;
+      }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
+      const response = await axios.get(
+        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
+        config
+      );
+
+      setUser(response.data);
+      setEditedUser(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar os dados do usuário:", error);
+      Alert.alert("Erro", "Não foi possível carregar os dados do usuário.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Define uma variável animada para a rolagem da página
-  const scrollY = useSharedValue(0);
+  // Função para enviar os dados atualizados
+  const updateUserProfile = async () => {
+    if (!editedUser || !editedUser.nome || !editedUser.email) {
+      Alert.alert("Erro", "Nome e email são obrigatórios.");
+      return;
+    }
 
-  // Handler para atualizar o valor de scrollY durante a rolagem
-  const scrollHandler = useAnimatedScrollHandler((event) => {
-    scrollY.value = event.contentOffset.y;
-  });
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
 
-  // Estilo animado para o cabeçalho, que muda com base na rolagem
-  const animatedHeaderStyle = useAnimatedStyle(() => {
-    const height =
-      scrollY.value < heightPageCover
-        ? 90 + (scrollY.value / heightPageCover) * 90
-        : 180;
+      if (!userId || !token) {
+        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
+        return;
+      }
 
-    return {
-      height,
-      transform: [{ translateY: Math.max(scrollY.value, heightPageCover) }],
-    };
-  });
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      };
 
-  // Estilo animado para o conteúdo do corpo da página
-  const animatedBodyContainerStyle = useAnimatedStyle(() => {
-    const marginTop =
-      scrollY.value < heightPageCover
-        ? (scrollY.value / heightPageCover) * 90
-        : 90;
+      const formData = new FormData();
+      formData.append("nome", editedUser.nome);
+      formData.append("email", editedUser.email);
+      formData.append("nascimento", editedUser.nascimento);
 
-    return {
-      marginTop,
-    };
-  });
+      if (editedUser.foto) {
+        const localUri = editedUser.foto;
+        const filename = localUri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename ?? "");
+        const fileType = match ? `image/${match[1]}` : `image`;
+
+        formData.append("foto", {
+          uri: localUri,
+          name: filename ?? "profile.jpg",
+          type: fileType,
+        } as any);
+      }
+
+      await axios.put(
+        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
+        formData,
+        config
+      );
+
+      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
+
+      // Recarregar os dados do usuário após a atualização
+      fetchUserData();
+    } catch (error: any) {
+      if (error.response) {
+        console.error("Erro no servidor:", error.response.data);
+      } else if (error.request) {
+        console.error("Erro de rede:", error.request);
+      } else {
+        console.error("Erro desconhecido:", error.message);
+      }
+      Alert.alert("Erro", "Não foi possível atualizar o perfil.");
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  // Função para alternar entre edição e exibição
+  const handleEditToggle = () => {
+    if (isEditing) {
+      // Salva as alterações ao sair do modo de edição
+      updateUserProfile();
+    }
+    setIsEditing(!isEditing);
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Carregando dados do usuário...</Text>
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text>Erro ao carregar os dados do usuário.</Text>
+      </View>
+    );
+  }
+
+  const addOneDay = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1); // Adiciona 1 dia
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+  // TRECHO API -- FIM
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Imagem de fundo da página */}
-      <View style={localStyles.PageCover}>
-        <ImageBackground
-          source={images.fundo}
-          style={localStyles.backgroundImage}
-        />
-      </View>
+      {/* Exibe o cabeçalho com título */}
+      <Header title="Perfil" />
 
-      {/* ScrollView animado para o conteúdo da página */}
-      <Animated.ScrollView
-        contentContainerStyle={localStyles.scrollContent}
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
+      <ParallaxProfile
+        id={user._id}
+        name={user.nome}
+        photo={user.foto}
+        initialIsEditing={false}
+        initialIsRegisting={false}
+        isEditing={isEditing}
+        onEditChange={setIsEditing}
       >
-        <View style={[localStyles.container]}>
-          {/* Cabeçalho animado que exibe a imagem de perfil e o nome */}
-          <Animated.View style={[localStyles.header, animatedHeaderStyle]}>
-            {(isEditing || isRegisting) && (
-              <TouchableOpacity
-                onPress={pickImage}
-                style={localStyles.fotoContainer}
-              >
-                <Image
-                  source={{
-                    uri: selectedImage
-                      ? selectedImage
-                      : "https://example.com/user-image.jpg",
-                  }}
-                  style={localStyles.foto}
-                />
-              </TouchableOpacity>
-            )}
-            {!(isEditing || isRegisting) && (
-              <Image
-                source={{
-                  uri: selectedImage
-                    ? selectedImage
-                    : "https://example.com/user-image.jpg",
-                }}
-                style={localStyles.foto}
-              />
-            )}
+        {/* Conteúdo visual enviado ao ParallaxProfile */}
+        <Text style={styles.label}>Apelido:</Text>
+        {isEditing ? (
+          <TextInput
+            style={styles.input}
+            value={editedUser.apelido}
+            onChangeText={(text) =>
+              setEditedUser((prevState: any) => ({
+                ...prevState,
+                apelido: text,
+              }))
+            }
+          />
+        ) : (
+          <Text style={styles.label}>@{user.apelido}</Text>
+        )}
+        {/* Email */}
+        <Text style={styles.label}>Email:</Text>
+        {isEditing ? (
+          <TextInput
+            style={styles.input}
+            value={editedUser.email}
+            onChangeText={(text) =>
+              setEditedUser((prevState: any) => ({
+                ...prevState,
+                email: text,
+              }))
+            }
+          />
+        ) : (
+          <Text style={styles.label}>{user.email}</Text>
+        )}
+        {/* Data de Nascimento */}
+        <Text style={styles.label}>Data de Nascimento:</Text>
+        {isEditing ? (
+          <TextInput
+            style={styles.input}
+            value={addOneDay(editedUser.nascimento)}
+          />
+        ) : (
+          <Text style={styles.label}>{addOneDay(user.nascimento)}</Text>
+        )}
 
-            {/* Exibe um campo de entrada ou um texto para o nome com base no estado */}
-            {isEditing || isRegisting ? (
-              <TextInput
-                style={localStyles.headerTitleInput}
-                placeholder="Digite o nome aqui..."
-                value={name || ""}
-                onChangeText={(text) => setName(text)}
-              />
-            ) : (
-              <Text style={localStyles.headerTitle}>
-                {name || "Nome não informado"}
-              </Text>
-            )}
-          </Animated.View>
+        {/* Botão de Editar/Salvar */}
+        <TouchableOpacity
+          style={styles.buttonPrimary}
+          onPress={handleEditToggle}
+        >
+          <Text style={styles.buttonPrimaryText}>
+            {isEditing ? "Salvar" : "Editar Perfil"}
+          </Text>
+        </TouchableOpacity>
 
-          {/* Conteúdo principal da página com suporte a rolagem */}
-          <View style={[{ marginTop: heightPageCover + heightHeader }]}>
-            <ScrollView contentContainerStyle={localStyles.scrollContent}>
-              <View style={localStyles.bodyContainer}>
-                <Animated.View
-                  style={[
-                    localStyles.bodyContainer,
-                    animatedBodyContainerStyle,
-                  ]}
-                >
-                  {children}
-                </Animated.View>
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      </Animated.ScrollView>
+        {/* Botão Cancelar visível apenas se isEditing for true */}
+        {isEditing && (
+          <TouchableOpacity
+            style={styles.buttonSecondary}
+            onPress={() => {
+              setIsEditing(false); // Sai do modo de edição
+              setEditedUser(user); // Reverte as mudanças, restaurando os dados originais
+            }}
+          >
+            <Text style={styles.buttonSecondaryText}>Cancelar</Text>
+          </TouchableOpacity>
+        )}
+      </ParallaxProfile>
     </View>
   );
 };
 
-// Estilos locais do componente
 const localStyles = StyleSheet.create({
-  container: { flex: 1, padding: 0 },
-  header: {
+  container: {
+    flex: 1,
     backgroundColor: Theme.light.background,
+  },
+  backgroundImage: {
+    flex: 1, // Faz a imagem ocupar toda a área disponível
+    justifyContent: "center", // Centraliza o conteúdo verticalmente
+    alignItems: "center", // Centraliza o conteúdo horizontalmente
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+  },
+  header: {
     position: "absolute",
     top: 0,
-    width: "100%",
-    zIndex: 1,
-    height: heightHeader,
+    width: screenWidth,
+    height: 200,
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.6)", // Fundo semi-transparente
   },
-  fotoContainer: {
-    width: 150,
-    height: 150,
-    borderColor: "#333",
-    borderRadius: 15,
-    position: "absolute",
-    bottom: 0,
-    left: 0,
+  headerTitle: {
+    fontSize: 30, // Aumenta o tamanho do texto
+    fontWeight: "bold",
+    color: "#333",
+    marginLeft: 180, // Margem esquerda ajustada
+  },
+  scrollContent: {
+    paddingTop: 200, // Espaço para exibir o cabeçalho
+  },
+  bodyContainer: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: Theme.light.background,
+  },
+  imageContainer: {
+    flexDirection: "row", // Adiciona flexDirection para alinhar imagem e texto na horizontal
+    alignItems: "center", // Centraliza verticalmente o conteúdo
   },
   foto: {
     width: 150,
@@ -220,47 +292,50 @@ const localStyles = StyleSheet.create({
     borderWidth: 5,
     borderColor: "#333",
     borderRadius: 15,
+    marginLeft: 15,
+    marginBottom: 16,
     backgroundColor: "white",
     position: "absolute",
-    bottom: 15,
-    left: 15,
+    top: -90,
   },
-  headerTitleInput: {
-    fontSize: 30,
-    color: "#333",
+  textContainer: {
+    paddingLeft: 16,
+    flex: 1, // Permite que o container ocupe o espaço restante
+  },
+  content: {
+    fontSize: 16,
+    color: "#555",
+  },
+  label: {
+    fontSize: 18,
+    color: Theme.light.text,
+    alignSelf: "flex-start",
+    marginLeft: "10%",
+    marginBottom: 8,
+  },
+  textInput: {
+    fontSize: 16,
+    color: Theme.light.text,
     marginLeft: 195,
     borderWidth: 1,
     right: 15,
   },
-  headerTitle: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: "#333",
-    marginLeft: 180,
+  userInfoText: {
+    fontSize: 16,
+    color: Theme.light.text,
+    marginBottom: 20,
+    alignSelf: "flex-start",
+    marginLeft: "10%",
   },
-  scrollContent: { paddingTop: 0 },
-  bodyContainer: {
-    paddingTop: 0,
-    flex: 1,
-    padding: 16,
-    backgroundColor: Theme.light.background,
-  },
-  backgroundImage: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-  },
-  PageCover: {
-    position: "absolute",
-    top: 0,
-    width: screenWidth,
-    height: heightPageCover,
-    justifyContent: "center",
-    alignItems: "center",
+  userInfoTextEditable: {
+    fontSize: 16,
+    color: Theme.light.text,
+    marginBottom: 20,
+    alignSelf: "flex-start",
+    marginLeft: "10%",
+    borderBottomWidth: 1,
+    borderBottomColor: Theme.light.text,
   },
 });
 
-export default ParallaxProfile;
+export default UserProfile;

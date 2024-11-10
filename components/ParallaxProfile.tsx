@@ -34,6 +34,8 @@ export interface ParallaxProfileProps {
   initialIsEditing?: boolean;
   initialIsRegisting?: boolean;
   children?: React.ReactNode;
+  isEditing?: boolean;
+  onEditChange?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Componente principal ParallaxProfile
@@ -41,14 +43,11 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   id,
   name: initialName = null,
   photo,
-  initialIsEditing = false,
+  isEditing = false, // Recebe o estado de edição do componente pai
   initialIsRegisting = false,
   children,
 }) => {
   // Estados para controlar o modo de edição, registro, imagem selecionada e nome
-  const [isEditing, setIsEditing] = useState<boolean>(
-    id ? initialIsEditing : false
-  );
   const [isRegisting, setIsRegisting] = useState<boolean>(
     !id || initialIsRegisting
   );
@@ -61,7 +60,6 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   useEffect(() => {
     if (!id) {
       setIsRegisting(true);
-      setIsEditing(false);
     }
   }, [id]);
 

@@ -4,8 +4,6 @@ import {
   Text,
   StyleSheet,
   Dimensions,
-  Image,
-  ImageBackground,
   TextInput,
   TouchableOpacity,
   Alert,
@@ -152,7 +150,7 @@ const UserProfile: React.FC = () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [1, 1],
       quality: 1,
     });
 
@@ -192,6 +190,10 @@ const UserProfile: React.FC = () => {
   };
   // TRECHO API -- FIM
 
+  const handleEditChange = () => {
+    setIsEditing((prevState) => !prevState); // Alterna entre true e false
+  };
+
   return (
     <View style={{ flex: 1 }}>
       {/* Exibe o cabeçalho com título */}
@@ -203,6 +205,7 @@ const UserProfile: React.FC = () => {
         photo={user.foto}
         initialIsEditing={false}
         initialIsRegisting={false}
+        onEditChange={setIsEditing}
       >
         {/* Conteúdo visual enviado ao ParallaxProfile */}
         <Text style={styles.label}>Apelido:</Text>
