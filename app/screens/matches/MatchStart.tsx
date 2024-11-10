@@ -26,7 +26,7 @@ const RegistroPartidaScreen = () => {
   const [inicioPartida, setInicioPartida] = useState("");
   const [participants, setParticipants] = useState<string[]>([]);
   const [validNicknames, setValidNicknames] = useState<string[]>([]);
-  const [validGames, setValidGames] = useState<string[]>([]);
+  const [validGames, setValidGames] = useState<{ id: string; titulo: string }[]>([]); // Armazena ID e título dos jogos
 
   // Buscar apelidos válidos e jogos válidos na API ao carregar o componente
   useEffect(() => {
@@ -58,7 +58,10 @@ const RegistroPartidaScreen = () => {
         const response = await axios.get(
           "https://api-noob-react.onrender.com/api/jogos"
         );
-        const games = response.data.map((jogo: any) => jogo.titulo);
+        const games = response.data.map((jogo: any) => ({
+          id: jogo._id,
+          titulo: jogo.titulo,
+        }));
         setValidGames(games);
       } catch (error) {
         console.error("Erro ao buscar jogos:", error);
@@ -81,7 +84,8 @@ const RegistroPartidaScreen = () => {
   };
 
   const validateGame = () => {
-    if (!validGames.includes(inputJogo.trim())) {
+    const selectedGame = validGames.find((game) => game.titulo === inputJogo.trim());
+    if (!selectedGame) {
       alert("Jogo não encontrado. Por favor, insira um jogo válido.");
     }
   };
@@ -94,6 +98,13 @@ const RegistroPartidaScreen = () => {
   const registrarPartida = async () => {
     if (participants.length === 0 || !inputJogo || !inicioPartida) {
       Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    // Encontra o jogo selecionado pelo título e obtém seu ID
+    const selectedGame = validGames.find((game) => game.titulo === inputJogo.trim());
+    if (!selectedGame) {
+      Alert.alert("Erro", "Jogo não encontrado. Por favor, insira um jogo válido.");
       return;
     }
 
@@ -112,10 +123,11 @@ const RegistroPartidaScreen = () => {
       const usuarios = participants.map((apelido) => ({ apelido }));
 
       const partidaData = {
-        usuarios, // Agora é uma lista de objetos
-        jogo: inputJogo,
-        explicacao: explicacao ? { tempoExplicacao } : "",
+        usuarios,
+        jogo: selectedGame.id, // Utiliza o ID do jogo em vez do título
+        explicacao: tempoExplicacao,
         inicio: inicioPartida,
+        registrador: userId,
       };
 
       const response = await axios.post(
