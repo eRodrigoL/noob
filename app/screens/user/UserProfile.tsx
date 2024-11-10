@@ -10,37 +10,19 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import Animated, {
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-} from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker"; // Biblioteca para seleção de imagens
 import styles from "@styles/Default";
-import { TextInputMask } from "react-native-masked-text";
-import { images } from "@routes/Routes";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
+import ParallaxProfile from "@/components/ParallaxProfile";
 import ApiWakeUp from "@/components/AcordarAPI";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
 const UserProfile: React.FC = () => {
-  <ApiWakeUp /> // Mantem a API desperta
-
-  // TRECHO PARA O PARALLAX -- INICIO
-  const scrollY = useSharedValue(0);
-
-  const scrollHandler = useAnimatedScrollHandler((event) => {
-    scrollY.value = event.contentOffset.y;
-  });
-
-  const backgroundStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: scrollY.value * 0.3 }], // Parallax mais lento para imagem de fundo
-  }));
-  // TREHO PARA O PARALLAX -- FIM
+  <ApiWakeUp />; // Mantem a API desperta
 
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -208,118 +190,83 @@ const UserProfile: React.FC = () => {
       year: "numeric",
     });
   };
-  // TRECHO API -- INICIO
+  // TRECHO API -- FIM
 
   return (
     <View style={{ flex: 1 }}>
       {/* Exibe o cabeçalho com título */}
       <Header title="Perfil" />
-      <View style={localStyles.container}>
-        {/* Cabeçalho fixo */}
-        <View style={localStyles.header}>
-          <ImageBackground
-            source={images.fundo}
-            style={localStyles.backgroundImage}
-          ></ImageBackground>
-        </View>
 
-        <Animated.ScrollView
-          contentContainerStyle={localStyles.scrollContent}
-          onScroll={scrollHandler}
-          scrollEventThrottle={16}
+      <ParallaxProfile
+        id={user._id}
+        name={user.nome}
+        photo={user.foto}
+        initialIsEditing={false}
+        initialIsRegisting={false}
+      >
+        {/* Conteúdo visual enviado ao ParallaxProfile */}
+        <Text style={styles.label}>Apelido:</Text>
+        {isEditing ? (
+          <TextInput
+            style={styles.input}
+            value={editedUser.apelido}
+            onChangeText={(text) =>
+              setEditedUser((prevState: any) => ({
+                ...prevState,
+                apelido: text,
+              }))
+            }
+          />
+        ) : (
+          <Text style={styles.label}>@{user.apelido}</Text>
+        )}
+        {/* Email */}
+        <Text style={styles.label}>Email:</Text>
+        {isEditing ? (
+          <TextInput
+            style={styles.input}
+            value={editedUser.email}
+            onChangeText={(text) =>
+              setEditedUser((prevState: any) => ({
+                ...prevState,
+                email: text,
+              }))
+            }
+          />
+        ) : (
+          <Text style={styles.label}>{user.email}</Text>
+        )}
+        {/* Data de Nascimento */}
+        <Text style={styles.label}>Data de Nascimento:</Text>
+        {isEditing ? (
+          <TextInput
+            style={styles.input}
+            value={addOneDay(editedUser.nascimento)}
+          />
+        ) : (
+          <Text style={styles.label}>{addOneDay(user.nascimento)}</Text>
+        )}
+
+        {/* Botão de Editar/Salvar */}
+        <TouchableOpacity
+          style={styles.buttonPrimary}
+          onPress={handleEditToggle}
         >
-          {/* Corpo da tela com conteúdo */}
-          <View style={localStyles.bodyContainer}>
-            {/* Primeiro container com imagem */}
-            <View style={[localStyles.imageContainer, { height: 50 }]}>
-              {/* Imagem de Perfil */}
-              <Image
-                source={{
-                  uri: editedUser.foto || "https://example.com/user-image.jpg",
-                }}
-                style={localStyles.foto}
-              />
-              {isEditing && (
-                <TouchableOpacity
-                  style={styles.buttonPrimary}
-                  onPress={handleImagePick}
-                >
-                  <Text style={styles.buttonPrimaryText}>
-                    Selecionar nova foto
-                  </Text>
-                </TouchableOpacity>
-              )}
+          <Text style={styles.buttonPrimaryText}>
+            {isEditing ? "Salvar" : "Editar Perfil"}
+          </Text>
+        </TouchableOpacity>
 
-              {/* Apelido (não editável) */}
-              <Text style={localStyles.headerTitle}>{user.apelido}</Text>
-            </View>
-
-            {/* Segundo container com conteúdo, ajustando o topo para começar após a imagem */}
-            <View style={[localStyles.textContainer, { marginTop: 25 }]}>
-              {/* Nome */}
-              <Text style={localStyles.label}>Nome:</Text>
-              {isEditing ? (
-                <TextInput
-                  style={localStyles.userInfoTextEditable}
-                  value={editedUser.nome}
-                  onChangeText={(text) =>
-                    setEditedUser((prevState: any) => ({
-                      ...prevState,
-                      nome: text,
-                    }))
-                  }
-                />
-              ) : (
-                <Text style={localStyles.userInfoText}>{user.nome}</Text>
-              )}
-
-              {/* Email */}
-              <Text style={localStyles.label}>Email:</Text>
-              {isEditing ? (
-                <TextInput
-                  style={localStyles.userInfoTextEditable}
-                  value={editedUser.email}
-                  onChangeText={(text) =>
-                    setEditedUser((prevState: any) => ({
-                      ...prevState,
-                      email: text,
-                    }))
-                  }
-                />
-              ) : (
-                <Text style={localStyles.userInfoText}>{user.email}</Text>
-              )}
-
-              {/* Data de Nascimento */}
-              <Text style={localStyles.label}>Data de Nascimento:</Text>
-              {isEditing ? (
-                <TextInput
-                  style={localStyles.userInfoTextEditable}
-                  value={addOneDay(editedUser.nascimento)}
-                />
-              ) : (
-                <Text style={localStyles.userInfoText}>
-                  {addOneDay(user.nascimento)}
-                </Text>
-              )}
-
-              {/* Botão de Editar/Salvar */}
-              <TouchableOpacity
-                style={styles.buttonPrimary}
-                onPress={handleEditToggle}
-              >
-                <Text style={styles.buttonPrimaryText}>
-                  {isEditing ? "Salvar" : "Editar Perfil"}
-                </Text>
-              </TouchableOpacity>
-
-              <Text style={localStyles.content}>
-                Demais informações...{"\n\n"}
-              </Text>
-            </View>
-          </View>
-        </Animated.ScrollView>
-      </View>
+        {/* Botão Cancelar visível apenas se isEditing for true */}
+        {isEditing && (
+          <TouchableOpacity
+            style={styles.buttonSecondary} // Você pode criar um estilo separado para o botão Cancelar
+            onPress={() => setIsEditing(false)} // Muda isEditing para false quando pressionado
+          >
+            <Text style={styles.buttonSecondaryText}>Cancelar</Text>
+          </TouchableOpacity>
+        )}
+      </ParallaxProfile>
     </View>
   );
 };
@@ -390,6 +337,13 @@ const localStyles = StyleSheet.create({
     alignSelf: "flex-start",
     marginLeft: "10%",
     marginBottom: 8,
+  },
+  textInput: {
+    fontSize: 16,
+    color: Theme.light.text,
+    marginLeft: 195,
+    borderWidth: 1,
+    right: 15,
   },
   userInfoText: {
     fontSize: 16,

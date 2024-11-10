@@ -32,6 +32,7 @@ interface ParallaxProfileProps {
   id?: string | null;
   initialIsEditing?: boolean;
   initialIsRegisting?: boolean;
+  name?: string | null;
   children?: React.ReactNode;
 }
 
@@ -40,13 +41,14 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   id,
   initialIsEditing = false,
   initialIsRegisting = false,
+  name: initialName = null,
   children,
 }) => {
   // Estados para controlar o modo de edição, registro, imagem selecionada e nome
   const [isEditing, setIsEditing] = useState(id ? initialIsEditing : false);
   const [isRegisting, setIsRegisting] = useState(!id || initialIsRegisting);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(initialName);
 
   // Efeito para atualizar os estados de edição e registro com base no id
   useEffect(() => {
@@ -160,11 +162,13 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
               <TextInput
                 style={localStyles.headerTitleInput}
                 placeholder="Digite o nome aqui..."
-                value={name}
-                onChangeText={setName}
+                value={name || ""}
+                onChangeText={(text) => setName(text)}
               />
             ) : (
-              <Text style={localStyles.headerTitle}>{name || "Nome"}</Text>
+              <Text style={localStyles.headerTitle}>
+                {name || "Nome não informado"}
+              </Text>
             )}
           </Animated.View>
 

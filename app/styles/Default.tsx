@@ -49,6 +49,21 @@ const styles = StyleSheet.create({
     fontSize: 18, // Define o tamanho da fonte do texto do botão
     fontWeight: "bold", // Define a espessura da fonte como negrito
   },
+  buttonSecondary: {
+    width: "80%", // Define a largura do botão primário
+    height: 50, // Define a altura do botão primário
+    backgroundColor: Theme.light.secondary.background, // Define a cor de fundo do botão primário com base no tema
+    justifyContent: "center", // Centraliza o conteúdo verticalmente dentro do botão
+    alignItems: "center", // Centraliza o conteúdo horizontalmente dentro do botão
+    borderRadius: 5, // Define o raio da borda para cantos arredondados
+    marginTop: 20, // Define a margem superior
+    marginBottom: 20, // Define a margem inferior
+  },
+  buttonSecondaryText: {
+    color: Theme.light.secondary.text, // Define a cor do texto do botão primário com base no tema
+    fontSize: 18, // Define o tamanho da fonte do texto do botão
+    fontWeight: "bold", // Define a espessura da fonte como negrito
+  },
   signupText: {
     color: Theme.light.text, // Define a cor do texto de cadastro com base no tema
     fontSize: 16, // Define o tamanho da fonte do texto de cadastro
