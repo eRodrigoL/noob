@@ -189,7 +189,7 @@ const UserProfile: React.FC = () => {
             }
           />
         ) : (
-          <Text style={styles.label}>@{user.apelido}</Text>
+          <Text style={styles.label}>{user.apelido}</Text>
         )}
         {/* Email */}
         <Text style={styles.label}>Email:</Text>

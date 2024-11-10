@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Biblioteca de ícones
@@ -6,10 +6,47 @@ import { Theme } from "@/app/styles/Theme";
 import SandwichMenu from "./SandwichMenu";
 import { useFocusEffect } from "@react-navigation/native"; // Importa o hook de navegação
 import { screens } from "@routes/Routes";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 // Definição do componente Header que recebe o título como prop
 const Header = ({ title }: { title: string }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [hasOpenMatch, setHasOpenMatch] = useState(false);
+
+  // Função para verificar se há partidas em aberto
+  const checkOpenMatches = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+
+      if (userId && token) {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        };
+
+        const response = await axios.get(
+          `https://api-noob-react.onrender.com/api/partidas?registrador=${userId}&fim=null`,
+          config
+        );
+        setHasOpenMatch(response.data.length > 0);
+      }
+    } catch (error) {
+      console.error("Erro ao verificar partidas em aberto:", error);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      checkOpenMatches(); // Verifica as partidas ao focar a tela
+      return () => {
+        setModalVisible(false); // Fecha o modal sempre que a tela perder o foco
+      };
+    }, [])
+  );
 
   const handleOpenModal = () => {
     setModalVisible(true);
@@ -19,14 +56,14 @@ const Header = ({ title }: { title: string }) => {
     setModalVisible(false);
   };
 
-  // Garante que o modal será fechado sempre que a tela perder o foco e reabrirá corretamente ao focar novamente.
-  useFocusEffect(
-    React.useCallback(() => {
-      return () => {
-        setModalVisible(false); // Fecha o modal sempre que a tela perder o foco
-      };
-    }, [])
-  );
+  // Função para decidir qual tela abrir ao clicar no botão de configurações
+  const handleSettingsPress = () => {
+    if (hasOpenMatch) {
+      screens.matches.finish();
+    } else {
+      screens.matches.play();
+    }
+  };
 
   return (
     <View style={localStyles.headerContainer}>
@@ -46,7 +83,7 @@ const Header = ({ title }: { title: string }) => {
       {/* Botão de configurações à direita */}
       <TouchableOpacity
         style={localStyles.settingsButton}
-        onPress={() => screens.matches.play()}
+        onPress={handleSettingsPress}
       >
         <Text style={localStyles.text}>🎲</Text>
       </TouchableOpacity>
@@ -81,3 +118,4 @@ const localStyles = StyleSheet.create({
 });
 
 export default Header;
+
