@@ -30,8 +30,6 @@ const RegisterUser: React.FC = () => {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [capaUri, setCapaUri] = useState<string | null>(null); // Novo estado para capa
 
-  const router = useRouter();
-
   const pickImage = async (setImage: (uri: string | null) => void) => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -79,7 +77,7 @@ const RegisterUser: React.FC = () => {
 
     try {
       const formData = new FormData();
-      formData.append("nome",nome);
+      formData.append("nome", nome);
       formData.append("apelido", `@${apelido}`);
       formData.append("nascimento", nascimento);
       formData.append("email", email);
