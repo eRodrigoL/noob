@@ -174,6 +174,7 @@ const UserProfile: React.FC = () => {
         initialIsRegisting={false}
         isEditing={isEditing}
         onEditChange={setIsEditing}
+        setEditedUser={setEditedUser}
       >
         {/* Conteúdo visual enviado ao ParallaxProfile */}
         <Text style={styles.label}>Apelido:</Text>
