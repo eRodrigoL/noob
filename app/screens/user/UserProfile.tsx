@@ -177,20 +177,8 @@ const UserProfile: React.FC = () => {
       >
         {/* Conteúdo visual enviado ao ParallaxProfile */}
         <Text style={styles.label}>Apelido:</Text>
-        {isEditing ? (
-          <TextInput
-            style={styles.input}
-            value={editedUser.apelido}
-            onChangeText={(text) =>
-              setEditedUser((prevState: any) => ({
-                ...prevState,
-                apelido: text,
-              }))
-            }
-          />
-        ) : (
-          <Text style={styles.label}>@{user.apelido}</Text>
-        )}
+        <Text style={styles.label}>{user.apelido}</Text>
+
         {/* Email */}
         <Text style={styles.label}>Email:</Text>
         {isEditing ? (
