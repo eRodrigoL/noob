@@ -14,16 +14,28 @@ import styles from "@/app/styles/Default";
 import { StyleSheet } from "react-native";
 import { Theme } from "@/app/styles/Theme";
 import { screens } from "@/app/routes/Routes";
+import { useNavigation } from '@react-navigation/native';
 
 const RegistroPartidaScreen = () => {
   const [victory, setVictory] = useState("");
   const [scoreType, setScoreType] = useState("");
-  const [score, setScore] = useState<string | null>(null); // Pontuação opcional
-  const [endTime, setEndTime] = useState(""); // Horário de fim da partida
+  const [score, setScore] = useState<string | null>(null);
+  const [endTime, setEndTime] = useState("");
   const [partidaId, setPartidaId] = useState(null);
-  const [inputText, setInputText] = useState(""); // Para adicionar texto do participante
-  const [participants, setParticipants] = useState<string[]>([]); // Lista de participantes
-  const [validNicknames, setValidNicknames] = useState<string[]>([]); // Lista de apelidos válidos
+  const [inputText, setInputText] = useState("");
+  const [participants, setParticipants] = useState<string[]>([]);
+  const [validNicknames, setValidNicknames] = useState<string[]>([]);
+  const navigation = useNavigation();
+
+  const refreshScreen = () => {
+    // Atualiza o estado para refletir a mudança na tela
+    setVictory("");
+    setScoreType("");
+    setScore(null);
+    setEndTime("");
+    setParticipants([]);
+    setInputText("");
+  };
 
   useEffect(() => {
     const fetchPartidaEmAberto = async () => {
@@ -47,9 +59,8 @@ const RegistroPartidaScreen = () => {
           if (response.data && response.data.length > 0) {
             const partidaAberta = response.data[0];
             setPartidaId(partidaAberta._id);
-
-            // Extrai apelidos dos usuários e define na lista de apelidos válidos
-            const nicknames = partidaAberta.usuarios.map((user: any) => user.apelido);
+            
+            const nicknames = partidaAberta.usuarios.map((user: { apelido: string }) => user.apelido);
             setValidNicknames(nicknames);
           } else {
             Alert.alert("Info", "Nenhuma partida em aberto encontrada.");
@@ -66,7 +77,6 @@ const RegistroPartidaScreen = () => {
     fetchPartidaEmAberto();
   }, []);
 
-  // Função para adicionar participante à lista
   const addParticipant = () => {
     const trimmedInput = inputText.trim();
     if (trimmedInput && validNicknames.includes(trimmedInput) && !participants.includes(trimmedInput)) {
@@ -79,12 +89,10 @@ const RegistroPartidaScreen = () => {
     }
   };
 
-  // Função para remover participante
   const removeParticipant = (index: number) => {
     setParticipants(participants.filter((_, i) => i !== index));
   };
 
-  // Função para salvar a partida na API
   const handleSaveMatch = async () => {
     if (!partidaId) return;
 
@@ -110,6 +118,7 @@ const RegistroPartidaScreen = () => {
       } else if (victory === "naoConcluido") {
         await axios.delete(`https://api-noob-react.onrender.com/api/partidas/${partidaId}`, config);
         Alert.alert("Partida não concluída", "A partida foi excluída com sucesso.");
+        screens.boardgame.list(); 
         return;
       } else {
         vencedor = participants.map((apelido) => ({ apelido }));
@@ -128,6 +137,9 @@ const RegistroPartidaScreen = () => {
       );
 
       Alert.alert("Sucesso", "A partida foi atualizada com sucesso.");
+      refreshScreen();
+      screens.boardgame.list(); // Redireciona para a lista após salvar
+      
     } catch (error) {
       console.error("Erro ao atualizar a partida:", error);
       Alert.alert("Erro", "Não foi possível atualizar a partida.");
@@ -139,12 +151,10 @@ const RegistroPartidaScreen = () => {
       <View style={styles.container}>
         <Text style={[styles.title, localStyles.header]}>Registro de partida</Text>
 
-        {/* Exibir o ID da partida em aberto, se encontrado */}
         {partidaId && (
           <Text style={styles.label}>ID da partida em aberto: {partidaId}</Text>
         )}
 
-        {/* Horário de Fim */}
         <Text style={styles.label}>Fim da partida:</Text>
         <TextInput
           placeholder="18:55"
@@ -153,20 +163,23 @@ const RegistroPartidaScreen = () => {
           onChangeText={setEndTime}
         />
 
-        {/* Campo Participantes */}
         <Text style={styles.label}>Vitória:</Text>
         <TextInput
           placeholder="Digite o/os vencedores e pressione Enter..."
           style={[styles.input, localStyles.input]}
           value={inputText}
           onChangeText={setInputText}
-          onSubmitEditing={addParticipant}
+          onSubmitEditing={victory === "" ? addParticipant : undefined}
+          editable={victory === ""}
         />
-        <TouchableOpacity style={localStyles.addButton} onPress={addParticipant}>
+        <TouchableOpacity
+          style={localStyles.addButton}
+          onPress={victory === "" ? addParticipant : undefined}
+          disabled={victory !== ""}
+        >
           <Text style={localStyles.addButtonText}>Adicionar</Text>
         </TouchableOpacity>
 
-        {/* Exibição dos chips de participantes */}
         <ScrollView horizontal style={localStyles.tagContainer}>
           {participants.map((participant, index) => (
             <View key={index} style={localStyles.tag}>
@@ -180,7 +193,10 @@ const RegistroPartidaScreen = () => {
 
         <Text style={styles.label}>Ou selecione as opções abaixo:</Text>
         <RadioButton.Group
-          onValueChange={(newValue) => setVictory(newValue)}
+          onValueChange={(newValue) => {
+            setVictory(newValue);
+            setParticipants([]);
+          }}
           value={victory}
         >
           <View style={localStyles.radioContainer}>
@@ -197,7 +213,6 @@ const RegistroPartidaScreen = () => {
           </View>
         </RadioButton.Group>
 
-        {/* Pontuação */}
         <Text style={styles.label}>Pontuações:</Text>
         <RadioButton.Group
           onValueChange={(newValue) => setScoreType(newValue)}
@@ -213,7 +228,6 @@ const RegistroPartidaScreen = () => {
           </View>
         </RadioButton.Group>
 
-        {/* Campo de pontuação */}
         {scoreType === "pontos" && (
           <TextInput
             placeholder="Digite a pontuação"
@@ -224,16 +238,16 @@ const RegistroPartidaScreen = () => {
           />
         )}
 
-        {/* Botão Salvar Partida */}
         <TouchableOpacity style={styles.buttonPrimary} onPress={handleSaveMatch}>
           <Text style={styles.buttonPrimaryText}>Salvar Partida</Text>
         </TouchableOpacity>
-      
 
-        {/* Botão Finalizar depois */}
         <TouchableOpacity
           style={styles.buttonPrimary}
-          onPress={screens.boardgame.list}
+          onPress={() => {
+          screens.boardgame.list();// Redireciona para a lista ao finalizar depois
+            refreshScreen();
+          }}
         >
           <Text style={styles.buttonPrimaryText}>Finalizar depois</Text>
         </TouchableOpacity>
@@ -297,4 +311,5 @@ const localStyles = StyleSheet.create({
 });
 
 export default RegistroPartidaScreen;
+
 
