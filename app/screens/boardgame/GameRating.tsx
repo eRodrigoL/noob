@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Theme } from "@/app/styles/Theme";
 import styles from "@/app/styles/Default";
 import { useLocalSearchParams } from "expo-router";
+import ApiWakeUp from "@/app/services/AcordarAPI";
 
 interface Game {
   titulo: string;
@@ -21,6 +22,8 @@ interface Avaliacao {
 }
 
 export default function GameReview() {
+  <ApiWakeUp />; // Mantem a API desperta
+
   const { id: jogo } = useLocalSearchParams<{ id?: string }>();
   const [game, setGame] = useState<Game | null>(null);
   const [avaliacao, setAvaliacao] = useState<Avaliacao>({

@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import styles from "@styles/Default";
+import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
 import ParallaxProfile from "@/components/ParallaxProfile";
 import ApiWakeUp from "@/app/services/AcordarAPI";
+
+const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
 const UserProfile: React.FC = () => {
   <ApiWakeUp />; // Mantem a API desperta
@@ -166,8 +177,20 @@ const UserProfile: React.FC = () => {
         setEditedUser={setEditedUser}
       >
         <Text style={styles.label}>Apelido:</Text>
-        <Text style={styles.label}>{user.apelido}</Text>
-
+        {isEditing ? (
+          <TextInput
+            style={styles.input}
+            value={editedUser.apelido}
+            onChangeText={(text) =>
+              setEditedUser((prevState: any) => ({
+                ...prevState,
+                apelido: text,
+              }))
+            }
+          />
+        ) : (
+          <Text style={styles.label}>@{user.apelido}</Text>
+        )}
         {/* Email */}
         <Text style={styles.label}>Email:</Text>
         {isEditing ? (
@@ -184,7 +207,6 @@ const UserProfile: React.FC = () => {
         ) : (
           <Text style={styles.label}>{user.email}</Text>
         )}
-
         {/* Data de Nascimento */}
         <Text style={styles.label}>Data de Nascimento:</Text>
         {isEditing ? (
@@ -222,5 +244,71 @@ const UserProfile: React.FC = () => {
     </View>
   );
 };
+
+const localStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Theme.light.background,
+  },
+  bodyContainer: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: Theme.light.background,
+  },
+  imageContainer: {
+    flexDirection: "row", // Adiciona flexDirection para alinhar imagem e texto na horizontal
+    alignItems: "center", // Centraliza verticalmente o conteúdo
+  },
+  foto: {
+    width: 150,
+    height: 150,
+    borderWidth: 5,
+    borderColor: "#333",
+    borderRadius: 15,
+    marginLeft: 15,
+    marginBottom: 16,
+    backgroundColor: "white",
+    position: "absolute",
+    top: -90,
+  },
+  textContainer: {
+    paddingLeft: 16,
+    flex: 1, // Permite que o container ocupe o espaço restante
+  },
+  content: {
+    fontSize: 16,
+    color: "#555",
+  },
+  label: {
+    fontSize: 18,
+    color: Theme.light.text,
+    alignSelf: "flex-start",
+    marginLeft: "10%",
+    marginBottom: 8,
+  },
+  textInput: {
+    fontSize: 16,
+    color: Theme.light.text,
+    marginLeft: 195,
+    borderWidth: 1,
+    right: 15,
+  },
+  userInfoText: {
+    fontSize: 16,
+    color: Theme.light.text,
+    marginBottom: 20,
+    alignSelf: "flex-start",
+    marginLeft: "10%",
+  },
+  userInfoTextEditable: {
+    fontSize: 16,
+    color: Theme.light.text,
+    marginBottom: 20,
+    alignSelf: "flex-start",
+    marginLeft: "10%",
+    borderBottomWidth: 1,
+    borderBottomColor: Theme.light.text,
+  },
+});
 
 export default UserProfile;

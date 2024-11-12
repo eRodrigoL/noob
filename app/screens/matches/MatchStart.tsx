@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,11 +7,14 @@ import {
   StyleSheet,
   Switch,
   ScrollView,
+  Alert,
 } from "react-native";
 import styles from "@/app/styles/Default";
 import { Theme } from "@/app/styles/Theme";
 import ApiWakeUp from "@/app/services/AcordarAPI";
 import { screens } from "@/app/routes/Routes";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const RegistroPartidaScreen = () => {
   <ApiWakeUp />; // Mantém a API desperta
@@ -19,17 +22,124 @@ const RegistroPartidaScreen = () => {
   const [explicacao, setExplicacao] = useState(false);
   const [tempoExplicacao, setTempoExplicacao] = useState("");
   const [inputText, setInputText] = useState("");
+  const [inputJogo, setInputJogo] = useState("");
+  const [inicioPartida, setInicioPartida] = useState("");
   const [participants, setParticipants] = useState<string[]>([]);
+  const [validNicknames, setValidNicknames] = useState<string[]>([]);
+  const [validGames, setValidGames] = useState<string[]>([]);
+
+  // Buscar apelidos válidos e jogos válidos na API ao carregar o componente
+  useEffect(() => {
+    const fetchNicknames = async () => {
+      try {
+        const userId = await AsyncStorage.getItem("userId");
+        const token = await AsyncStorage.getItem("token");
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        };
+
+        const response = await axios.get(
+          "https://api-noob-react.onrender.com/api/usuarios",
+          config
+        );
+        const nicknames = response.data.map((usuario: any) => usuario.apelido);
+        setValidNicknames(nicknames);
+      } catch (error) {
+        console.error("Erro ao buscar apelidos:", error);
+      }
+    };
+
+    const fetchGames = async () => {
+      try {
+        const response = await axios.get(
+          "https://api-noob-react.onrender.com/api/jogos"
+        );
+        const games = response.data.map((jogo: any) => jogo.titulo);
+        setValidGames(games);
+      } catch (error) {
+        console.error("Erro ao buscar jogos:", error);
+      }
+    };
+
+    fetchNicknames();
+    fetchGames();
+  }, []);
 
   const addParticipant = () => {
     if (inputText.trim()) {
-      setParticipants([...participants, inputText.trim()]);
-      setInputText("");
+      if (validNicknames.includes(inputText.trim())) {
+        setParticipants([...participants, inputText.trim()]);
+        setInputText("");
+      } else {
+        alert("Apelido não encontrado. Por favor, insira um apelido válido.");
+      }
+    }
+  };
+
+  const validateGame = () => {
+    if (!validGames.includes(inputJogo.trim())) {
+      alert("Jogo não encontrado. Por favor, insira um jogo válido.");
     }
   };
 
   const removeParticipant = (index: number) => {
     setParticipants(participants.filter((_, i) => i !== index));
+  };
+
+  // Função para registrar a partida na API
+  const registrarPartida = async () => {
+    if (participants.length === 0 || !inputJogo || !inicioPartida) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      };
+
+      // Transformar cada apelido em um objeto { apelido: "apelido" }
+      const usuarios = participants.map((apelido) => ({ apelido }));
+
+      const partidaData = {
+        usuarios, // Agora é uma lista de objetos
+        jogo: inputJogo,
+        explicacao: explicacao ? { tempoExplicacao } : "",
+        inicio: inicioPartida,
+      };
+
+      const response = await axios.post(
+        "https://api-noob-react.onrender.com/api/partidas",
+        partidaData,
+        config
+      );
+
+      if (response.status === 201) {
+        Alert.alert("Sucesso", "Partida registrada com sucesso!");
+        // Limpar os campos após o sucesso
+        setParticipants([]);
+        setInputJogo("");
+        setTempoExplicacao("");
+        setInicioPartida("");
+        setExplicacao(false);
+      }
+    } catch (error) {
+      console.error("Erro ao registrar a partida:", error);
+      Alert.alert(
+        "Erro",
+        "Não foi possível registrar a partida. Tente novamente."
+      );
+    }
   };
 
   return (
@@ -72,6 +182,9 @@ const RegistroPartidaScreen = () => {
         <TextInput
           placeholder="Digite o jogo a pesquisar..."
           style={[styles.input, localStyles.input]}
+          value={inputJogo}
+          onChangeText={setInputJogo}
+          onBlur={validateGame} // Verifica o jogo quando o campo perde o foco
         />
 
         {/* Explicação das Regras */}
@@ -97,14 +210,16 @@ const RegistroPartidaScreen = () => {
         <TextInput
           placeholder="18:30"
           style={[styles.input, localStyles.input]}
+          value={inicioPartida}
+          onChangeText={setInicioPartida}
         />
 
         {/* Botão Registrar */}
         <TouchableOpacity
           style={styles.buttonPrimary}
-          onPress={screens.matches.finish}
+          onPress={registrarPartida}
         >
-          <Text style={styles.buttonPrimaryText}>Avançar</Text>
+          <Text style={styles.buttonPrimaryText}>Registrar Partida</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

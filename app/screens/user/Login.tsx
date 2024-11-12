@@ -25,11 +25,13 @@ const Login: React.FC = () => {
       return;
     }
 
+    const apelidoCorrigido = `@${apelido}`;
+
     try {
       // Faz uma requisição para o backend para autenticação
       const response = await axios.post(
         "https://api-noob-react.onrender.com/api/login",
-        { apelido, senha }
+        { apelido: apelidoCorrigido, senha }
       );
 
       // Se o status da resposta for 200, login é bem-sucedido
