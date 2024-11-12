@@ -15,8 +15,11 @@ import { StyleSheet } from "react-native";
 import { Theme } from "@/app/styles/Theme";
 import { screens } from "@/app/routes/Routes";
 import { useNavigation } from '@react-navigation/native';
+import ApiWakeUp from "@/app/services/AcordarAPI";
 
 const RegistroPartidaScreen = () => {
+  <ApiWakeUp />; // Mantém a API desperta
+
   const [victory, setVictory] = useState("");
   const [scoreType, setScoreType] = useState("");
   const [score, setScore] = useState<string | null>(null);

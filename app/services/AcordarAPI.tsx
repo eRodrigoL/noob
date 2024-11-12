@@ -39,7 +39,7 @@ const ApiWakeUp = () => {
     wakeUpApis();
 
     // Configura o intervalo de tempo em milessegundos(ms)
-    const interval = setInterval(wakeUpApis, 300000); // 4 min
+    const interval = setInterval(wakeUpApis, 180000); // 3 min
 
     // Limpa o intervalo quando o componente é desmontado
     return () => clearInterval(interval);
