@@ -1,60 +1,27 @@
 import React, { useState } from "react";
-import {
-  Dimensions,
-  View,
-  Text,
-  TextInput,
-  Alert,
-  StyleSheet,
-} from "react-native";
-import * as ImagePicker from "expo-image-picker";
+import { View, Text, TextInput, Alert } from "react-native";
 import axios from "axios";
 import styles from "@styles/Default";
 import { TextInputMask } from "react-native-masked-text";
 import ButtonPrimary from "@components/ButtonPrimary";
-import ButtonGoBack from "@/components/ButtonGoBack";
 import { screens } from "@routes/Routes";
 import ApiWakeUp from "@/app/services/AcordarAPI";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
 import ParallaxProfile from "@/components/ParallaxProfile";
-
-const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
 const RegisterUser: React.FC = () => {
   <ApiWakeUp />; // Mantem a API desperta
 
-  const [nome, setNome] = useState("");
+  const [nome] = useState("");
   const [apelido, setApelido] = useState("");
   const [nascimento, setNascimento] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [imageUri, setImageUri] = useState<string | null>(null);
-  const [capaUri, setCapaUri] = useState<string | null>(null); // Novo estado para capa
+  const [imageUri] = useState<string | null>(null);
+  const [capaUri] = useState<string | null>(null); // Novo estado para capa
   const isEditing = () => {}; // Função vazia, serve apenas como parametro para o Parallax
   const [editedUser] = useState<any>(null);
-
-  const pickImage = async (setImage: (uri: string | null) => void) => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      alert("Permissão para acessar as fotos é necessária!");
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (!result.canceled && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
-    }
-  };
 
   const isPasswordStrong = (password: string) => {
     const strongPasswordRegex =
