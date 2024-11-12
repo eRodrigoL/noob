@@ -127,7 +127,7 @@ const RegisterUser: React.FC = () => {
         <Text style={styles.label}>Apelido:</Text>
         <TextInput
           style={styles.input}
-          value={nome}
+          value={apelido}
           placeholder="Apelido"
           onChangeText={setApelido}
         />
@@ -144,7 +144,7 @@ const RegisterUser: React.FC = () => {
         />
 
         {/* Email */}
-        <Text style={styles.label}>Data de nascimento:</Text>
+        <Text style={styles.label}>Email:</Text>
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -154,7 +154,7 @@ const RegisterUser: React.FC = () => {
         />
 
         {/* Senha */}
-        <Text style={styles.label}>Data de nascimento:</Text>
+        <Text style={styles.label}>Senha:</Text>
         <TextInput
           style={styles.input}
           placeholder="Senha"
@@ -164,7 +164,7 @@ const RegisterUser: React.FC = () => {
         />
 
         {/* Confirmação de sSenha */}
-        <Text style={styles.label}>Data de nascimento:</Text>
+        <Text style={styles.label}>Confirmação de senha:</Text>
         <TextInput
           style={styles.input}
           placeholder="Confirme a senha"

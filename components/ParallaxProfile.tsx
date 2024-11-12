@@ -36,12 +36,13 @@ export interface ParallaxProfileProps {
   children?: React.ReactNode;
   isEditing?: boolean;
   onEditChange?: React.Dispatch<React.SetStateAction<boolean>>;
-  setEditedUser: React.Dispatch<React.SetStateAction<User>>; // Função para atualizar o estado do usuário
+  setEditedUser?: React.Dispatch<React.SetStateAction<User>>; // Função para atualizar o estado do usuário
 }
 
 interface User {
-  nome: string | null;
-  foto: string | null;
+  id?: string;
+  nome: string;
+  foto?: string | null;
 }
 
 // Componente principal ParallaxProfile
@@ -88,20 +89,22 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
 
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri);
-      setEditedUser((prev) => ({
-        ...prev,
-        foto: result.assets[0].uri, // Atualiza a foto no estado global
-      }));
+      setEditedUser &&
+        setEditedUser((prev) => ({
+          ...prev,
+          foto: result.assets[0].uri, // Atualiza a foto no estado global
+        }));
     }
   };
 
   // Função para capturar alterações no nome
   const handleNomeChange = (value: string) => {
     setName(value);
-    setEditedUser((prev) => ({
-      ...prev,
-      nome: value, // Atualiza o nome no estado global
-    }));
+    setEditedUser &&
+      setEditedUser((prev) => ({
+        ...prev,
+        nome: value, // Atualiza o nome no estado global
+      }));
   };
 
   // Define uma variável animada para a rolagem da página
@@ -189,7 +192,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
                 style={localStyles.headerTitleInput}
                 placeholder="Digite o nome aqui..."
                 value={name || ""}
-                onChangeText={(text) => setName(text)}
+                onChangeText={handleNomeChange}
               />
             ) : (
               <Text style={localStyles.headerTitle}>
