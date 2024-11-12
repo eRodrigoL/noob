@@ -1,341 +1,215 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
+  Dimensions,
   View,
   Text,
-  StyleSheet,
-  Dimensions,
   TextInput,
-  TouchableOpacity,
   Alert,
+  StyleSheet,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import styles from "@styles/Default";
+import { TextInputMask } from "react-native-masked-text";
+import ButtonPrimary from "@components/ButtonPrimary";
+import ButtonGoBack from "@/components/ButtonGoBack";
+import { screens } from "@routes/Routes";
+import ApiWakeUp from "@/app/services/AcordarAPI";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Theme } from "@/app/styles/Theme"; // Importa o tema de cores
 import Header from "@/components/Header";
-import ParallaxProfile from "./testeRODRIGO";
-import ApiWakeUp from "@/app/services/AcordarAPI";
+import ParallaxProfile from "@/components/ParallaxProfile";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
-const UserProfile: React.FC = () => {
+const RegisterUser: React.FC = () => {
   <ApiWakeUp />; // Mantem a API desperta
 
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState<any>(null);
+  const [nome, setNome] = useState("");
+  const [apelido, setApelido] = useState("");
+  const [nascimento, setNascimento] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [capaUri, setCapaUri] = useState<string | null>(null); // Novo estado para capa
+  const isEditing = () => {}; // Função vazia, serve apenas como parametro para o Parallax
+  const [editedUser] = useState<any>(null);
 
-  // Função para buscar os dados do usuário
-  const fetchUserData = async () => {
-    try {
-      const userId = await AsyncStorage.getItem("userId");
-      const token = await AsyncStorage.getItem("token");
+  const pickImage = async (setImage: (uri: string | null) => void) => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("Permissão para acessar as fotos é necessária!");
+      return;
+    }
 
-      if (!userId || !token) {
-        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
-        return;
-      }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-
-      const response = await axios.get(
-        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
-        config
-      );
-
-      setUser(response.data);
-      setEditedUser(response.data);
-    } catch (error) {
-      console.error("Erro ao buscar os dados do usuário:", error);
-      Alert.alert("Erro", "Não foi possível carregar os dados do usuário.");
-    } finally {
-      setLoading(false);
+    if (!result.canceled && result.assets.length > 0) {
+      setImage(result.assets[0].uri);
     }
   };
 
-  // Função para enviar os dados atualizados
-  const updateUserProfile = async () => {
-    if (!editedUser || !editedUser.nome || !editedUser.email) {
-      Alert.alert("Erro", "Nome e email são obrigatórios.");
+  const isPasswordStrong = (password: string) => {
+    const strongPasswordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return strongPasswordRegex.test(password);
+  };
+
+  const handleRegister = async () => {
+    if (!nome || !apelido || !email || !senha || !confirmarSenha) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    if (senha !== confirmarSenha) {
+      Alert.alert("Erro", "As senhas não coincidem.");
+      return;
+    }
+
+    if (!isPasswordStrong(senha)) {
+      Alert.alert(
+        "Erro",
+        "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial."
+      );
       return;
     }
 
     try {
-      const userId = await AsyncStorage.getItem("userId");
-      const token = await AsyncStorage.getItem("token");
-
-      if (!userId || !token) {
-        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
-        return;
-      }
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      };
-
       const formData = new FormData();
-      formData.append("nome", editedUser.nome);
-      formData.append("email", editedUser.email);
-      formData.append("nascimento", editedUser.nascimento);
+      formData.append("nome", nome);
+      formData.append("apelido", `@${apelido}`);
+      formData.append("nascimento", nascimento);
+      formData.append("email", email);
+      formData.append("senha", senha);
 
-      if (editedUser.foto) {
-        const localUri = editedUser.foto;
-        const filename = localUri.split("/").pop();
+      if (imageUri) {
+        const filename = imageUri.split("/").pop();
         const match = /\.(\w+)$/.exec(filename ?? "");
         const fileType = match ? `image/${match[1]}` : `image`;
 
         formData.append("foto", {
-          uri: localUri,
-          name: filename ?? "profile.jpg",
+          uri: imageUri,
+          name: filename,
           type: fileType,
         } as any);
       }
 
-      await axios.put(
-        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
-        formData,
-        config
-      );
+      if (capaUri) {
+        const filename = capaUri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename ?? "");
+        const fileType = match ? `image/${match[1]}` : `image`;
 
-      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
-
-      // Recarregar os dados do usuário após a atualização
-      fetchUserData();
-    } catch (error: any) {
-      if (error.response) {
-        console.error("Erro no servidor:", error.response.data);
-      } else if (error.request) {
-        console.error("Erro de rede:", error.request);
-      } else {
-        console.error("Erro desconhecido:", error.message);
+        formData.append("capa", {
+          uri: capaUri,
+          name: filename,
+          type: fileType,
+        } as any);
       }
-      Alert.alert("Erro", "Não foi possível atualizar o perfil.");
+
+      const response = await axios.post(
+        "https://api-noob-react.onrender.com/api/usuarios",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      //
+      if (response.status === 201) {
+        const message = response.data.message;
+        Alert.alert("Sucesso", message);
+
+        screens.user.login();
+      }
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        Alert.alert("Erro", error.response.data.message);
+      } else {
+        Alert.alert(
+          "Erro",
+          "Houve um erro ao criar o usuário. Tente com novas credenciais!"
+        );
+      }
     }
   };
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  // Função para alternar entre edição e exibição
-  const handleEditToggle = () => {
-    if (isEditing) {
-      // Salva as alterações ao sair do modo de edição
-      updateUserProfile();
-    }
-    setIsEditing(!isEditing);
-  };
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text>Carregando dados do usuário...</Text>
-      </View>
-    );
-  }
-
-  if (!user) {
-    return (
-      <View style={styles.container}>
-        <Text>Erro ao carregar os dados do usuário.</Text>
-      </View>
-    );
-  }
-
-  const addOneDay = (dateString: string) => {
-    const date = new Date(dateString);
-    date.setDate(date.getDate() + 1); // Adiciona 1 dia
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
-  // TRECHO API -- FIM
 
   return (
     <View style={{ flex: 1 }}>
       {/* Exibe o cabeçalho com título */}
-      <Header title="Perfil" />
+      <Header title="Cadastro de conta" />
 
       <ParallaxProfile
-        id={user._id}
-        name={user.nome}
-        photo={user.foto}
+        id={null}
+        name={nome}
+        photo={imageUri}
         initialIsEditing={false}
         initialIsRegisting={false}
-        isEditing={isEditing}
-        onEditChange={setIsEditing}
-        setEditedUser={setEditedUser}
+        isEditing={true}
+        onEditChange={isEditing}
+        setEditedUser={editedUser}
       >
-        {/* Conteúdo visual enviado ao ParallaxProfile */}
+        {/* Apelido */}
         <Text style={styles.label}>Apelido:</Text>
-        {isEditing ? (
-          <TextInput
-            style={styles.input}
-            value={editedUser.apelido}
-            onChangeText={(text) =>
-              setEditedUser((prevState: any) => ({
-                ...prevState,
-                apelido: text,
-              }))
-            }
-          />
-        ) : (
-          <Text style={styles.label}>@{user.apelido}</Text>
-        )}
+        <TextInput
+          style={styles.input}
+          value={nome}
+          placeholder="Apelido"
+          onChangeText={setApelido}
+        />
+
+        {/* Nascimento */}
+        <Text style={styles.label}>Data de nascimento:</Text>
+        <TextInputMask
+          style={styles.input}
+          type={"datetime"}
+          options={{ format: "DD/MM/YYYY" }}
+          placeholder="Data nascimento"
+          value={nascimento}
+          onChangeText={setNascimento}
+        />
+
         {/* Email */}
-        <Text style={styles.label}>Email:</Text>
-        {isEditing ? (
-          <TextInput
-            style={styles.input}
-            value={editedUser.email}
-            onChangeText={(text) =>
-              setEditedUser((prevState: any) => ({
-                ...prevState,
-                email: text,
-              }))
-            }
-          />
-        ) : (
-          <Text style={styles.label}>{user.email}</Text>
-        )}
-        {/* Data de Nascimento */}
-        <Text style={styles.label}>Data de Nascimento:</Text>
-        {isEditing ? (
-          <TextInput
-            style={styles.input}
-            value={addOneDay(editedUser.nascimento)}
-          />
-        ) : (
-          <Text style={styles.label}>{addOneDay(user.nascimento)}</Text>
-        )}
+        <Text style={styles.label}>Data de nascimento:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+        />
 
-        {/* Botão de Editar/Salvar */}
-        <TouchableOpacity
-          style={styles.buttonPrimary}
-          onPress={handleEditToggle}
-        >
-          <Text style={styles.buttonPrimaryText}>
-            {isEditing ? "Salvar" : "Editar Perfil"}
-          </Text>
-        </TouchableOpacity>
+        {/* Senha */}
+        <Text style={styles.label}>Data de nascimento:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          secureTextEntry
+          value={senha}
+          onChangeText={setSenha}
+        />
 
-        {/* Botão Cancelar visível apenas se isEditing for true */}
-        {isEditing && (
-          <TouchableOpacity
-            style={styles.buttonSecondary}
-            onPress={() => {
-              setIsEditing(false); // Sai do modo de edição
-              setEditedUser(user); // Reverte as mudanças, restaurando os dados originais
-            }}
-          >
-            <Text style={styles.buttonSecondaryText}>Cancelar</Text>
-          </TouchableOpacity>
-        )}
+        {/* Confirmação de sSenha */}
+        <Text style={styles.label}>Data de nascimento:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Confirme a senha"
+          secureTextEntry
+          value={confirmarSenha}
+          onChangeText={setConfirmarSenha}
+        />
+
+        <ButtonPrimary title="Confirmar cadastrar" onPress={handleRegister} />
       </ParallaxProfile>
     </View>
   );
 };
 
-const localStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Theme.light.background,
-  },
-  backgroundImage: {
-    flex: 1, // Faz a imagem ocupar toda a área disponível
-    justifyContent: "center", // Centraliza o conteúdo verticalmente
-    alignItems: "center", // Centraliza o conteúdo horizontalmente
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-  },
-  header: {
-    position: "absolute",
-    top: 0,
-    width: screenWidth,
-    height: 200,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.6)", // Fundo semi-transparente
-  },
-  headerTitle: {
-    fontSize: 30, // Aumenta o tamanho do texto
-    fontWeight: "bold",
-    color: "#333",
-    marginLeft: 180, // Margem esquerda ajustada
-  },
-  scrollContent: {
-    paddingTop: 200, // Espaço para exibir o cabeçalho
-  },
-  bodyContainer: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: Theme.light.background,
-  },
-  imageContainer: {
-    flexDirection: "row", // Adiciona flexDirection para alinhar imagem e texto na horizontal
-    alignItems: "center", // Centraliza verticalmente o conteúdo
-  },
-  foto: {
-    width: 150,
-    height: 150,
-    borderWidth: 5,
-    borderColor: "#333",
-    borderRadius: 15,
-    marginLeft: 15,
-    marginBottom: 16,
-    backgroundColor: "white",
-    position: "absolute",
-    top: -90,
-  },
-  textContainer: {
-    paddingLeft: 16,
-    flex: 1, // Permite que o container ocupe o espaço restante
-  },
-  content: {
-    fontSize: 16,
-    color: "#555",
-  },
-  label: {
-    fontSize: 18,
-    color: Theme.light.text,
-    alignSelf: "flex-start",
-    marginLeft: "10%",
-    marginBottom: 8,
-  },
-  textInput: {
-    fontSize: 16,
-    color: Theme.light.text,
-    marginLeft: 195,
-    borderWidth: 1,
-    right: 15,
-  },
-  userInfoText: {
-    fontSize: 16,
-    color: Theme.light.text,
-    marginBottom: 20,
-    alignSelf: "flex-start",
-    marginLeft: "10%",
-  },
-  userInfoTextEditable: {
-    fontSize: 16,
-    color: Theme.light.text,
-    marginBottom: 20,
-    alignSelf: "flex-start",
-    marginLeft: "10%",
-    borderBottomWidth: 1,
-    borderBottomColor: Theme.light.text,
-  },
-});
-
-export default UserProfile;
+export default RegisterUser;

@@ -176,7 +176,6 @@ const UserProfile: React.FC = () => {
         onEditChange={setIsEditing}
         setEditedUser={setEditedUser}
       >
-        {/* Conteúdo visual enviado ao ParallaxProfile */}
         <Text style={styles.label}>Apelido:</Text>
         {isEditing ? (
           <TextInput
@@ -245,97 +244,5 @@ const UserProfile: React.FC = () => {
     </View>
   );
 };
-
-const localStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Theme.light.background,
-  },
-  backgroundImage: {
-    flex: 1, // Faz a imagem ocupar toda a área disponível
-    justifyContent: "center", // Centraliza o conteúdo verticalmente
-    alignItems: "center", // Centraliza o conteúdo horizontalmente
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-  },
-  header: {
-    position: "absolute",
-    top: 0,
-    width: screenWidth,
-    height: 200,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.6)", // Fundo semi-transparente
-  },
-  headerTitle: {
-    fontSize: 30, // Aumenta o tamanho do texto
-    fontWeight: "bold",
-    color: "#333",
-    marginLeft: 180, // Margem esquerda ajustada
-  },
-  scrollContent: {
-    paddingTop: 200, // Espaço para exibir o cabeçalho
-  },
-  bodyContainer: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: Theme.light.background,
-  },
-  imageContainer: {
-    flexDirection: "row", // Adiciona flexDirection para alinhar imagem e texto na horizontal
-    alignItems: "center", // Centraliza verticalmente o conteúdo
-  },
-  foto: {
-    width: 150,
-    height: 150,
-    borderWidth: 5,
-    borderColor: "#333",
-    borderRadius: 15,
-    marginLeft: 15,
-    marginBottom: 16,
-    backgroundColor: "white",
-    position: "absolute",
-    top: -90,
-  },
-  textContainer: {
-    paddingLeft: 16,
-    flex: 1, // Permite que o container ocupe o espaço restante
-  },
-  content: {
-    fontSize: 16,
-    color: "#555",
-  },
-  label: {
-    fontSize: 18,
-    color: Theme.light.text,
-    alignSelf: "flex-start",
-    marginLeft: "10%",
-    marginBottom: 8,
-  },
-  textInput: {
-    fontSize: 16,
-    color: Theme.light.text,
-    marginLeft: 195,
-    borderWidth: 1,
-    right: 15,
-  },
-  userInfoText: {
-    fontSize: 16,
-    color: Theme.light.text,
-    marginBottom: 20,
-    alignSelf: "flex-start",
-    marginLeft: "10%",
-  },
-  userInfoTextEditable: {
-    fontSize: 16,
-    color: Theme.light.text,
-    marginBottom: 20,
-    alignSelf: "flex-start",
-    marginLeft: "10%",
-    borderBottomWidth: 1,
-    borderBottomColor: Theme.light.text,
-  },
-});
 
 export default UserProfile;
