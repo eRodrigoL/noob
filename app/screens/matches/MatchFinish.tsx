@@ -55,7 +55,7 @@ const RegistroPartidaScreen = () => {
           };
 
           const response = await axios.get(
-            `https://api-noob-react.onrender.com/api/partidas?registrador=${userId}&fim=null`,
+            `https://api-noob-react.onrender.com/api/partidas/filtro?registrador=${userId}&fim=null`,
             config
           );
 

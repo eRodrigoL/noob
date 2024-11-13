@@ -40,15 +40,26 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
         };
 
         const response = await axios.get(
-          `https://api-noob-react.onrender.com/api/partidas?registrador=${userId}&fim=null`,
+          `https://api-noob-react.onrender.com/api/partidas/filtro?registrador=${userId}&fim=null`,
           config
         );
         setHasOpenMatch(response.data.length > 0);
       }
     } catch (error) {
-      console.error("Erro ao verificar partidas em aberto:", error);
+      if (axios.isAxiosError(error)) {
+        // Verifica se o erro é do tipo AxiosError
+        if (error.response && error.response.status === 404) {
+          
+          setHasOpenMatch(false); // Nenhuma partida em aberto
+        } else {
+          console.error("Erro ao verificar partidas em aberto:", error);
+        }
+      } else {
+        console.error("Erro desconhecido:", error);
+      }
     }
   };
+  
 
   // Verifica as partidas em aberto ao abrir o modal
   useEffect(() => {
