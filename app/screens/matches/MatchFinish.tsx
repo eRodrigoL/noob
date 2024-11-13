@@ -96,6 +96,31 @@ const RegistroPartidaScreen = () => {
   };
 
   const handleSaveMatch = async () => {
+    // Validações de campos obrigatórios
+  if (!endTime.trim()) {
+    Alert.alert("Erro", "O campo 'Fim da partida' é obrigatório.");
+    return;
+  }
+
+  if (!victory) {
+    Alert.alert("Erro", "Selecione uma opção de vitória.");
+    return;
+  }
+
+  if (victory === "individual" && participants.length === 0) {
+    Alert.alert("Erro", "Adicione pelo menos um vencedor.");
+    return;
+  }
+
+  if (!scoreType) {
+    Alert.alert("Erro", "Selecione um tipo de pontuação.");
+    return;
+  }
+
+  if (scoreType === "pontos" && (!score || isNaN(parseInt(score, 10)))) {
+    Alert.alert("Erro", "Insira uma pontuação válida.");
+    return;
+  }
     if (!partidaId) return;
 
     try {
