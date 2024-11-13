@@ -127,7 +127,7 @@ const RegisterUser: React.FC = () => {
         <Text style={styles.label}>Apelido:</Text>
         <TextInput
           style={styles.input}
-          value={nome}
+          value={apelido}
           placeholder="Apelido"
           onChangeText={setApelido}
         />
