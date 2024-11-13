@@ -31,7 +31,6 @@ const RegistroPartidaScreen = () => {
   const navigation = useNavigation();
 
   const refreshScreen = () => {
-    // Atualiza o estado para refletir a mudança na tela
     setVictory("");
     setScoreType("");
     setScore(null);
@@ -72,8 +71,8 @@ const RegistroPartidaScreen = () => {
           Alert.alert("Erro", "Usuário não autenticado.");
         }
       } catch (error) {
-        console.error("Erro ao buscar partida:", error);
-        Alert.alert("Erro", "Não foi possível buscar a partida.");
+        //console.error("Erro ao buscar partida:", error);
+        //Alert.alert("Erro", "Não foi possível buscar a partida.");
       }
     };
 
@@ -197,21 +196,21 @@ const RegistroPartidaScreen = () => {
         <Text style={styles.label}>Ou selecione as opções abaixo:</Text>
         <RadioButton.Group
           onValueChange={(newValue) => {
-            setVictory(newValue);
-            setParticipants([]);
+            setVictory(newValue === victory ? "" : newValue);
+            if (newValue !== victory) setParticipants([]);
           }}
           value={victory}
         >
           <View style={localStyles.radioContainer}>
-            <RadioButton value="coletiva" />
+            <RadioButton disabled={participants.length > 0} value="coletiva" />
             <Text style={localStyles.radioLabel}>Vitória coletiva</Text>
           </View>
           <View style={localStyles.radioContainer}>
-            <RadioButton value="derrota" />
+            <RadioButton disabled={participants.length > 0} value="derrota" />
             <Text style={localStyles.radioLabel}>Derrota coletiva (o jogo venceu)</Text>
           </View>
           <View style={localStyles.radioContainer}>
-            <RadioButton value="naoConcluido" />
+            <RadioButton disabled={participants.length > 0} value="naoConcluido" />
             <Text style={localStyles.radioLabel}>Jogo não concluído</Text>
           </View>
         </RadioButton.Group>
@@ -314,5 +313,6 @@ const localStyles = StyleSheet.create({
 });
 
 export default RegistroPartidaScreen;
+
 
 
