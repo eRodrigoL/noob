@@ -10,18 +10,13 @@ import Header from "@/components/Header";
 import ParallaxProfile from "@/components/ParallaxProfile";
 
 const RegisterUser: React.FC = () => {
-  <ApiWakeUp />; // Mantem a API desperta
-
-  const [nome] = useState("");
+  // Estados dos campos do formulário
   const [apelido, setApelido] = useState("");
   const [nascimento, setNascimento] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [imageUri] = useState<string | null>(null);
-  const [capaUri] = useState<string | null>(null); // Novo estado para capa
-  const isEditing = () => {}; // Função vazia, serve apenas como parametro para o Parallax
-  const [editedUser] = useState<any>(null);
+  const [editedUser, setEditedUser] = useState<any>({ nome: "", foto: null });
 
   const isPasswordStrong = (password: string) => {
     const strongPasswordRegex =
@@ -30,7 +25,13 @@ const RegisterUser: React.FC = () => {
   };
 
   const handleRegister = async () => {
-    if (!nome || !apelido || !email || !senha || !confirmarSenha) {
+    if (
+      !editedUser.nome || // Verifica o nome atualizado
+      !apelido ||
+      !email ||
+      !senha ||
+      !confirmarSenha
+    ) {
       Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
       return;
     }
@@ -50,31 +51,19 @@ const RegisterUser: React.FC = () => {
 
     try {
       const formData = new FormData();
-      formData.append("nome", nome);
+      formData.append("nome", editedUser.nome);
       formData.append("apelido", `@${apelido}`);
       formData.append("nascimento", nascimento);
       formData.append("email", email);
       formData.append("senha", senha);
 
-      if (imageUri) {
-        const filename = imageUri.split("/").pop();
+      if (editedUser.foto) {
+        const filename = editedUser.foto.split("/").pop();
         const match = /\.(\w+)$/.exec(filename ?? "");
         const fileType = match ? `image/${match[1]}` : `image`;
 
         formData.append("foto", {
-          uri: imageUri,
-          name: filename,
-          type: fileType,
-        } as any);
-      }
-
-      if (capaUri) {
-        const filename = capaUri.split("/").pop();
-        const match = /\.(\w+)$/.exec(filename ?? "");
-        const fileType = match ? `image/${match[1]}` : `image`;
-
-        formData.append("capa", {
-          uri: capaUri,
+          uri: editedUser.foto,
           name: filename,
           type: fileType,
         } as any);
@@ -89,11 +78,9 @@ const RegisterUser: React.FC = () => {
           },
         }
       );
-      //
-      if (response.status === 201) {
-        const message = response.data.message;
-        Alert.alert("Sucesso", message);
 
+      if (response.status === 201) {
+        Alert.alert("Sucesso", response.data.message);
         screens.user.login();
       }
     } catch (error: any) {
@@ -115,19 +102,17 @@ const RegisterUser: React.FC = () => {
 
       <ParallaxProfile
         id={null}
-        name={nome}
-        photo={imageUri}
+        name={editedUser.nome}
+        photo={editedUser.foto}
         initialIsEditing={false}
-        initialIsRegisting={false}
-        isEditing={true}
-        onEditChange={isEditing}
-        setEditedUser={editedUser}
+        initialIsRegisting={true}
+        setEditedUser={setEditedUser}
       >
         {/* Apelido */}
         <Text style={styles.label}>Apelido:</Text>
         <TextInput
           style={styles.input}
-          value={nome}
+          value={apelido}
           placeholder="Apelido"
           onChangeText={setApelido}
         />
@@ -163,7 +148,7 @@ const RegisterUser: React.FC = () => {
           onChangeText={setSenha}
         />
 
-        {/* Confirmação de sSenha */}
+        {/* Confirmação de Senha */}
         <Text style={styles.label}>Confirmação de senha:</Text>
         <TextInput
           style={styles.input}
@@ -173,7 +158,7 @@ const RegisterUser: React.FC = () => {
           onChangeText={setConfirmarSenha}
         />
 
-        <ButtonPrimary title="Confirmar cadastrar" onPress={handleRegister} />
+        <ButtonPrimary title="Confirmar cadastro" onPress={handleRegister} />
       </ParallaxProfile>
     </View>
   );
