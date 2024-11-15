@@ -102,13 +102,8 @@ const RegistroPartidaScreen = () => {
     return;
   }
 
-  if (!victory) {
-    Alert.alert("Erro", "Selecione uma opção de vitória.");
-    return;
-  }
-
-  if (victory === "individual" && participants.length === 0) {
-    Alert.alert("Erro", "Adicione pelo menos um vencedor.");
+  if ((participants.length === 0 && !victory)) {
+    Alert.alert("Erro", "Adicione pelo menos um vencedor ou opção de vitória");
     return;
   }
 
