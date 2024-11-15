@@ -16,6 +16,7 @@ import { Theme } from "@/app/styles/Theme";
 import { screens } from "@/app/routes/Routes";
 import { useNavigation } from '@react-navigation/native';
 import ApiWakeUp from "@/app/services/AcordarAPI";
+import { MaskedTextInput } from "react-native-mask-text";
 
 const RegistroPartidaScreen = () => {
   <ApiWakeUp />; // Mantém a API desperta
@@ -97,41 +98,55 @@ const RegistroPartidaScreen = () => {
 
   const handleSaveMatch = async () => {
     // Validações de campos obrigatórios
-  if (!endTime.trim()) {
-    Alert.alert("Erro", "O campo 'Fim da partida' é obrigatório.");
-    return;
-  }
-
-  if ((participants.length === 0 && !victory)) {
-    Alert.alert("Erro", "Adicione pelo menos um vencedor ou opção de vitória");
-    return;
-  }
-
-  if (!scoreType) {
-    Alert.alert("Erro", "Selecione um tipo de pontuação.");
-    return;
-  }
-
-  if (scoreType === "pontos" && (!score || isNaN(parseInt(score, 10)))) {
-    Alert.alert("Erro", "Insira uma pontuação válida.");
-    return;
-  }
+    if (!endTime.trim()) {
+      Alert.alert("Erro", "O campo 'Fim da partida' é obrigatório.");
+      return;
+    }
+  
+    if ((participants.length === 0 && !victory)) {
+      Alert.alert("Erro", "Adicione pelo menos um vencedor ou opção de vitória");
+      return;
+    }
+  
+    if (!scoreType) {
+      Alert.alert("Erro", "Selecione um tipo de pontuação.");
+      return;
+    }
+  
+    if (scoreType === "pontos" && (!score || isNaN(parseInt(score, 10)))) {
+      Alert.alert("Erro", "Insira uma pontuação válida.");
+      return;
+    }
+  
     if (!partidaId) return;
-
+  
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         Alert.alert("Erro", "Usuário não autenticado.");
         return;
       }
-
+  
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       };
-
+  
+      // Validação e formatação do horário 'fim'
+      const horarioRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+      const trimmedEndTime = endTime.trim();
+  
+      if (trimmedEndTime.length !== 5 || !horarioRegex.test(trimmedEndTime)) {
+        Alert.alert("Erro", "Formato de horário inválido para o campo 'Fim da partida'. Use hh:mm.");
+        return;
+      }
+  
+      const [hours, minutes] = trimmedEndTime.split(":").map(Number);
+      const now = new Date();
+      const fim = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+  
       let vencedor;
       if (victory === "coletiva") {
         vencedor = validNicknames.map((apelido) => ({ apelido }));
@@ -140,50 +155,58 @@ const RegistroPartidaScreen = () => {
       } else if (victory === "naoConcluido") {
         await axios.delete(`https://api-noob-react.onrender.com/api/partidas/${partidaId}`, config);
         Alert.alert("Partida não concluída", "A partida foi excluída com sucesso.");
-        screens.boardgame.list(); 
+        screens.boardgame.list();
         return;
       } else {
         vencedor = participants.map((apelido) => ({ apelido }));
       }
-
+  
       const partidaData = {
-        fim: endTime,
+        fim: fim.toISOString(),
         vencedor,
         pontuacao: scoreType === "pontos" ? parseInt(score || "0", 10) : null,
       };
-
+  
       await axios.put(
         `https://api-noob-react.onrender.com/api/partidas/${partidaId}`,
         partidaData,
         config
       );
-
+  
       Alert.alert("Sucesso", "A partida foi atualizada com sucesso.");
       refreshScreen();
       screens.boardgame.list(); // Redireciona para a lista após salvar
-      
     } catch (error) {
       console.error("Erro ao atualizar a partida:", error);
       Alert.alert("Erro", "Não foi possível atualizar a partida.");
     }
   };
+  
 
   return (
     <ScrollView>
       <View style={styles.container}>
         <Text style={[styles.title, localStyles.header]}>Registro de partida</Text>
 
-        {partidaId && (
-          <Text style={styles.label}>ID da partida em aberto: {partidaId}</Text>
-        )}
-
         <Text style={styles.label}>Fim da partida:</Text>
-        <TextInput
-          placeholder="18:55"
-          style={[styles.input, localStyles.input]}
-          value={endTime}
-          onChangeText={setEndTime}
-        />
+        <MaskedTextInput
+        mask="99:99"
+        placeholder="18:30"
+        style={[styles.input, localStyles.input]}
+        value={endTime}
+        onChangeText={(text, rawText) => {
+        const horarioRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+        const formattedText = rawText.replace(/^(\d{2})(\d{2})$/, "$1:$2");
+
+        if (formattedText.length === 5 && !horarioRegex.test(formattedText)) {
+        Alert.alert("Erro", "Formato de horário inválido. Use hh:mm.");
+      }
+
+        setEndTime(formattedText.trim());
+      }}
+      keyboardType="numeric" // Garante que o teclado numérico seja exibido
+      />
+
 
         <Text style={styles.label}>Vitória:</Text>
         <TextInput
