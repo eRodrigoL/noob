@@ -15,6 +15,7 @@ import ApiWakeUp from "@/app/services/AcordarAPI";
 import { screens } from "@/app/routes/Routes";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MaskedTextInput } from "react-native-mask-text";
 
 const RegistroPartidaScreen = () => {
   <ApiWakeUp />; // Mantém a API desperta
@@ -26,9 +27,8 @@ const RegistroPartidaScreen = () => {
   const [inicioPartida, setInicioPartida] = useState("");
   const [participants, setParticipants] = useState<string[]>([]);
   const [validNicknames, setValidNicknames] = useState<string[]>([]);
-  const [validGames, setValidGames] = useState<{ id: string; titulo: string }[]>([]); // Armazena ID e título dos jogos
+  const [validGames, setValidGames] = useState<{ id: string; titulo: string }[]>([]);
 
-  // Buscar apelidos válidos e jogos válidos na API ao carregar o componente
   useEffect(() => {
     const fetchNicknames = async () => {
       try {
@@ -38,7 +38,7 @@ const RegistroPartidaScreen = () => {
         const config = {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
           },
         };
 
@@ -74,27 +74,21 @@ const RegistroPartidaScreen = () => {
 
   const addParticipant = () => {
     const trimmedInput = inputText.trim();
-  
-    if (!trimmedInput) return; // Evita inclusão se o campo estiver vazio
-  
-    // Verifica se o apelido começa com "@"
+
+    if (!trimmedInput) return;
+
     if (trimmedInput.startsWith("@")) {
-      // Remove o "@" para verificar na lista de apelidos válidos
-      //const nickname = trimmedInput.slice(1); // apelido sem "@"
-  
       if (validNicknames.includes(trimmedInput)) {
-        setParticipants([...participants, trimmedInput]); // Inclui com "@"
+        setParticipants([...participants, trimmedInput]);
         setInputText("");
       } else {
         alert("Apelido não encontrado. Por favor, insira um apelido válido.");
       }
     } else {
-      // Caso o apelido não comece com "@", simplesmente adiciona sem verificação
       setParticipants([...participants, trimmedInput]);
       setInputText("");
     }
   };
-  
 
   const validateGame = () => {
     const selectedGame = validGames.find((game) => game.titulo === inputJogo.trim());
@@ -107,76 +101,85 @@ const RegistroPartidaScreen = () => {
     setParticipants(participants.filter((_, i) => i !== index));
   };
 
-  // Função para registrar a partida na API
   const registrarPartida = async () => {
     if (participants.length === 0 || !inputJogo || !inicioPartida) {
       Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
       return;
     }
-
-    // Encontra o jogo selecionado pelo título e obtém seu ID
+  
     const selectedGame = validGames.find((game) => game.titulo === inputJogo.trim());
     if (!selectedGame) {
       Alert.alert("Erro", "Jogo não encontrado. Por favor, insira um jogo válido.");
       return;
     }
-
+  
     try {
       const userId = await AsyncStorage.getItem("userId");
       const token = await AsyncStorage.getItem("token");
-
+  
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       };
-
-      // Transformar cada apelido em um objeto { apelido: "apelido" }
+  
+      const horarioRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+      const trimmedInicioPartida = inicioPartida.trim();
+  
+      // Validando o formato do horário
+      if (trimmedInicioPartida.length !== 5 || !horarioRegex.test(trimmedInicioPartida)) {
+        throw new Error("Horário inválido. Insira no formato hh:mm.");
+      }
+  
+      const [hours, minutes] = trimmedInicioPartida.split(":").map(Number);
+      const now = new Date();
+      const inicio = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+  
       const usuarios = participants.map((apelido) => ({ apelido }));
-
+  
       const partidaData = {
         usuarios,
-        jogo: selectedGame.id, // Utiliza o ID do jogo em vez do título
+        jogo: selectedGame.id,
         explicacao: tempoExplicacao,
-        inicio: inicioPartida,
+        inicio: inicio.toISOString(),
         registrador: userId,
       };
-
+  
       const response = await axios.post(
         "https://api-noob-react.onrender.com/api/partidas",
         partidaData,
         config
       );
-
+  
       if (response.status === 201) {
         Alert.alert("Sucesso", "Partida registrada com sucesso!");
-        // Limpar os campos após o sucesso
         setParticipants([]);
         setInputJogo("");
         setTempoExplicacao("");
         setInicioPartida("");
         setExplicacao(false);
-
+  
         screens.matches.finish();
       }
     } catch (error) {
-      console.error("Erro ao registrar a partida:", error);
-      Alert.alert(
-        "Erro",
-        "Não foi possível registrar a partida. Tente novamente."
-      );
+      if (error instanceof Error) {
+        console.error("Erro ao registrar a partida:", error.message);
+        Alert.alert("Erro", error.message || "Ocorreu um erro ao registrar a partida.");
+      } else {
+        console.error("Erro desconhecido:", error);
+        Alert.alert("Erro", "Ocorreu um erro inesperado.");
+      }
     }
   };
+  
+  
 
   return (
     <ScrollView>
       <View style={styles.container}>
-        <Text style={[styles.title, localStyles.header]}>
-          Registro de partida
-        </Text>
+        <Text style={[styles.title, localStyles.header]}>Registro de partida</Text>
 
-        {/* Campo Participantes */}
         <Text style={styles.label}>Participantes:</Text>
         <TextInput
           placeholder="Digite o jogador a adicionar e pressione Enter..."
@@ -185,14 +188,10 @@ const RegistroPartidaScreen = () => {
           onChangeText={setInputText}
           onSubmitEditing={addParticipant}
         />
-        <TouchableOpacity
-          style={localStyles.addButton}
-          onPress={addParticipant}
-        >
+        <TouchableOpacity style={localStyles.addButton} onPress={addParticipant}>
           <Text style={localStyles.addButtonText}>Adicionar</Text>
         </TouchableOpacity>
 
-        {/* Exibição dos chips de participantes */}
         <ScrollView horizontal style={localStyles.tagContainer}>
           {participants.map((participant, index) => (
             <View key={index} style={localStyles.tag}>
@@ -204,17 +203,15 @@ const RegistroPartidaScreen = () => {
           ))}
         </ScrollView>
 
-        {/* Campo Jogo */}
         <Text style={styles.label}>Jogo:</Text>
         <TextInput
           placeholder="Digite o jogo a pesquisar..."
           style={[styles.input, localStyles.input]}
           value={inputJogo}
           onChangeText={setInputJogo}
-          onBlur={validateGame} // Verifica o jogo quando o campo perde o foco
+          onBlur={validateGame}
         />
 
-        {/* Explicação das Regras */}
         <View style={localStyles.explicacaoContainer}>
           <Switch
             value={explicacao}
@@ -229,23 +226,30 @@ const RegistroPartidaScreen = () => {
             value={tempoExplicacao}
             onChangeText={setTempoExplicacao}
             editable={!explicacao}
+            keyboardType="numeric"
           />
         </View>
 
-        {/* Horário de Início */}
         <Text style={styles.label}>Início da partida:</Text>
-        <TextInput
+        <MaskedTextInput
+          mask="99:99"
           placeholder="18:30"
           style={[styles.input, localStyles.input]}
           value={inicioPartida}
-          onChangeText={setInicioPartida}
+          onChangeText={(text, rawText) => {
+            const horarioRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+            const formattedText = rawText.replace(/^(\d{2})(\d{2})$/, "$1:$2");
+          
+            if (formattedText.length === 5 && !horarioRegex.test(formattedText)) {
+              Alert.alert("Erro", "Formato de horário inválido. Use hh:mm.");
+            }
+          
+            setInicioPartida(formattedText.trim());
+          }}
+          keyboardType="numeric"
         />
 
-        {/* Botão Registrar */}
-        <TouchableOpacity
-          style={styles.buttonPrimary}
-          onPress={registrarPartida}
-        >
+        <TouchableOpacity style={styles.buttonPrimary} onPress={registrarPartida}>
           <Text style={styles.buttonPrimaryText}>Registrar Partida</Text>
         </TouchableOpacity>
       </View>
