@@ -18,7 +18,7 @@ const RegisterUser: React.FC = () => {
   const [email, setEmail] = useState(""); // Armazena o email
   const [senha, setSenha] = useState(""); // Armazena a senha
   const [confirmarSenha, setConfirmarSenha] = useState(""); // Armazena a confirmação da senha
-  const [editedUser, setEditedUser] = useState<any>({ nome: "", foto: null }); // Armazena informações editadas do usuário
+  const [editedUser, setEditedUser] = useState<any>({ nome: "", foto: null, capa: null }); // Armazena informações editadas do usuário
 
   // Função para verificar a força da senha
   const isPasswordStrong = (password: string) => {
@@ -78,6 +78,18 @@ const RegisterUser: React.FC = () => {
         } as any); // Adiciona a foto ao FormData
       }
 
+      if (editedUser.capa) {
+        const filename = editedUser.capa.split("/").pop(); // Extrai o nome do arquivo
+        const match = /\.(\w+)$/.exec(filename ?? ""); // Verifica a extensão
+        const fileType = match ? `image/${match[1]}` : `image`; // Define o tipo do arquivo
+
+        formData.append("capa", {
+          uri: editedUser.capa,
+          name: filename,
+          type: fileType,
+        } as any); // Adiciona a foto ao FormData
+      }
+
       // Faz a requisição HTTP para o endpoint da API
       const response = await axios.post(
         "https://api-noob-react.onrender.com/api/usuarios",
@@ -116,6 +128,7 @@ const RegisterUser: React.FC = () => {
         id={null} // Nenhum ID inicial
         name={editedUser.nome} // Nome editado do usuário
         photo={editedUser.foto} // Foto do usuário
+        cover={editedUser.capa} // Foto do usuário
         initialIsEditing={false} // Indica que o perfil não está sendo editado
         initialIsRegisting={true} // Indica que está no modo de registro
         setEditedUser={setEditedUser} // Função para atualizar os dados do usuário
