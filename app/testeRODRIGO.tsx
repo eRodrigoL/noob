@@ -320,14 +320,10 @@ const localStyles = StyleSheet.create({
   PageCover: {
     position: "absolute",
     top: 0,
-    width: screenWidth - 6,
+    width: "100%",
     height: heightPageCover,
     justifyContent: "center",
     alignItems: "center",
-    borderTopWidth: 3, // Define a espessura da borda superior
-    borderLeftWidth: 3, // Define a espessura da borda esquerda
-    borderRightWidth: 3, // Define a espessura da borda direita
-    borderBottomWidth: 0, // Remove a borda inferior
     borderColor: Theme.light.text,
     zIndex: 5,
   },
