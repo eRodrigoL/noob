@@ -179,10 +179,21 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
     };
   });
 
+  // função para fazer com que a capa suba com o scroll
+  const animatedCoverStyle = useAnimatedStyle(() => {
+    return {
+        transform: [
+            {
+                translateY: scrollY.value > 0 ? -scrollY.value : 0, // Move para cima com o scroll
+            },
+        ],
+    };
+});
+
   return (
     <View style={{ flex: 1 }}>
       {/* Capa*/}
-      <View style={localStyles.PageCover}>
+      <Animated.View style={[localStyles.PageCover, animatedCoverStyle]}>
         {(isEditing || isRegisting) && (
           <TouchableOpacity
             onPress={pickBackgroudImage}
@@ -212,7 +223,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
             style={localStyles.backgroundImage}
           />
         )}
-      </View>
+      </Animated.View>
 
       {/* ScrollView animado para o conteúdo da página */}
       <Animated.ScrollView
@@ -313,8 +324,12 @@ const localStyles = StyleSheet.create({
     height: heightPageCover,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 3,
+    borderTopWidth: 3, // Define a espessura da borda superior
+    borderLeftWidth: 3, // Define a espessura da borda esquerda
+    borderRightWidth: 3, // Define a espessura da borda direita
+    borderBottomWidth: 0, // Remove a borda inferior
     borderColor: Theme.light.text,
+    zIndex: 5,
   },
   backgroundImage: {
     flex: 1,
