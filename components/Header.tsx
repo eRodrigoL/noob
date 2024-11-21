@@ -38,7 +38,6 @@ const Header = ({ title }: { title: string }) => {
       if (axios.isAxiosError(error)) {
         // Verifica se o erro é do tipo AxiosError
         if (error.response && error.response.status === 404) {
-      
           setHasOpenMatch(false); // Nenhuma partida em aberto
         } else {
           console.error("Erro ao verificar partidas em aberto:", error);
@@ -128,4 +127,3 @@ const localStyles = StyleSheet.create({
 });
 
 export default Header;
-

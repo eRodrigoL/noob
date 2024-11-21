@@ -182,23 +182,24 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   // função para fazer com que a capa suba com o scroll
   const animatedCoverStyle = useAnimatedStyle(() => {
     return {
-        transform: [
-            {
-                translateY: scrollY.value > 0 ? -scrollY.value : 0, // Move para cima com o scroll
-            },
-        ],
+      transform: [
+        {
+          translateY: scrollY.value > 0 ? -scrollY.value : 0, // Move para cima com o scroll
+        },
+      ],
     };
-});
+  });
 
   return (
     <View style={{ flex: 1 }}>
       {/* Capa*/}
       <Animated.View style={[localStyles.PageCover, animatedCoverStyle]}>
         {(isEditing || isRegisting) && (
-          <TouchableOpacity
-            onPress={pickBackgroudImage}
-            style={[localStyles.coverTouchable]}
-          >
+          <View>
+            <TouchableOpacity
+              onPress={pickBackgroudImage}
+              style={[localStyles.coverTouchable]}
+            />
             <ImageBackground
               source={{
                 uri: selectedBackgroundImage
@@ -206,12 +207,9 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
                   : "https://example.com/user-image.jpg", // Imagem padrão
               }}
               style={localStyles.backgroundImage}
-            >
-              <Text style={localStyles.editHint}>
-                Toque para alterar a capa
-              </Text>
-            </ImageBackground>
-          </TouchableOpacity>
+            />
+            <Text style={localStyles.editHint}>Toque para alterar a capa</Text>
+          </View>
         )}
         {!(isEditing || isRegisting) && (
           <ImageBackground
@@ -308,6 +306,8 @@ const localStyles = StyleSheet.create({
     zIndex: 1,
     height: heightHeader,
     justifyContent: "center",
+    borderTopWidth: 3,
+    borderColor: Theme.light.text,
   },
   coverTouchable: {
     position: "absolute",
@@ -324,11 +324,6 @@ const localStyles = StyleSheet.create({
     height: heightPageCover,
     justifyContent: "center",
     alignItems: "center",
-    borderTopWidth: 3, // Define a espessura da borda superior
-    borderLeftWidth: 3, // Define a espessura da borda esquerda
-    borderRightWidth: 3, // Define a espessura da borda direita
-    borderBottomWidth: 0, // Remove a borda inferior
-    borderColor: Theme.light.text,
     zIndex: 5,
   },
   backgroundImage: {
