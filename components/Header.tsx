@@ -109,6 +109,7 @@ const localStyles = StyleSheet.create({
     padding: 0,
     backgroundColor: Theme.light.backgroundHeader,
     height: 60,
+    zIndex: 1,
   },
   menuButton: {
     padding: 10,
