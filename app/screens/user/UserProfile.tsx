@@ -88,6 +88,19 @@ const UserProfile: React.FC = () => {
         } as any);
       }
 
+      if (editedUser.capa) {
+        const localUri = editedUser.capa;
+        const filename = localUri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename ?? "");
+        const fileType = match ? `image/${match[1]}` : `image`;
+
+        formData.append("capa", {
+          uri: localUri,
+          name: filename ?? "profile.jpg",
+          type: fileType,
+        } as any);
+      }
+
       await axios.put(
         `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
         formData,
@@ -159,6 +172,7 @@ const UserProfile: React.FC = () => {
         id={user._id}
         name={user.nome}
         photo={user.foto}
+        cover={user.capa}
         initialIsEditing={false}
         initialIsRegisting={false}
         isEditing={isEditing}
