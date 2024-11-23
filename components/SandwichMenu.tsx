@@ -7,6 +7,7 @@ import {
   Animated,
   Dimensions,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import { screens } from "@/app/routes/Routes";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -24,6 +25,7 @@ const { width } = Dimensions.get("window");
 const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
   const slideAnim = React.useRef(new Animated.Value(-width)).current;
   const [hasOpenMatch, setHasOpenMatch] = useState(false);
+  const router = useRouter();
 
   // Função para verificar se há partidas em aberto
   const checkOpenMatches = async () => {
@@ -47,10 +49,8 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Verifica se o erro é do tipo AxiosError
         if (error.response && error.response.status === 404) {
-          
-          setHasOpenMatch(false); // Nenhuma partida em aberto
+          setHasOpenMatch(false);
         } else {
           console.error("Erro ao verificar partidas em aberto:", error);
         }
@@ -59,9 +59,18 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
       }
     }
   };
-  
 
-  // Verifica as partidas em aberto ao abrir o modal
+  // Função de logout
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.multiRemove(["token", "userId"]); // Remove os dados armazenados
+      Alert.alert("Sucesso", "Logout realizado com sucesso!");
+      screens.user.login(); // Redireciona para a tela de login (substitua o caminho conforme necessário)
+    } catch (error) {
+      console.error("Erro ao realizar logout:", error);
+    }
+  };
+
   useEffect(() => {
     if (visible) {
       checkOpenMatches();
@@ -87,7 +96,6 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
     }).start(() => onClose());
   };
 
-  // Função para decidir qual tela abrir ao clicar em "Jogar"
   const handlePlayPress = () => {
     if (hasOpenMatch) {
       screens.matches.finish();
@@ -125,14 +133,18 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
                   title="Início"
                   onPress={() => screens.boardgame.list()}
                 />
+                <ButtonPrimary title="Jogar" onPress={handlePlayPress} />
                 <ButtonPrimary
-                  title="Jogar"
-                  onPress={handlePlayPress}
+                  title="Teste"
+                  onPress={() => screens.teste()}
                 />
-                <ButtonPrimary title="Teste" onPress={() => screens.teste()} />
                 <ButtonPrimary
                   title="Teste 2"
                   onPress={() => screens.teste2()}
+                />
+                <ButtonPrimary // Botão de logout
+                  title="Sair"
+                  onPress={handleLogout}
                 />
               </View>
             </Animated.View>
