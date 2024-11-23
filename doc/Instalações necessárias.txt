@@ -1,5 +1,4 @@
 1. npm install
 2. npm install axios
-3. install @react-native-async-storage/async-storage
+3. npm install @react-native-async-storage/async-storage
 4. npm install react-native-paper
-5. npm install react-native-mask-text

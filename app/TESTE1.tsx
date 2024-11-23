@@ -7,7 +7,7 @@ import ButtonPrimary from "@components/ButtonPrimary"; // Botão customizado
 import { screens } from "@routes/Routes"; // Função para navegação entre telas
 import ApiWakeUp from "@/app/services/AcordarAPI"; // Serviço para "acordar" a API
 import Header from "@/components/Header"; // Componente de cabeçalho
-import ParallaxProfile from "./testeRODRIGO"; // Componente para exibição de perfil com efeitos
+import ParallaxProfile from "@/components/ParallaxProfile"; // Componente para exibição de perfil com efeitos
 
 const RegisterUser: React.FC = () => {
   <ApiWakeUp />; // Mantém a API ativa durante o uso do app

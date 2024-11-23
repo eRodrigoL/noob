@@ -6,6 +6,7 @@ import styles from "@styles/Default";
 import Header from "@/components/Header";
 import ParallaxProfile from "@/components/ParallaxProfile";
 import ApiWakeUp from "@/app/services/AcordarAPI";
+import { Tabs } from "expo-router";
 
 const UserProfile: React.FC = () => {
   <ApiWakeUp />; // Mantem a API desperta
@@ -153,7 +154,7 @@ const UserProfile: React.FC = () => {
   return (
     <View style={{ flex: 1 }}>
       {/* Exibe o cabeçalho com título */}
-      <Header title="Perfil"/>
+      <Header title="Perfil" />
 
       <ParallaxProfile
         id={user._id}
@@ -165,7 +166,6 @@ const UserProfile: React.FC = () => {
         onEditChange={setIsEditing}
         setEditedUser={setEditedUser}
       >
-        {/* Apelido */}
         <Text style={styles.label}>Apelido:</Text>
         <Text style={styles.label}>{user.apelido}</Text>
 

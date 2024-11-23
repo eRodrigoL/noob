@@ -193,25 +193,8 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   return (
     <View style={{ flex: 1 }}>
       {/* Capa*/}
-      <Animated.View style={[localStyles.PageCover, animatedCoverStyle]}>
-        {(isEditing || isRegisting) && (
-          <View>
-            <TouchableOpacity
-              onPress={pickBackgroudImage}
-              style={[localStyles.coverTouchable]}
-            />
-            <ImageBackground
-              source={{
-                uri: selectedBackgroundImage
-                  ? selectedBackgroundImage
-                  : "https://example.com/user-image.jpg", // Imagem padrão
-              }}
-              style={localStyles.backgroundImage}
-            />
-            <Text style={localStyles.editHint}>Toque para alterar a capa</Text>
-          </View>
-        )}
-        {!(isEditing || isRegisting) && (
+      {(isEditing || isRegisting) && (
+        <View style={localStyles.PageCover}>
           <ImageBackground
             source={{
               uri: selectedBackgroundImage
@@ -219,6 +202,28 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
                 : "https://example.com/user-image.jpg", // Imagem padrão
             }}
             style={localStyles.backgroundImage}
+          />
+          <Text style={localStyles.editHint}>Toque para alterar a capa</Text>
+        </View>
+      )}
+      {!(isEditing || isRegisting) && (
+        <ImageBackground
+          source={{
+            uri: selectedBackgroundImage
+              ? selectedBackgroundImage
+              : "https://example.com/user-image.jpg", // Imagem padrão
+          }}
+          style={localStyles.backgroundImage}
+        />
+      )}
+
+      <Animated.View
+        style={[localStyles.PageCover, { zIndex: 5 }, animatedCoverStyle]}
+      >
+        {(isEditing || isRegisting) && (
+          <TouchableOpacity
+            onPress={pickBackgroudImage}
+            style={localStyles.coverTouchable}
           />
         )}
       </Animated.View>
@@ -313,18 +318,17 @@ const localStyles = StyleSheet.create({
     position: "absolute",
     top: 0,
     left: 0,
-    width: "100%",
+    marginLeft: 170,
+    width: screenWidth - 170,
     height: "100%",
-    zIndex: 10, // Garante que fique acima de outros elementos
   },
   PageCover: {
     position: "absolute",
     top: 0,
-    width: "100%",
+    width: screenWidth,
     height: heightPageCover,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 5,
   },
   backgroundImage: {
     flex: 1,

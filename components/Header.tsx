@@ -38,7 +38,6 @@ const Header = ({ title }: { title: string }) => {
       if (axios.isAxiosError(error)) {
         // Verifica se o erro é do tipo AxiosError
         if (error.response && error.response.status === 404) {
-      
           setHasOpenMatch(false); // Nenhuma partida em aberto
         } else {
           console.error("Erro ao verificar partidas em aberto:", error);
@@ -110,6 +109,7 @@ const localStyles = StyleSheet.create({
     padding: 0,
     backgroundColor: Theme.light.backgroundHeader,
     height: 60,
+    zIndex: 1,
   },
   menuButton: {
     padding: 10,
@@ -128,4 +128,3 @@ const localStyles = StyleSheet.create({
 });
 
 export default Header;
-
