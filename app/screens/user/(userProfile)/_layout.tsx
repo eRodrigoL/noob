@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { NavigationContainer } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import styles from "@styles/Default";
 import Header from "@/components/Header";
 import ParallaxProfile from "@/components/ParallaxProfile";
 import ApiWakeUp from "@/app/services/AcordarAPI";
-import UserProfileDescription from "./Descricao";
-
-// Criação do Stack Navigator
-const Stack = createStackNavigator();
+import { Tabs } from "expo-router";
 
 const UserProfile: React.FC = () => {
   <ApiWakeUp />; // Mantem a API desperta
@@ -170,27 +165,61 @@ const UserProfile: React.FC = () => {
         isEditing={isEditing}
         onEditChange={setIsEditing}
         setEditedUser={setEditedUser}
-      />
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Descrição"
-            options={{ title: "Descrição do Perfil" }}
+      >
+        <Text style={styles.label}>Apelido:</Text>
+        <Text style={styles.label}>{user.apelido}</Text>
+
+        {/* Email */}
+        <Text style={styles.label}>Email:</Text>
+        {isEditing ? (
+          <TextInput
+            style={styles.input}
+            value={editedUser.email}
+            onChangeText={(text) =>
+              setEditedUser((prevState: any) => ({
+                ...prevState,
+                email: text,
+              }))
+            }
+          />
+        ) : (
+          <Text style={styles.label}>{user.email}</Text>
+        )}
+
+        {/* Data de Nascimento */}
+        <Text style={styles.label}>Data de Nascimento:</Text>
+        {isEditing ? (
+          <TextInput
+            style={styles.input}
+            value={addOneDay(editedUser.nascimento)}
+          />
+        ) : (
+          <Text style={styles.label}>{addOneDay(user.nascimento)}</Text>
+        )}
+
+        {/* Botão de Editar/Salvar */}
+        <TouchableOpacity
+          style={styles.buttonPrimary}
+          onPress={handleEditToggle}
+        >
+          <Text style={styles.buttonPrimaryText}>
+            {isEditing ? "Salvar" : "Editar Perfil"}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Botão Cancelar visível apenas se isEditing for true */}
+        {isEditing && (
+          <TouchableOpacity
+            style={styles.buttonSecondary}
+            onPress={() => {
+              setIsEditing(false); // Sai do modo de edição
+              setEditedUser(user); // Reverte as mudanças, restaurando os dados originais
+            }}
           >
-            {(props) => (
-              <UserProfileDescription
-                {...props}
-                user={user}
-                editedUser={editedUser}
-                isEditing={isEditing}
-                handleEditToggle={handleEditToggle}
-                setEditedUser={setEditedUser}
-                addOneDay={addOneDay}
-              />
-            )}
-          </Stack.Screen>
-        </Stack.Navigator>
-      </NavigationContainer>
+            <Text style={styles.buttonSecondaryText}>Cancelar</Text>
+          </TouchableOpacity>
+        )}
+      </ParallaxProfile>
     </View>
   );
 };
