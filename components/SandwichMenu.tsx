@@ -9,11 +9,11 @@ import {
   TouchableWithoutFeedback,
   Alert,
 } from "react-native";
-import { screens } from "@/app/routes/Routes";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import ButtonPrimary from "./ButtonPrimary";
 import { Theme } from "@styles/Theme"; // Importa o Theme com as cores
+import { screens } from "@/app/routes/Routes";
 
 interface ModalProps {
   visible: boolean;
@@ -25,9 +25,21 @@ const { width } = Dimensions.get("window");
 const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
   const slideAnim = React.useRef(new Animated.Value(-width)).current;
   const [hasOpenMatch, setHasOpenMatch] = useState(false);
-  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Função para verificar se há partidas em aberto
+  // Verifica autenticação do usuário
+  const checkAuthentication = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+      setIsAuthenticated(!!userId && !!token); // Define como autenticado se ambos existirem
+    } catch (error) {
+      console.error("Erro ao verificar autenticação:", error);
+      setIsAuthenticated(false);
+    }
+  };
+
+  // Verifica se há partidas em aberto
   const checkOpenMatches = async () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
@@ -63,9 +75,11 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
   // Função de logout
   const handleLogout = async () => {
     try {
-      await AsyncStorage.multiRemove(["token", "userId"]); // Remove os dados armazenados
+      await AsyncStorage.multiRemove(["token", "userId"]);
       Alert.alert("Sucesso", "Logout realizado com sucesso!");
-      screens.user.login(); // Redireciona para a tela de login (substitua o caminho conforme necessário)
+      setIsAuthenticated(false);
+      screens.boardgame.list;
+      
     } catch (error) {
       console.error("Erro ao realizar logout:", error);
     }
@@ -73,7 +87,8 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
 
   useEffect(() => {
     if (visible) {
-      checkOpenMatches();
+      checkAuthentication(); // Verifica se está autenticado
+      if (isAuthenticated) checkOpenMatches(); // Verifica partidas abertas apenas se autenticado
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: 500,
@@ -86,7 +101,7 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
         useNativeDriver: true,
       }).start(() => onClose());
     }
-  }, [visible]);
+  }, [visible, isAuthenticated]);
 
   const handleClose = () => {
     Animated.timing(slideAnim, {
@@ -122,30 +137,35 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
             >
               <View style={styles.buttonContainer}>
                 <ButtonPrimary
-                  title="Login"
-                  onPress={() => screens.user.login()}
-                />
-                <ButtonPrimary
-                  title="Perfil"
-                  onPress={() => screens.user.userProfile()}
-                />
-                <ButtonPrimary
                   title="Início"
                   onPress={() => screens.boardgame.list()}
                 />
-                <ButtonPrimary title="Jogar" onPress={handlePlayPress} />
-                <ButtonPrimary
-                  title="Teste"
-                  onPress={() => screens.teste()}
-                />
-                <ButtonPrimary
-                  title="Teste 2"
-                  onPress={() => screens.teste2()}
-                />
-                <ButtonPrimary // Botão de logout
-                  title="Sair"
-                  onPress={handleLogout}
-                />
+                {!isAuthenticated ? (
+                  <ButtonPrimary
+                    title="Login"
+                    onPress={() => screens.user.login()}
+                  />
+                ) : (
+                  <>
+                    <ButtonPrimary
+                      title="Perfil"
+                      onPress={() => screens.user.userProfile()}
+                    />
+                    <ButtonPrimary title="Jogar" onPress={handlePlayPress} />
+                    <ButtonPrimary
+                      title="Teste"
+                      onPress={() => screens.teste()}
+                    />
+                    <ButtonPrimary
+                      title="Teste 2"
+                      onPress={() => screens.teste2()}
+                    />
+                    <ButtonPrimary
+                      title="Sair"
+                      onPress={handleLogout}
+                    />
+                  </>
+                )}
               </View>
             </Animated.View>
           </TouchableWithoutFeedback>
@@ -172,18 +192,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginTop: 20,
   },
-  modalButton: {
-    backgroundColor: Theme.light.backgroundButton, // Botões com cor secundária do tema
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: Theme.light.textButton, // Texto do botão conforme o tema
-    fontSize: 18,
-  },
 });
 
 export default SandwichMenu;
-
