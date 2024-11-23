@@ -13,6 +13,19 @@ import axios from "axios";
 const Header = ({ title }: { title: string }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [hasOpenMatch, setHasOpenMatch] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Estado de autenticação
+
+  // Função para verificar se o usuário está autenticado
+  const checkAuthentication = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+      setIsAuthenticated(!!userId && !!token); // Verifica se ambos existem
+    } catch (error) {
+      console.error("Erro ao verificar autenticação:", error);
+      setIsAuthenticated(false);
+    }
+  };
 
   // Função para verificar se há partidas em aberto
   const checkOpenMatches = async () => {
@@ -36,7 +49,6 @@ const Header = ({ title }: { title: string }) => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Verifica se o erro é do tipo AxiosError
         if (error.response && error.response.status === 404) {
           setHasOpenMatch(false); // Nenhuma partida em aberto
         } else {
@@ -50,11 +62,14 @@ const Header = ({ title }: { title: string }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      checkOpenMatches(); // Verifica as partidas ao focar a tela
+      checkAuthentication(); // Verifica autenticação ao focar
+      if (isAuthenticated) {
+        checkOpenMatches(); // Verifica partidas abertas apenas se autenticado
+      }
       return () => {
         setModalVisible(false); // Fecha o modal sempre que a tela perder o foco
       };
-    }, [])
+    }, [isAuthenticated])
   );
 
   const handleOpenModal = () => {
@@ -76,27 +91,31 @@ const Header = ({ title }: { title: string }) => {
 
   return (
     <View style={localStyles.headerContainer}>
-      {/* Menu sanduíche à esquerda */}
-      <TouchableOpacity
-        style={localStyles.menuButton}
-        onPress={handleOpenModal}
-      >
-        <Ionicons name="menu" size={30} color="black" />
-      </TouchableOpacity>
-      {/* Modal */}
-      <SandwichMenu visible={modalVisible} onClose={handleCloseModal} />
+    {/* Menu sanduíche à esquerda */}
+    <TouchableOpacity
+      style={localStyles.menuButton}
+      onPress={handleOpenModal}
+    >
+      <Ionicons name="menu" size={30} color="black" />
+    </TouchableOpacity>
+    {/* Modal */}
+    <SandwichMenu visible={modalVisible} onClose={handleCloseModal} />
 
-      {/* Título centralizado */}
-      <Text style={localStyles.title}>{title}</Text>
+    {/* Título centralizado */}
+    <Text style={localStyles.title}>{title}</Text>
 
-      {/* Botão de configurações à direita */}
-      <TouchableOpacity
-        style={localStyles.settingsButton}
-        onPress={handleSettingsPress}
-      >
-        <Text style={localStyles.text}>🎲</Text>
-      </TouchableOpacity>
+    {/* Espaço reservado para o ícone de configurações */}
+    <View style={localStyles.iconPlaceholder}>
+      {isAuthenticated && (
+        <TouchableOpacity
+          style={localStyles.settingsButton}
+          onPress={handleSettingsPress}
+        >
+          <Text style={localStyles.text}>🎲</Text>
+        </TouchableOpacity>
+      )}
     </View>
+  </View>
   );
 };
 
@@ -118,6 +137,8 @@ const localStyles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: Theme.light.text,
+    textAlign: "center", // Garante que o texto é centralizado
+    flex: 1, // Ocupa o espaço restante entre os botões
   },
   text: {
     fontSize: 30,
@@ -125,6 +146,11 @@ const localStyles = StyleSheet.create({
   settingsButton: {
     padding: 10,
   },
+  iconPlaceholder: {
+    width: 55, // Largura equivalente ao ícone
+    alignItems: "center", // Centraliza o ícone (se exibido)
+  },
 });
+
 
 export default Header;

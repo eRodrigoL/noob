@@ -78,8 +78,7 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
       await AsyncStorage.multiRemove(["token", "userId"]);
       Alert.alert("Sucesso", "Logout realizado com sucesso!");
       setIsAuthenticated(false);
-      screens.boardgame.list;
-      
+      screens.boardgame.list();
     } catch (error) {
       console.error("Erro ao realizar logout:", error);
     }
