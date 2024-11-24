@@ -165,6 +165,7 @@ const UserProfile: React.FC = () => {
         onEditChange={setIsEditing}
         setEditedUser={setEditedUser}
       >
+        {/* Apelido */}
         <Text style={styles.label}>Apelido:</Text>
         <Text style={styles.label}>{user.apelido}</Text>
 

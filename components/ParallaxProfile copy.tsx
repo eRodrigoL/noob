@@ -156,7 +156,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
         onScroll={scrollHandler}
         scrollEventThrottle={16}
       >
-        <View>
+        <View style={[localStyles.container]}>
           {/* Cabeçalho animado que exibe a imagem de perfil e o nome */}
           <Animated.View style={[localStyles.header, animatedHeaderStyle]}>
             {/* Local da foto*/}
@@ -202,7 +202,20 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
           </Animated.View>
 
           {/* Conteúdo principal da página com suporte a rolagem */}
-          <View style={localStyles.bodyContainer}>{children}</View>
+          <View style={[{ marginTop: heightPageCover + heightHeader }]}>
+            <ScrollView contentContainerStyle={localStyles.scrollContent}>
+              <View style={localStyles.bodyContainer}>
+                <Animated.View
+                  style={[
+                    localStyles.bodyContainer,
+                    animatedBodyContainerStyle,
+                  ]}
+                >
+                  {children}
+                </Animated.View>
+              </View>
+            </ScrollView>
+          </View>
         </View>
       </Animated.ScrollView>
     </View>
@@ -211,9 +224,9 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
 
 // Estilos locais do componente
 const localStyles = StyleSheet.create({
+  container: { flex: 1, padding: 0 },
   header: {
-    //backgroundColor: Theme.light.background,
-    backgroundColor: "red",
+    backgroundColor: Theme.light.background,
     position: "absolute",
     top: 0,
     width: "100%",
@@ -254,16 +267,12 @@ const localStyles = StyleSheet.create({
     color: Theme.light.text,
     marginLeft: 180,
   },
-  scrollContent: {
-    flexGrow: 1,
-  },
+  scrollContent: { paddingTop: 0 },
   bodyContainer: {
     paddingTop: 0,
     flex: 1,
-    padding: 0,
+    padding: 16,
     backgroundColor: Theme.light.background,
-    marginTop: heightPageCover + heightHeader,
-    minHeight: screenHeight - (heightPageCover + heightHeader + 120),
   },
   backgroundImage: {
     flex: 1,

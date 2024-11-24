@@ -15,7 +15,9 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
+  interpolate,
 } from "react-native-reanimated";
+import { Extrapolation } from "react-native-reanimated";
 import * as ImagePicker from "expo-image-picker";
 import styles from "@styles/Default";
 import { images } from "@routes/Routes";
@@ -117,14 +119,15 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
 
   // Estilo animado para o cabeçalho, que muda com base na rolagem
   const animatedHeaderStyle = useAnimatedStyle(() => {
-    const height =
-      scrollY.value < heightPageCover
-        ? 90 + (scrollY.value / heightPageCover) * 90
-        : 180;
+    const translateY = interpolate(
+      scrollY.value,
+      [0, heightPageCover],
+      [0, -heightPageCover],
+      "clamp"
+    );
 
     return {
-      height,
-      transform: [{ translateY: Math.max(scrollY.value, heightPageCover) }],
+      transform: [{ translateY }],
     };
   });
 
@@ -143,7 +146,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   return (
     <View style={{ flex: 1 }}>
       {/* Imagem de fundo da página */}
-      <View style={localStyles.PageCover}>
+      <View style={[localStyles.PageCover, { zIndex: 5 }]}>
         <ImageBackground
           source={images.fundo}
           style={localStyles.backgroundImage}
@@ -156,26 +159,14 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
         onScroll={scrollHandler}
         scrollEventThrottle={16}
       >
-        <View>
-          {/* Cabeçalho animado que exibe a imagem de perfil e o nome */}
-          <Animated.View style={[localStyles.header, animatedHeaderStyle]}>
-            {/* Local da foto*/}
-            {(isEditing || isRegisting) && (
-              <TouchableOpacity
-                onPress={pickImage}
-                style={localStyles.fotoContainer}
-              >
-                <Image
-                  source={{
-                    uri: selectedImage
-                      ? selectedImage
-                      : "https://example.com/user-image.jpg", // imagem padrão se foto for null
-                  }}
-                  style={localStyles.foto}
-                />
-              </TouchableOpacity>
-            )}
-            {!(isEditing || isRegisting) && (
+        {/* Cabeçalho animado que exibe a imagem de perfil e o nome */}
+        <Animated.View style={[localStyles.header, animatedHeaderStyle]}>
+          {/* Local da foto*/}
+          {(isEditing || isRegisting) && (
+            <TouchableOpacity
+              onPress={pickImage}
+              style={localStyles.fotoContainer}
+            >
               <Image
                 source={{
                   uri: selectedImage
@@ -184,26 +175,44 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
                 }}
                 style={localStyles.foto}
               />
-            )}
+            </TouchableOpacity>
+          )}
+          {!(isEditing || isRegisting) && (
+            <Image
+              source={{
+                uri: selectedImage
+                  ? selectedImage
+                  : "https://example.com/user-image.jpg", // imagem padrão se foto for null
+              }}
+              style={localStyles.foto}
+            />
+          )}
 
-            {/* Local do nome */}
-            {isEditing || isRegisting ? (
-              <TextInput
-                style={localStyles.headerTitleInput}
-                placeholder="Digite o nome aqui..."
-                value={name || ""}
-                onChangeText={handleNomeChange}
-              />
-            ) : (
-              <Text style={localStyles.headerTitle}>
-                {name || "Nome não informado"}
-              </Text>
-            )}
-          </Animated.View>
-
-          {/* Conteúdo principal da página com suporte a rolagem */}
-          <View style={localStyles.bodyContainer}>{children}</View>
-        </View>
+          {/* Local do nome */}
+          {isEditing || isRegisting ? (
+            <TextInput
+              style={localStyles.headerTitleInput}
+              placeholder="Digite o nome aqui..."
+              value={name || ""}
+              onChangeText={handleNomeChange}
+            />
+          ) : (
+            <Text style={localStyles.headerTitle}>
+              {name || "Nome não informado"}
+            </Text>
+          )}
+        </Animated.View>
+        {/* Conteúdo principal */}
+        {/* Conteúdo principal da página com suporte a rolagem */}
+        <ScrollView contentContainerStyle={localStyles.scrollContent}>
+          <View style={localStyles.bodyContainer}>
+            <Animated.View
+              style={[localStyles.bodyContainer, animatedBodyContainerStyle]}
+            >
+              {children}
+            </Animated.View>
+          </View>
+        </ScrollView>
       </Animated.ScrollView>
     </View>
   );
@@ -211,15 +220,16 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
 
 // Estilos locais do componente
 const localStyles = StyleSheet.create({
+  container: { flex: 1, padding: 0 },
   header: {
-    //backgroundColor: Theme.light.background,
     backgroundColor: "red",
     position: "absolute",
-    top: 0,
-    width: "100%",
-    zIndex: 1,
-    height: heightHeader,
-    justifyContent: "center",
+    top: heightPageCover,
+    left: 0,
+    right: 0,
+    zIndex: 3,
+    justifyContent: "flex-end",
+    paddingBottom: 10,
   },
   fotoContainer: {
     width: 150,
@@ -258,12 +268,8 @@ const localStyles = StyleSheet.create({
     flexGrow: 1,
   },
   bodyContainer: {
-    paddingTop: 0,
     flex: 1,
-    padding: 0,
     backgroundColor: Theme.light.background,
-    marginTop: heightPageCover + heightHeader,
-    minHeight: screenHeight - (heightPageCover + heightHeader + 120),
   },
   backgroundImage: {
     flex: 1,
@@ -278,8 +284,7 @@ const localStyles = StyleSheet.create({
     top: 0,
     width: screenWidth,
     height: heightPageCover,
-    justifyContent: "center",
-    alignItems: "center",
+    zIndex: 1,
   },
 });
 
