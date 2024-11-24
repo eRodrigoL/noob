@@ -164,46 +164,47 @@ const UserProfile: React.FC = () => {
         onEditChange={setIsEditing}
         setEditedUser={setEditedUser}
       >
-        <Tabs
-          screenOptions={{
-            headerShown: false,
-            tabBarStyle: localStyles.tabBar,
-            tabBarActiveTintColor: "#007AFF",
-            tabBarInactiveTintColor: "#8E8E93",
-          }}
-        >
-          <Tabs.Screen
-            name="Descricao"
-            options={{
-              title: "Descrição",
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="person-outline" size={size} color={color} />
-              ),
+        <View style={localStyles.content}>
+          <Tabs
+            screenOptions={{
+              tabBarStyle: localStyles.tabBar,
+              tabBarActiveTintColor: "#007AFF",
+              tabBarInactiveTintColor: "#8E8E93",
             }}
-          />
-          <Tabs.Screen
-            name="Desempenho"
-            options={{
-              title: "Desempenho",
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons
-                  name="stats-chart-outline"
-                  size={size}
-                  color={color}
-                />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="Historico"
-            options={{
-              title: "Histórico",
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="time-outline" size={size} color={color} />
-              ),
-            }}
-          />
-        </Tabs>
+          >
+            <Tabs.Screen
+              name="Descricao"
+              options={{
+                title: "Descrição",
+                tabBarIcon: ({ color, size }) => (
+                  <Ionicons name="person-outline" size={size} color={color} />
+                ),
+              }}
+            />
+            <Tabs.Screen
+              name="Desempenho"
+              options={{
+                title: "Desempenho",
+                tabBarIcon: ({ color, size }) => (
+                  <Ionicons
+                    name="stats-chart-outline"
+                    size={size}
+                    color={color}
+                  />
+                ),
+              }}
+            />
+            <Tabs.Screen
+              name="Historico"
+              options={{
+                title: "Histórico",
+                tabBarIcon: ({ color, size }) => (
+                  <Ionicons name="time-outline" size={size} color={color} />
+                ),
+              }}
+            />
+          </Tabs>
+        </View>
       </ParallaxProfile>
     </View>
   );

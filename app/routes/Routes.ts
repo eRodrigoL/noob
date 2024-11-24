@@ -14,7 +14,7 @@ const images = {
 const screens = {
   testeDeRota: "/",
 
-  teste: () => router.push("/TESTE1"),
+  teste: () => router.push("/screens/user/(userProfile)"),
   teste2: () => router.push("/TESTE2"),
 
   user: {

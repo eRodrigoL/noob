@@ -234,7 +234,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
         onScroll={scrollHandler}
         scrollEventThrottle={16}
       >
-        <View style={[localStyles.container]}>
+        <View>
           {/* Cabeçalho animado que exibe a imagem de perfil e o nome */}
           <Animated.View style={[localStyles.header, animatedHeaderStyle]}>
             {/* Local da foto*/}
@@ -280,20 +280,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
           </Animated.View>
 
           {/* Conteúdo principal da página com suporte a rolagem */}
-          <View style={[{ marginTop: heightPageCover + heightHeader }]}>
-            <ScrollView contentContainerStyle={localStyles.scrollContent}>
-              <View style={localStyles.bodyContainer}>
-                <Animated.View
-                  style={[
-                    localStyles.bodyContainer,
-                    animatedBodyContainerStyle,
-                  ]}
-                >
-                  {children}
-                </Animated.View>
-              </View>
-            </ScrollView>
-          </View>
+          <View style={localStyles.bodyContainer}>{children}</View>
         </View>
       </Animated.ScrollView>
     </View>
@@ -302,9 +289,9 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
 
 // Estilos locais do componente
 const localStyles = StyleSheet.create({
-  container: { flex: 1, padding: 0 },
   header: {
-    backgroundColor: Theme.light.background,
+    //backgroundColor: Theme.light.background,
+    backgroundColor: "red",
     position: "absolute",
     top: 0,
     width: "100%",
@@ -371,12 +358,16 @@ const localStyles = StyleSheet.create({
     color: Theme.light.text,
     marginLeft: 180,
   },
-  scrollContent: { paddingTop: 0 },
+  scrollContent: {
+    flexGrow: 1,
+  },
   bodyContainer: {
     paddingTop: 0,
     flex: 1,
-    padding: 16,
+    padding: 0,
     backgroundColor: Theme.light.background,
+    marginTop: heightPageCover + heightHeader,
+    minHeight: screenHeight - (heightPageCover + heightHeader + 120),
   },
   editHint: {
     color: "white",
