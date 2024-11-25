@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { ScrollView, View, Text, Alert } from "react-native";
-import { Svg, Circle, Text as SvgText, G } from "react-native-svg";
+import { Svg, Circle, Text as SvgText, G, Line, Polygon } from "react-native-svg";
 
 export default function Desempenho() {
   // Estados
@@ -105,6 +105,29 @@ export default function Desempenho() {
   const circumference = Math.PI * radius;
   const offsetDerrotas = (1 - derrotasPercent / 100) * circumference;
 
+   // Dados do gráfico de teia de aranha
+   const labels = ["Força", "Velocidade", "Agilidade", "Resistência", "Inteligência"];
+   const values = [80, 70, 90, 60, 75]; // Percentuais
+   const max = 100; // Valor máximo
+   const centerX = 125;
+   const centerY = 125;
+   const chartRadius = 100;
+ 
+   const calculatePoints = (values: number[], radius: number) =>
+     values.map((value, index) => {
+       const angle = (2 * Math.PI * index) / values.length - Math.PI / 2; // Divide 360 graus entre os pontos
+       return {
+         x: centerX + radius * Math.cos(angle),
+         y: centerY + radius * Math.sin(angle),
+       };
+     });
+ 
+   const outerPoints = calculatePoints(Array(labels.length).fill(max), chartRadius);
+   const valuePoints = calculatePoints(
+     values.map((v) => (v / max) * chartRadius),
+     chartRadius
+   );
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
       <View style={{ alignItems: "center", paddingVertical: 20 }}>
@@ -162,7 +185,61 @@ export default function Desempenho() {
         <Text style={{ fontSize: 16, marginTop: 10 }}>
           Vitórias: {vitorias} | Derrotas: {derrotas}
         </Text>
+
+        <Text style={{ fontSize: 18, marginVertical: 20 }}>
+          Desempenho por categoria
+        </Text>
+
+        {/* Gráfico de Teia de Aranha */}
+        <Svg height={250} width={250} viewBox="0 0 250 250">
+          {outerPoints.map((point, index) => (
+            <Line
+              key={`line-${index}`}
+              x1={centerX}
+              y1={centerY}
+              x2={point.x}
+              y2={point.y}
+              stroke="#ccc"
+              strokeWidth={1}
+            />
+          ))}
+          {Array.from({ length: 5 }, (_, i) => {
+            const innerRadius = (chartRadius / 5) * (i + 1);
+            const innerPoints = calculatePoints(Array(labels.length).fill(max), innerRadius);
+            return (
+              <Polygon
+                key={`polygon-${i}`}
+                points={innerPoints.map((p) => `${p.x},${p.y}`).join(" ")}
+                stroke="#ccc"
+                strokeWidth={1}
+                fill="none"
+              />
+            );
+          })}
+          <Polygon
+            points={valuePoints.map((p) => `${p.x},${p.y}`).join(" ")}
+            stroke="#4caf50"
+            strokeWidth={2}
+            fill="rgba(76, 175, 80, 0.4)"
+          />
+          {outerPoints.map((point, index) => (
+            <SvgText
+              key={`label-${index}`}
+              x={point.x}
+              y={point.y}
+              textAnchor="middle"
+              fontSize="10"
+              fill="#333"
+              dx={point.x > centerX ? 5 : point.x < centerX ? -5 : 0}
+              dy={point.y > centerY ? 10 : point.y < centerY ? -10 : 0}
+            >
+              {labels[index]}
+            </SvgText>
+          ))}
+        </Svg>
+      
       </View>
+
     </ScrollView>
   );
 }
