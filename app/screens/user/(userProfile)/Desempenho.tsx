@@ -110,10 +110,6 @@ export default function Desempenho() {
     }
   };
 
-  /*useEffect(() => {
-    console.log("Estado de categorias atualizado:", categorias);
-  }, [categorias]);*/
-
   useEffect(() => {
     buscarApelido();
   }, []);
@@ -162,7 +158,6 @@ export default function Desempenho() {
    chartRadius
  );
 
- //console.log("Valores usados no gráfico:", values);
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
