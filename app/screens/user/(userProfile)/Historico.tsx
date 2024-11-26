@@ -112,7 +112,7 @@ export default function Historico() {
         data={partidas}
         keyExtractor={(item) => item._id}
         renderItem={renderItem}
-        ListHeaderComponent={<Text style={styles.header}>Histórico de Partidas</Text>}
+        //ListHeaderComponent={<Text style={styles.header}>Histórico de Partidas</Text>}
         ListFooterComponent={<Text style={styles.footer}>Fim do Histórico</Text>}
       />
     </View>
