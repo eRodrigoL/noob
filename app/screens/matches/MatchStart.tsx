@@ -321,7 +321,6 @@ const localStyles = StyleSheet.create({
   switchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 10,
   },
   switch: {
     transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
