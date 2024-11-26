@@ -205,35 +205,6 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
     };
   });
 
-  // const animatedBodyContainerStyle = useAnimatedStyle(() => {
-  //   // Altura inicial e máxima para o bodyContainer
-  //   const initialHeight =
-  //     screenHeight + 4 - (heightPageCover + initialHeightHeader + 120);
-  //   const maxHeight = screenHeight + 15 - (initialHeightHeader + 120);
-
-  //   // Progresso do scroll relativo à heightPageCover
-  //   const scrollProgress = Math.min(scrollY.value / heightPageCover, 1);
-
-  //   // Calcula a altura dinâmica
-  //   const heightDiff = maxHeight - initialHeight;
-  //   const height = initialHeight + heightDiff * scrollProgress;
-
-  //   // Deslocamento adicional
-  //   const additionalOffset = heightPageCover; // Valor fixo que desloca o bodyContainer mais para baixo
-
-  //   // Calcula o marginTop, garantindo limites e adicionando o deslocamento
-  //   const marginTop = Math.min(
-  //     heightPageCover + initialHeightHeader + additionalOffset - scrollY.value,
-  //     initialHeightHeader + additionalOffset
-  //   );
-
-  //   return {
-  //     height,
-  //     minHeight: initialHeight,
-  //     marginTop,
-  //   };
-  // });
-
   // função para fazer com que a capa suba com o scroll
   const animatedCoverStyle = useAnimatedStyle(() => {
     return {
@@ -358,7 +329,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
 const localStyles = StyleSheet.create({
   header: {
     //backgroundColor: Theme.light.background,
-    backgroundColor: "red",
+    backgroundColor: Theme.light.background,
     position: "absolute",
     top: 0,
     width: "100%",
