@@ -403,22 +403,7 @@ const localStyles = StyleSheet.create({
     padding: 0,
     backgroundColor: Theme.light.background,
   },
-  backgroundImage: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-  },
-  PageCover: {
-    position: "absolute",
-    top: 0,
-    width: screenWidth,
-    height: heightPageCover,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  editHint: {},
 });
 
 export default ParallaxProfile;
