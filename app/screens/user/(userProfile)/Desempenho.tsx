@@ -3,6 +3,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { ScrollView, View, Text, Alert } from "react-native";
 import { Svg, Circle, Text as SvgText, G, Line, Polygon } from "react-native-svg";
+import { ActivityIndicator } from "react-native"; // Indicador de carregamento
 
 export default function Desempenho() {
   // Estados
@@ -10,10 +11,12 @@ export default function Desempenho() {
   const [vitorias, setVitorias] = useState<number>(0);
   const [derrotas, setDerrotas] = useState<number>(0);
   const [categorias, setCategorias] = useState<{ [key: string]: number }>({}); // Vitórias por categoria
+  const [isLoading, setIsLoading] = useState<boolean>(true); // Novo estado
 
   // Função para buscar o apelido do usuário
   const buscarApelido = async () => {
     try {
+      setIsLoading(true); // Inicia carregamento
       const userId = await AsyncStorage.getItem("userId");
       const token = await AsyncStorage.getItem("token");
 
@@ -40,12 +43,15 @@ export default function Desempenho() {
         console.error("Erro desconhecido:", error);
         Alert.alert("Erro", "Ocorreu um erro inesperado.");
       }
+    } finally {
+      setIsLoading(false); // Finaliza carregamento
     }
   };
 
   // Função para buscar as partidas e calcular vitórias e derrotas
   const buscarPartidas = async (apelido: string) => {
     try {
+      setIsLoading(true); // Inicia carregamento
       const token = await AsyncStorage.getItem("token");
 
       if (!token) {
@@ -69,24 +75,24 @@ export default function Desempenho() {
         partida.vencedor.some((v: any) => v.apelido === apelido)
       );
 
-       // Buscar categorias
-  for (const partida of vitoriasTemp) {
-    const jogoId = partida.jogo; // ID do jogo
-    try {
-      const jogoResponse = await axios.get(
-        `https://api-noob-react.onrender.com/api/jogos/${jogoId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      // Buscar categorias
+      for (const partida of vitoriasTemp) {
+        const jogoId = partida.jogo; // ID do jogo
+        try {
+          const jogoResponse = await axios.get(
+            `https://api-noob-react.onrender.com/api/jogos/${jogoId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const categoria = jogoResponse.data.categoria;
+          categoriasTemp[categoria] = (categoriasTemp[categoria] || 0) + 1;
+        } catch (error) {
+          console.error(`Erro ao buscar categoria do jogo ${jogoId}:`, error);
         }
-      );
-      const categoria = jogoResponse.data.categoria;
-      categoriasTemp[categoria] = (categoriasTemp[categoria] || 0) + 1;
-    } catch (error) {
-      console.error(`Erro ao buscar categoria do jogo ${jogoId}:`, error);
-    }
-  }
+      }
 
       setCategorias({ ...categoriasTemp });
 
@@ -108,6 +114,9 @@ export default function Desempenho() {
         Alert.alert("Erro", "Ocorreu um erro inesperado.");
       }
     }
+    finally {
+      setIsLoading(false); // Finaliza carregamento
+    }
   };
 
   useEffect(() => {
@@ -120,6 +129,15 @@ export default function Desempenho() {
     }
   }, [apelido]);
 
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#4caf50" />
+        <Text style={{ marginTop: 10 }}>Carregando informações...</Text>
+      </View>
+    );
+  }
+
 
   // Dados do gráfico de indicador
   const total = vitorias + derrotas;
@@ -131,7 +149,7 @@ export default function Desempenho() {
   const circumference = Math.PI * radius;
   const offsetDerrotas = (1 - derrotasPercent / 100) * circumference;
 
- // Configuração do gráfico de teia de aranha
+  // Configuração do gráfico de teia de aranha
   const labels = Object.keys(categorias);
   const values = Object.values(categorias);
   const max = Math.max(...Object.values(categorias), 1); // Define o máximo dinamicamente
@@ -151,12 +169,12 @@ export default function Desempenho() {
       };
     });
   };
-  
- const outerPoints = calculatePoints(Array(labels.length).fill(max), chartRadius);
- const valuePoints = calculatePoints(
-   values.map((v) => (v / max) * chartRadius),
-   chartRadius
- );
+
+  const outerPoints = calculatePoints(Array(labels.length).fill(max), chartRadius);
+  const valuePoints = calculatePoints(
+    values.map((v) => (v / max) * chartRadius),
+    chartRadius
+  );
 
 
   return (
@@ -254,18 +272,18 @@ export default function Desempenho() {
             fill="rgba(76, 175, 80, 0.4)"
           />
           {outerPoints.map((point, index) => (
-          <SvgText
-          key={`label-${index}`}
-          x={point.x}
-          y={point.y}
-          textAnchor={point.x > centerX ? "start" : point.x < centerX ? "end" : "middle"}
-          fontSize="10"
-          fill="#333"
-          dx={point.x > centerX ? 15 : point.x < centerX ? -15 : 0} // Desloca mais
-          dy={point.y > centerY ? 10 : point.y < centerY ? -10 : -5} // Ajusta no eixo vertical
-          >
-            {`${labels[index]}: ${values[index]}`}
-          </SvgText>
+            <SvgText
+              key={`label-${index}`}
+              x={point.x}
+              y={point.y}
+              textAnchor={point.x > centerX ? "start" : point.x < centerX ? "end" : "middle"}
+              fontSize="10"
+              fill="#333"
+              dx={point.x > centerX ? 15 : point.x < centerX ? -15 : 0} // Desloca mais
+              dy={point.y > centerY ? 10 : point.y < centerY ? -10 : -5} // Ajusta no eixo vertical
+            >
+              {`${labels[index]}: ${values[index]}`}
+            </SvgText>
           ))}
         </Svg>
       </View>
