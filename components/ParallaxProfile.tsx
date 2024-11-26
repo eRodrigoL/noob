@@ -15,6 +15,7 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
+  runOnJS,
 } from "react-native-reanimated";
 import * as ImagePicker from "expo-image-picker";
 import styles from "@styles/Default";
@@ -24,7 +25,8 @@ import { Theme } from "@/app/styles/Theme";
 // Obtém as dimensões da tela para uso nos estilos
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 const heightPageCover = 200;
-const heightHeader = 90;
+const initialHeightHeader = 90;
+const finalHeightHeader = 180;
 
 // Define as propriedades aceitas pelo componente ParallaxProfile
 export interface ParallaxProfileProps {
@@ -63,6 +65,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
     photo || null
   );
   const [name, setName] = useState<string | null>(initialName);
+  const [interactionEnabled, setInteractionEnabled] = useState(true); // Para travar interação
 
   // Efeito para atualizar o estado de registro baseado no id
   useEffect(() => {
@@ -119,8 +122,10 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   const animatedHeaderStyle = useAnimatedStyle(() => {
     const height =
       scrollY.value < heightPageCover
-        ? 90 + (scrollY.value / heightPageCover) * 90
-        : 180;
+        ? initialHeightHeader +
+          (scrollY.value / heightPageCover) *
+            (finalHeightHeader - initialHeightHeader)
+        : finalHeightHeader;
 
     return {
       height,
@@ -130,12 +135,30 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
 
   // Estilo animado para o conteúdo do corpo da página
   const animatedBodyContainerStyle = useAnimatedStyle(() => {
-    const marginTop =
-      scrollY.value < heightPageCover
-        ? (scrollY.value / heightPageCover) * 90
-        : 90;
+    // Altura inicial e máxima para o bodyContainer
+    const initialHeight =
+      screenHeight + 4 - (heightPageCover + initialHeightHeader + 120);
+    const maxHeight = screenHeight + 15 - (initialHeightHeader + 120);
+
+    // Progresso do scroll relativo à heightPageCover
+    const scrollProgress = Math.min(scrollY.value / heightPageCover, 1);
+
+    // Calcula a altura dinâmica
+    const heightDiff = maxHeight - initialHeight;
+    const height = initialHeight + heightDiff * scrollProgress;
+
+    // Deslocamento adicional
+    const additionalOffset = heightPageCover; // Valor fixo que desloca o bodyContainer mais para baixo
+
+    // Calcula o marginTop, garantindo limites e adicionando o deslocamento
+    const marginTop = Math.min(
+      heightPageCover + initialHeightHeader + additionalOffset - scrollY.value,
+      initialHeightHeader + additionalOffset
+    );
 
     return {
+      height,
+      minHeight: initialHeight,
       marginTop,
     };
   });
@@ -201,8 +224,20 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
             )}
           </Animated.View>
 
-          {/* Conteúdo principal da página com suporte a rolagem */}
-          <View style={localStyles.bodyContainer}>{children}</View>
+          {/* View com tamanho fixo para forçar o scroll */}
+          <View style={{ height: screenHeight + initialHeightHeader }}>
+            {/* Conteúdo principal da página com suporte a rolagem */}
+            <Animated.View
+              style={[
+                localStyles.bodyContainer,
+                animatedBodyContainerStyle,
+                { position: "absolute", top: 0, left: 0, right: 0 },
+              ]}
+              pointerEvents={interactionEnabled ? "auto" : "none"}
+            >
+              {children}
+            </Animated.View>
+          </View>
         </View>
       </Animated.ScrollView>
     </View>
@@ -218,7 +253,7 @@ const localStyles = StyleSheet.create({
     top: 0,
     width: "100%",
     zIndex: 1,
-    height: heightHeader,
+    height: initialHeightHeader,
     justifyContent: "center",
   },
   fotoContainer: {
@@ -256,14 +291,13 @@ const localStyles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    flexDirection: "column",
   },
   bodyContainer: {
     paddingTop: 0,
     flex: 1,
     padding: 0,
     backgroundColor: Theme.light.background,
-    marginTop: heightPageCover + heightHeader,
-    minHeight: screenHeight - (heightPageCover + heightHeader + 120),
   },
   backgroundImage: {
     flex: 1,
