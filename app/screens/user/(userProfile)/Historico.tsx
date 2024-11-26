@@ -3,7 +3,6 @@ import { View, Text, FlatList, StyleSheet, ActivityIndicator } from "react-nativ
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Tipagem para os dados da API
 interface Usuario {
   apelido: string;
   _id: string;
@@ -20,11 +19,11 @@ interface Partida {
   jogo: string;
   explicacao: string;
   inicio: string;
-  fim: string;
+  fim: string | null; // Ajustei para permitir `null`
   registrador: string;
   vencedor: Vencedor[];
   duracao: number;
-  tituloJogo?: string; // Adicionado após buscar o título do jogo
+  tituloJogo?: string;
 }
 
 export default function Historico() {
@@ -45,11 +44,9 @@ export default function Historico() {
           },
         };
 
-        // Buscando dados das partidas
         const partidasResponse = await axios.get<Partida[]>("https://api-noob-react.onrender.com/api/partidas/", config);
         const partidasData = partidasResponse.data;
 
-        // Buscando títulos dos jogos com base no ID do campo "jogo"
         const partidasComTitulos: Partida[] = await Promise.all(
           partidasData.map(async (partida) => {
             const jogoResponse = await axios.get<{ titulo: string }>(
@@ -73,6 +70,15 @@ export default function Historico() {
     fetchPartidas();
   }, []);
 
+  const formatarData = (data: string | null): string => {
+    if (!data) return "Partida não concluída";
+    const dataObj = new Date(data);
+    const dia = String(dataObj.getDate()).padStart(2, "0");
+    const mes = String(dataObj.getMonth() + 1).padStart(2, "0"); // Mês começa em 0
+    const ano = dataObj.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  };
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -83,8 +89,8 @@ export default function Historico() {
   }
 
   const renderItem = ({ item }: { item: Partida }) => {
-    const { tituloJogo, usuarios, vencedor, duracao, fim } = item;
-    const dataConclusao = new Date(fim).toLocaleString();
+    const { tituloJogo, usuarios, vencedor, duracao, fim, explicacao } = item;
+    const dataConclusao = formatarData(fim);
     const participantes = usuarios.map((u) => u.apelido).join(", ");
     const vencedorNome = vencedor.map((v) => v.apelido).join(", ");
 
@@ -93,7 +99,8 @@ export default function Historico() {
         <Text style={styles.title}>Jogo: {tituloJogo}</Text>
         <Text>Data de conclusão: {dataConclusao}</Text>
         <Text>Participantes: {participantes}</Text>
-        <Text>Duração: {duracao * 60 } minutos</Text>
+        <Text>Duração: {duracao * 60 || 0} minutos</Text>
+        <Text>Tempo de explicação: {explicacao} minutos </Text>
         <Text>Vencedor: {vencedorNome || "Nenhum"}</Text>
       </View>
     );
@@ -105,6 +112,8 @@ export default function Historico() {
         data={partidas}
         keyExtractor={(item) => item._id}
         renderItem={renderItem}
+        ListHeaderComponent={<Text style={styles.header}>Histórico de Partidas</Text>}
+        ListFooterComponent={<Text style={styles.footer}>Fim do Histórico</Text>}
       />
     </View>
   );
@@ -113,13 +122,13 @@ export default function Historico() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
     backgroundColor: "#f9f9f9",
   },
   item: {
     backgroundColor: "#fff",
     padding: 15,
-    marginBottom: 10,
+    marginVertical: 8,
+    marginHorizontal: 16,
     borderRadius: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -130,6 +139,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "bold",
+  },
+  header: {
+    fontSize: 18,
+    fontWeight: "bold",
+    padding: 10,
+    textAlign: "center",
+    backgroundColor: "#e9e9e9",
+  },
+  footer: {
+    fontSize: 14,
+    textAlign: "center",
+    padding: 10,
+    color: "#666",
   },
   center: {
     flex: 1,
