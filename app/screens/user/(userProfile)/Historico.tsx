@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -19,7 +19,7 @@ interface Partida {
   jogo: string;
   explicacao: string;
   inicio: string;
-  fim: string | null; // Ajustei para permitir `null`
+  fim: string | null;
   registrador: string;
   vencedor: Vencedor[];
   duracao: number;
@@ -33,7 +33,6 @@ export default function Historico() {
   useEffect(() => {
     async function fetchPartidas() {
       try {
-
         const userId = await AsyncStorage.getItem("userId");
         const token = await AsyncStorage.getItem("token");
 
@@ -48,7 +47,7 @@ export default function Historico() {
         const partidasData = partidasResponse.data;
 
         const partidasComTitulos: Partida[] = await Promise.all(
-          partidasData.map(async (partida) => {
+          partidasData.map(async (partida: Partida) => {
             const jogoResponse = await axios.get<{ titulo: string }>(
               `https://api-noob-react.onrender.com/api/jogos/${partida.jogo}`
             );
@@ -88,33 +87,29 @@ export default function Historico() {
     );
   }
 
-  const renderItem = ({ item }: { item: Partida }) => {
-    const { tituloJogo, usuarios, vencedor, duracao, fim, explicacao } = item;
-    const dataConclusao = formatarData(fim);
-    const participantes = usuarios.map((u) => u.apelido).join(", ");
-    const vencedorNome = vencedor.map((v) => v.apelido).join(", ");
-
-    return (
-      <View style={styles.item}>
-        <Text style={styles.title}>Jogo: {tituloJogo}</Text>
-        <Text>Data de conclusão: {dataConclusao}</Text>
-        <Text>Participantes: {participantes}</Text>
-        <Text>Duração: {duracao * 60 || 0} minutos</Text>
-        <Text>Tempo de explicação: {explicacao} minutos </Text>
-        <Text>Vencedor: {vencedorNome || "Nenhum"}</Text>
-      </View>
-    );
-  };
-
   return (
     <View style={styles.container}>
-      <FlatList
-        data={partidas}
-        keyExtractor={(item) => item._id}
-        renderItem={renderItem}
-        //ListHeaderComponent={<Text style={styles.header}>Histórico de Partidas</Text>}
-        ListFooterComponent={<Text style={styles.footer}>Fim do Histórico</Text>}
-      />
+      <Text style={styles.header}>Histórico de Partidas</Text>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        {partidas.map((partida) => {
+          const { tituloJogo, usuarios, vencedor, duracao, fim, explicacao } = partida;
+          const dataConclusao = formatarData(fim);
+          const participantes = usuarios.map((u) => u.apelido).join(", ");
+          const vencedorNome = vencedor.map((v) => v.apelido).join(", ");
+
+          return (
+            <View key={partida._id} style={styles.item}>
+              <Text style={styles.title}>Jogo: {tituloJogo}</Text>
+              <Text>Data de conclusão: {dataConclusao}</Text>
+              <Text>Participantes: {participantes}</Text>
+              <Text>Duração: {duracao * 60 || 0} minutos</Text>
+              <Text>Tempo de explicação: {explicacao} minutos </Text>
+              <Text>Vencedor: {vencedorNome || "Nenhum"}</Text>
+            </View>
+          );
+        })}
+        <Text style={styles.footer}>Fim do Histórico</Text>
+      </ScrollView>
     </View>
   );
 }
@@ -124,11 +119,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f9f9f9",
   },
+  scrollViewContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
   item: {
     backgroundColor: "#fff",
     padding: 15,
-    marginVertical: 8,
-    marginHorizontal: 16,
+    marginBottom: 8,
     borderRadius: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
