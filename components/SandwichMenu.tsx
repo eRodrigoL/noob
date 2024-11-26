@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import {
   Modal,
@@ -7,10 +7,13 @@ import {
   Animated,
   Dimensions,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
-import { screens } from "@/app/routes/Routes";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import ButtonPrimary from "./ButtonPrimary";
 import { Theme } from "@styles/Theme"; // Importa o Theme com as cores
+import { screens } from "@/app/routes/Routes";
 
 interface ModalProps {
   visible: boolean;
@@ -21,9 +24,70 @@ const { width } = Dimensions.get("window");
 
 const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
   const slideAnim = React.useRef(new Animated.Value(-width)).current;
+  const [hasOpenMatch, setHasOpenMatch] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  React.useEffect(() => {
+  // Verifica autenticação do usuário
+  const checkAuthentication = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+      setIsAuthenticated(!!userId && !!token); // Define como autenticado se ambos existirem
+    } catch (error) {
+      console.error("Erro ao verificar autenticação:", error);
+      setIsAuthenticated(false);
+    }
+  };
+
+  // Verifica se há partidas em aberto
+  const checkOpenMatches = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const token = await AsyncStorage.getItem("token");
+
+      if (userId && token) {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        };
+
+        const response = await axios.get(
+          `https://api-noob-react.onrender.com/api/partidas/filtro?registrador=${userId}&fim=null`,
+          config
+        );
+        setHasOpenMatch(response.data.length > 0);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response && error.response.status === 404) {
+          setHasOpenMatch(false);
+        } else {
+          console.error("Erro ao verificar partidas em aberto:", error);
+        }
+      } else {
+        console.error("Erro desconhecido:", error);
+      }
+    }
+  };
+
+  // Função de logout
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.multiRemove(["token", "userId"]);
+      Alert.alert("Sucesso", "Logout realizado com sucesso!");
+      setIsAuthenticated(false);
+      screens.boardgame.list();
+    } catch (error) {
+      console.error("Erro ao realizar logout:", error);
+    }
+  };
+
+  useEffect(() => {
     if (visible) {
+      checkAuthentication(); // Verifica se está autenticado
+      if (isAuthenticated) checkOpenMatches(); // Verifica partidas abertas apenas se autenticado
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: 500,
@@ -36,7 +100,7 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
         useNativeDriver: true,
       }).start(() => onClose());
     }
-  }, [visible, slideAnim]);
+  }, [visible, isAuthenticated]);
 
   const handleClose = () => {
     Animated.timing(slideAnim, {
@@ -44,6 +108,14 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
       duration: 500,
       useNativeDriver: true,
     }).start(() => onClose());
+  };
+
+  const handlePlayPress = () => {
+    if (hasOpenMatch) {
+      screens.matches.finish();
+    } else {
+      screens.matches.play();
+    }
   };
 
   return (
@@ -64,26 +136,35 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
             >
               <View style={styles.buttonContainer}>
                 <ButtonPrimary
-                  title="Login"
-                  onPress={() => screens.user.login()}
-                />
-                <ButtonPrimary
-                  title="Perfil"
-                  onPress={() => screens.user.userProfile()}
-                />
-                <ButtonPrimary
                   title="Início"
                   onPress={() => screens.boardgame.list()}
                 />
-                <ButtonPrimary
-                  title="Jogar"
-                  onPress={() => screens.matches.play()}
-                />
-                <ButtonPrimary title="Teste" onPress={() => screens.teste()} />
-                <ButtonPrimary
-                  title="Teste 2"
-                  onPress={() => screens.teste2()}
-                />
+                {!isAuthenticated ? (
+                  <ButtonPrimary
+                    title="Login"
+                    onPress={() => screens.user.login()}
+                  />
+                ) : (
+                  <>
+                    <ButtonPrimary
+                      title="Perfil"
+                      onPress={() => screens.user.userProfile()}
+                    />
+                    <ButtonPrimary title="Jogar" onPress={handlePlayPress} />
+                    <ButtonPrimary
+                      title="Teste"
+                      onPress={() => screens.teste()}
+                    />
+                    <ButtonPrimary
+                      title="Teste 2"
+                      onPress={() => screens.teste2()}
+                    />
+                    <ButtonPrimary
+                      title="Sair"
+                      onPress={handleLogout}
+                    />
+                  </>
+                )}
               </View>
             </Animated.View>
           </TouchableWithoutFeedback>
@@ -109,17 +190,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 20,
-  },
-  modalButton: {
-    backgroundColor: Theme.light.backgroundButton, // Botões com cor secundária do tema
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: Theme.light.textButton, // Texto do botão conforme o tema
-    fontSize: 18,
   },
 });
 
