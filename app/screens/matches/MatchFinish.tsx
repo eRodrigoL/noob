@@ -98,24 +98,27 @@ const RegistroPartidaScreen = () => {
 
   const handleSaveMatch = async () => {
     // Validações de campos obrigatórios
-    if (!endTime.trim()) {
-      Alert.alert("Erro", "O campo 'Fim da partida' é obrigatório.");
-      return;
-    }
-  
-    if ((participants.length === 0 && !victory)) {
-      Alert.alert("Erro", "Adicione pelo menos um vencedor ou opção de vitória");
-      return;
-    }
-  
-    if (!scoreType) {
-      Alert.alert("Erro", "Selecione um tipo de pontuação.");
-      return;
-    }
-  
-    if (scoreType === "pontos" && (!score || isNaN(parseInt(score, 10)))) {
-      Alert.alert("Erro", "Insira uma pontuação válida.");
-      return;
+
+    if(victory != "naoConcluido"){
+      if (!endTime.trim()) {
+        Alert.alert("Erro", "O campo 'Fim da partida' é obrigatório.");
+        return;
+      }
+    
+      if ((participants.length === 0 && !victory)) {
+        Alert.alert("Erro", "Adicione pelo menos um vencedor ou opção de vitória");
+        return;
+      }
+    
+      if (!scoreType) {
+        Alert.alert("Erro", "Selecione um tipo de pontuação.");
+        return;
+      }
+    
+      if (scoreType === "pontos" && (!score || isNaN(parseInt(score, 10)))) {
+        Alert.alert("Erro", "Insira uma pontuação válida.");
+        return;
+      }
     }
   
     if (!partidaId) return;
@@ -133,12 +136,13 @@ const RegistroPartidaScreen = () => {
           "Content-Type": "application/json",
         },
       };
+      
   
       // Validação e formatação do horário 'fim'
       const horarioRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
       const trimmedEndTime = endTime.trim();
   
-      if (trimmedEndTime.length !== 5 || !horarioRegex.test(trimmedEndTime)) {
+      if (victory != "naoConcluido" && (trimmedEndTime.length !== 5 || !horarioRegex.test(trimmedEndTime))) {
         Alert.alert("Erro", "Formato de horário inválido para o campo 'Fim da partida'. Use hh:mm.");
         return;
       }
@@ -148,6 +152,8 @@ const RegistroPartidaScreen = () => {
       const fim = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
   
       let vencedor;
+
+      
       if (victory === "coletiva") {
         vencedor = validNicknames.map((apelido) => ({ apelido }));
       } else if (victory === "derrota") {
