@@ -9,6 +9,7 @@ export default function Desempenho() {
   const [apelido, setApelido] = useState<string | null>(null);
   const [vitorias, setVitorias] = useState<number>(0);
   const [derrotas, setDerrotas] = useState<number>(0);
+  const [categorias, setCategorias] = useState<{ [key: string]: number }>({}); // Vitórias por categoria
 
   // Função para buscar o apelido do usuário
   const buscarApelido = async () => {
@@ -63,17 +64,41 @@ export default function Desempenho() {
 
       const partidas = response.data;
 
-      // Filtrar vitórias e derrotas
-      const vitorias = partidas.filter((partida: any) =>
+      const categoriasTemp: { [key: string]: number } = {};
+      const vitoriasTemp = partidas.filter((partida: any) =>
         partida.vencedor.some((v: any) => v.apelido === apelido)
-      ).length;
+      );
 
+       // Buscar categorias
+  for (const partida of vitoriasTemp) {
+    const jogoId = partida.jogo; // ID do jogo
+    try {
+      const jogoResponse = await axios.get(
+        `https://api-noob-react.onrender.com/api/jogos/${jogoId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const categoria = jogoResponse.data.categoria;
+      categoriasTemp[categoria] = (categoriasTemp[categoria] || 0) + 1;
+    } catch (error) {
+      console.error(`Erro ao buscar categoria do jogo ${jogoId}:`, error);
+    }
+  }
+
+      setCategorias({ ...categoriasTemp });
+
+      // Contar derrotas
       const derrotas = partidas.filter((partida: any) =>
         partida.usuarios.some((u: any) => u.apelido === apelido)
-      ).length - vitorias;
+      ).length - vitoriasTemp.length;
 
-      setVitorias(vitorias);
+      setVitorias(vitoriasTemp.length);
       setDerrotas(derrotas);
+
+
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Erro na API:", error.response?.data || error.message);
@@ -85,6 +110,10 @@ export default function Desempenho() {
     }
   };
 
+  /*useEffect(() => {
+    console.log("Estado de categorias atualizado:", categorias);
+  }, [categorias]);*/
+
   useEffect(() => {
     buscarApelido();
   }, []);
@@ -94,6 +123,7 @@ export default function Desempenho() {
       buscarPartidas(apelido);
     }
   }, [apelido]);
+
 
   // Dados do gráfico de indicador
   const total = vitorias + derrotas;
@@ -105,28 +135,34 @@ export default function Desempenho() {
   const circumference = Math.PI * radius;
   const offsetDerrotas = (1 - derrotasPercent / 100) * circumference;
 
-   // Dados do gráfico de teia de aranha
-   const labels = ["Força", "Velocidade", "Agilidade", "Resistência", "Inteligência"];
-   const values = [80, 70, 90, 60, 75]; // Percentuais
-   const max = 100; // Valor máximo
-   const centerX = 125;
-   const centerY = 125;
-   const chartRadius = 100;
- 
-   const calculatePoints = (values: number[], radius: number) =>
-     values.map((value, index) => {
-       const angle = (2 * Math.PI * index) / values.length - Math.PI / 2; // Divide 360 graus entre os pontos
-       return {
-         x: centerX + radius * Math.cos(angle),
-         y: centerY + radius * Math.sin(angle),
-       };
-     });
- 
-   const outerPoints = calculatePoints(Array(labels.length).fill(max), chartRadius);
-   const valuePoints = calculatePoints(
-     values.map((v) => (v / max) * chartRadius),
-     chartRadius
-   );
+ // Configuração do gráfico de teia de aranha
+  const labels = Object.keys(categorias);
+  const values = Object.values(categorias);
+  const max = Math.max(...Object.values(categorias), 1); // Define o máximo dinamicamente
+  const centerX = 125;
+  const centerY = 125;
+  const chartRadius = 90;
+
+
+  const calculatePoints = (values: number[], radius: number) => {
+    const max = Math.max(...values); // Máximo para normalizar os valores
+    return values.map((value, index) => {
+      const angle = (2 * Math.PI * index) / values.length - Math.PI / 2;
+      const scaledValue = (value / max) * radius; // Proporção ao raio
+      return {
+        x: centerX + scaledValue * Math.cos(angle),
+        y: centerY + scaledValue * Math.sin(angle),
+      };
+    });
+  };
+  
+ const outerPoints = calculatePoints(Array(labels.length).fill(max), chartRadius);
+ const valuePoints = calculatePoints(
+   values.map((v) => (v / max) * chartRadius),
+   chartRadius
+ );
+
+ //console.log("Valores usados no gráfico:", values);
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
@@ -186,12 +222,12 @@ export default function Desempenho() {
           Vitórias: {vitorias} | Derrotas: {derrotas}
         </Text>
 
-        <Text style={{ fontSize: 18, marginVertical: 20 }}>
+        <Text style={{ fontSize: 18, marginVertical: 30, marginBottom: 0 }}>
           Desempenho por categoria
         </Text>
 
         {/* Gráfico de Teia de Aranha */}
-        <Svg height={250} width={250} viewBox="0 0 250 250">
+        <Svg height={350} width={350} viewBox="-30 -30 310 310">
           {outerPoints.map((point, index) => (
             <Line
               key={`line-${index}`}
@@ -223,25 +259,22 @@ export default function Desempenho() {
             fill="rgba(76, 175, 80, 0.4)"
           />
           {outerPoints.map((point, index) => (
-            <SvgText
-              key={`label-${index}`}
-              x={point.x}
-              y={point.y}
-              textAnchor="middle"
-              fontSize="10"
-              fill="#333"
-              dx={point.x > centerX ? 5 : point.x < centerX ? -5 : 0}
-              dy={point.y > centerY ? 10 : point.y < centerY ? -10 : 0}
-            >
-              {labels[index]}
-            </SvgText>
+          <SvgText
+          key={`label-${index}`}
+          x={point.x}
+          y={point.y}
+          textAnchor={point.x > centerX ? "start" : point.x < centerX ? "end" : "middle"}
+          fontSize="10"
+          fill="#333"
+          dx={point.x > centerX ? 15 : point.x < centerX ? -15 : 0} // Desloca mais
+          dy={point.y > centerY ? 10 : point.y < centerY ? -10 : -5} // Ajusta no eixo vertical
+          >
+            {`${labels[index]}: ${values[index]}`}
+          </SvgText>
           ))}
         </Svg>
-      
       </View>
 
     </ScrollView>
   );
 }
-
-
