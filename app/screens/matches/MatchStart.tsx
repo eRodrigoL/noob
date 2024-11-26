@@ -213,22 +213,27 @@ const RegistroPartidaScreen = () => {
         />
 
         <View style={localStyles.explicacaoContainer}>
-          <Switch
-            value={explicacao}
-            onValueChange={setExplicacao}
-            style={localStyles.switch}
-          />
-          <Text style={localStyles.switchLabel}>não houve</Text>
-          <Text style={styles.label}>Tempo de explicação:</Text>
-          <TextInput
-            placeholder="Minutos"
-            style={[styles.input, localStyles.inputTime]}
-            value={tempoExplicacao}
-            onChangeText={setTempoExplicacao}
-            editable={!explicacao}
-            keyboardType="numeric"
-          />
+          <View style={localStyles.rowContainer}>
+            <Text style={styles.label}>Tempo de explicação:</Text>
+            <TextInput
+              placeholder="Minutos"
+              style={[styles.input, localStyles.inputTime]}
+              value={tempoExplicacao}
+              onChangeText={setTempoExplicacao}
+              editable={!explicacao}
+              keyboardType="numeric"
+            />
+          </View>
+          <View style={localStyles.switchContainer}>
+            <Switch
+              value={explicacao}
+              onValueChange={setExplicacao}
+              style={localStyles.switch}
+            />
+            <Text style={localStyles.switchLabel}>não houve</Text>
+          </View>
         </View>
+
 
         <Text style={styles.label}>Início da partida:</Text>
         <MaskedTextInput
@@ -304,11 +309,19 @@ const localStyles = StyleSheet.create({
     fontWeight: "bold",
   },
   explicacaoContainer: {
+    marginBottom: 20,
+    marginTop: 20,
+  },
+  rowContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
-    paddingHorizontal: 5,
+    marginBottom: 10,
+  },
+  switchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
   },
   switch: {
     transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
@@ -316,15 +329,15 @@ const localStyles = StyleSheet.create({
   },
   switchLabel: {
     fontSize: 16,
-    color: Theme.light.textButton,
+    color: "#000",
   },
   inputTime: {
     backgroundColor: Theme.light.backgroundCard,
-    marginBottom: 10,
+    marginLeft: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 8,
-    width: 100,
+    width: 80,
     textAlign: "center",
   },
 });
