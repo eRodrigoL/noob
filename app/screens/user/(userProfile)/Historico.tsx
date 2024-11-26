@@ -43,11 +43,28 @@ export default function Historico() {
           },
         };
 
-        const partidasResponse = await axios.get<Partida[]>("https://api-noob-react.onrender.com/api/partidas/", config);
+        // Obtém o apelido do usuário logado
+        const usuarioResponse = await axios.get<Usuario>(
+          `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
+          config
+        );
+        const usuarioApelido = usuarioResponse.data.apelido;
+
+        // Busca todas as partidas
+        const partidasResponse = await axios.get<Partida[]>(
+          "https://api-noob-react.onrender.com/api/partidas/",
+          config
+        );
         const partidasData = partidasResponse.data;
 
+        // Filtra partidas nas quais o usuário participou
+        const partidasFiltradas = partidasData.filter((partida) =>
+          partida.usuarios.some((usuario) => usuario.apelido === usuarioApelido)
+        );
+
+        // Adiciona títulos aos jogos
         const partidasComTitulos: Partida[] = await Promise.all(
-          partidasData.map(async (partida: Partida) => {
+          partidasFiltradas.map(async (partida) => {
             const jogoResponse = await axios.get<{ titulo: string }>(
               `https://api-noob-react.onrender.com/api/jogos/${partida.jogo}`
             );
@@ -103,7 +120,7 @@ export default function Historico() {
               <Text>Data de conclusão: {dataConclusao}</Text>
               <Text>Participantes: {participantes}</Text>
               <Text>Duração: {duracao * 60 || 0} minutos</Text>
-              <Text>Tempo de explicação: {explicacao} minutos </Text>
+              <Text>Tempo de explicação: {explicacao} minutos</Text>
               <Text>Vencedor: {vencedorNome || "Nenhum"}</Text>
             </View>
           );
