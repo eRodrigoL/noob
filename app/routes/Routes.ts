@@ -1,4 +1,5 @@
 import { router } from "expo-router"; // Importa o Router para gerenciar as rotas do aplicativo
+import gameDashboard from "../screens/boardgame/GameDashboard";
 
 // Definição de constantes com imagens que serão usadas em diversas telas
 const images = {
@@ -42,6 +43,15 @@ const screens = {
     // Rota para o avaliação dos jogos
     rating: (id: string | number) =>
       router.push(`/screens/boardgame/GameRating?id=${id}`),
+
+    // Rota para gráficos dos jogos
+    gameDashboard: (id: string | number) =>
+      router.push(`/screens\boardgame\GameDashboard?id=${id}`),
+
+    // Rota para ranking dos jogos
+    ranking: (id: string | number) =>
+      router.push(`/screens\boardgame\Ranking?id=${id}`),
+    
   },
 
   matches: {
