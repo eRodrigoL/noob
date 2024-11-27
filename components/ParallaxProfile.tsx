@@ -12,17 +12,19 @@ import {
   TouchableOpacity, // Para criar botões clicáveis
 } from "react-native";
 import Animated, {
-  useAnimatedScrollHandler, // Para manipular eventos de rolagem animados
-  useAnimatedStyle, // Para definir estilos animados
-  useSharedValue, // Para gerenciar valores compartilhados de animação
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  runOnJS,
 } from "react-native-reanimated";
 import * as ImagePicker from "expo-image-picker"; // Para permitir a seleção de imagens da galeria do dispositivo
 import { Theme } from "@/app/styles/Theme"; // Importa a paleta de cores do tema
 
 // Obtém as dimensões da tela e define valores constantes para o cabeçalho e cobertura da página
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
-const heightPageCover = 200; // Altura da cobertura da página
-const heightHeader = 90; // Altura do cabeçalho
+const heightPageCover = 200;
+const initialHeightHeader = 90;
+const finalHeightHeader = 180;
 
 // Define as propriedades aceitas pelo componente ParallaxProfile
 export interface ParallaxProfileProps {
@@ -69,7 +71,8 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   const [selectedImage, setSelectedImage] = useState<string | null>(
     photo || null // Inicializa a imagem selecionada com a capa ou null
   );
-  const [name, setName] = useState<string | null>(initialName); // Nome inicial no perfil
+  const [name, setName] = useState<string | null>(initialName);
+  const [interactionEnabled, setInteractionEnabled] = useState(true); // Para travar interação
 
   // Efeito colateral para ativar o modo de registro caso o id seja indefinido
   useEffect(() => {
@@ -158,8 +161,10 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   const animatedHeaderStyle = useAnimatedStyle(() => {
     const height =
       scrollY.value < heightPageCover
-        ? 90 + (scrollY.value / heightPageCover) * 90 // Calcula altura proporcional à rolagem
-        : 180;
+        ? initialHeightHeader +
+          (scrollY.value / heightPageCover) *
+            (finalHeightHeader - initialHeightHeader)
+        : finalHeightHeader;
 
     return {
       height,
@@ -169,12 +174,33 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
 
   // Estilo animado para o corpo principal, ajustando o espaçamento superior
   const animatedBodyContainerStyle = useAnimatedStyle(() => {
-    const marginTop =
-      scrollY.value < heightPageCover
-        ? (scrollY.value / heightPageCover) * 90 // Calcula a margem proporcional à rolagem
-        : 90;
+    // Ajusta os cálculos das alturas inicial e final para diminuir heightPageCover
+    const initialHeight = screenHeight - (2 * heightPageCover + 6);
+    const maxHeight =
+      screenHeight - (heightPageCover + initialHeightHeader + 2);
+
+    const scrollProgress = Math.min(scrollY.value / heightPageCover, 1);
+    const heightDiff = maxHeight - initialHeight;
+    const height = initialHeight + heightDiff * scrollProgress;
+
+    // Deslocamento adicional ajustado
+    const additionalOffset = heightPageCover;
+
+    // Calcula a altura dinâmica do cabeçalho
+    const headerHeight =
+      initialHeightHeader +
+      (scrollY.value / heightPageCover) *
+        (finalHeightHeader - initialHeightHeader);
+
+    // Cálculo para o marginTop ajustado
+    const marginTop = Math.max(
+      headerHeight + additionalOffset,
+      initialHeightHeader + additionalOffset
+    );
 
     return {
+      height,
+      minHeight: initialHeight,
       marginTop,
     };
   });
@@ -279,8 +305,20 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
             )}
           </Animated.View>
 
-          {/* Conteúdo principal da página com suporte a rolagem */}
-          <View style={localStyles.bodyContainer}>{children}</View>
+          {/* View com tamanho fixo para forçar o scroll */}
+          <View style={{ height: screenHeight + initialHeightHeader }}>
+            {/* Conteúdo principal da página com suporte a rolagem */}
+            <Animated.View
+              style={[
+                localStyles.bodyContainer,
+                animatedBodyContainerStyle,
+                { position: "absolute", top: 0, left: 0, right: 0 },
+              ]}
+              pointerEvents={interactionEnabled ? "auto" : "none"}
+            >
+              {children}
+            </Animated.View>
+          </View>
         </View>
       </Animated.ScrollView>
     </View>
@@ -291,12 +329,12 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
 const localStyles = StyleSheet.create({
   header: {
     //backgroundColor: Theme.light.background,
-    backgroundColor: "red",
+    backgroundColor: Theme.light.background,
     position: "absolute",
     top: 0,
     width: "100%",
-    zIndex: 2,
-    height: heightHeader,
+    zIndex: 1,
+    height: initialHeightHeader,
     justifyContent: "center",
     borderTopWidth: 3,
     borderColor: Theme.light.text,
@@ -360,26 +398,15 @@ const localStyles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    flexDirection: "column",
   },
   bodyContainer: {
     paddingTop: 0,
     flex: 1,
     padding: 0,
     backgroundColor: Theme.light.background,
-    marginTop: heightPageCover + heightHeader,
-    minHeight: screenHeight - (heightPageCover + heightHeader + 120),
   },
-  editHint: {
-    color: "white",
-    textAlign: "center",
-    marginLeft: 160,
-    marginTop: 0,
-    fontSize: 30,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-  },
+  editHint: {},
 });
 
 export default ParallaxProfile;
