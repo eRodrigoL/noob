@@ -329,7 +329,7 @@ const localStyles = StyleSheet.create({
     marginLeft: 5,
   },
   addButton: {
-    backgroundColor: Theme.light.backgroundButton,
+    backgroundColor: Theme.light.secondary.background,
     padding: 10,
     borderRadius: 8,
     alignItems: "center",
@@ -344,7 +344,7 @@ const localStyles = StyleSheet.create({
   },
   tag: {
     flexDirection: "row",
-    backgroundColor: Theme.light.backgroundButton,
+    backgroundColor: Theme.light.secondary.backgroundButton,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 20,
