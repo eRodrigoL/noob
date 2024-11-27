@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Dimensions, ActivityIndicator } from "react-native";
-import { useLocalSearchParams } from "expo-router";
-import Svg, { Polygon, Circle, Text as SvgText, Line } from "react-native-svg";
+import React, { useState, useEffect } from "react";
+import { View, Text, ActivityIndicator } from "react-native";
+import { Svg, Circle, Line, Polygon, Text as SvgText } from "react-native-svg";
 import axios from "axios";
+import { useLocalSearchParams } from "expo-router";
 
 export default function GameDashboard() {
   // Capturando o parâmetro `id` da rota
@@ -15,15 +15,17 @@ export default function GameDashboard() {
   // Categorias e configurações do gráfico
   const categories = ["Beleza", "Divertimento", "Duração", "Preço", "Armazenamento"];
   const maxValue = 100; // Valor máximo para o gráfico
-  const chartSize = 300; // Tamanho do gráfico
+  const chartSize = 250; // Tamanho do gráfico (área central)
+  const margin = 70; // Margem extra para os rótulos
+  const svgSize = chartSize + margin * 2; // Tamanho total do SVG
   const radius = chartSize / 2; // Raio do gráfico
 
   // Função para calcular coordenadas de cada ponto
   const calculateCoordinates = (value: number, index: number, total: number) => {
     const angle = (Math.PI * 2 * index) / total; // Ângulo em radianos
     const distance = (value / maxValue) * radius; // Distância do centro
-    const x = radius + distance * Math.sin(angle); // Coordenada X
-    const y = radius - distance * Math.cos(angle); // Coordenada Y
+    const x = margin + radius + distance * Math.sin(angle); // Coordenada X
+    const y = margin + radius - distance * Math.cos(angle); // Coordenada Y
     return { x, y };
   };
 
@@ -38,11 +40,9 @@ export default function GameDashboard() {
   // Função para buscar os dados da API com axios
   const fetchData = async () => {
     try {
-      console.log("Iniciando fetch para o ID:", id);
       const response = await axios.get(
         `https://api-noob-react.onrender.com/api/avaliacoes/`
       );
-      console.log("Dados recebidos da API:", response.data);
 
       // Filtrar as avaliações pelo ID do jogo
       const filteredEvaluations = response.data.filter(
@@ -62,7 +62,7 @@ export default function GameDashboard() {
         Preço: "preco",
         Armazenamento: "armazenamento",
       };
-      
+
       // Calcular as médias das categorias
       const averages = categories.map((category) => {
         const apiField = categoryMapping[category]; // Obtemos o campo correspondente da API
@@ -72,7 +72,7 @@ export default function GameDashboard() {
         }, 0);
         return sum / filteredEvaluations.length;
       });
-      
+
       setData(averages);
       setLoading(false);
     } catch (err) {
@@ -92,18 +92,13 @@ export default function GameDashboard() {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Text style={{ marginBottom: 20 }}>Conteúdo da aba Gráficos do jogo</Text>
-      {id ? (
-        <Text style={{ marginBottom: 20 }}>ID do Jogo: {id}</Text>
-      ) : (
-        <Text style={{ marginBottom: 20 }}>ID não fornecido</Text>
-      )}
 
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : error ? (
         <Text style={{ color: "red" }}>{error}</Text>
       ) : (
-        <Svg width={chartSize} height={chartSize}>
+        <Svg width={svgSize} height={svgSize}>
           {/* Linhas da grade */}
           {[1, 0.75, 0.5, 0.25].map((factor, i) => (
             <Polygon
@@ -130,8 +125,8 @@ export default function GameDashboard() {
             return (
               <Line
                 key={index}
-                x1={radius}
-                y1={radius}
+                x1={margin + radius}
+                y1={margin + radius}
                 x2={x}
                 y2={y}
                 stroke="gray"
@@ -143,29 +138,43 @@ export default function GameDashboard() {
           {/* Polígono dos dados */}
           <Polygon points={points} fill="rgba(26, 255, 146, 0.3)" stroke="green" />
 
-          {/* Categorias */}
+          {/* Categorias e rótulos de valores */}
           {categories.map((category, index) => {
-            const { x, y } = calculateCoordinates(
-              maxValue + 20,
-              index,
-              categories.length
-            );
+            // Calcular posição do rótulo da categoria
+            const { x, y } = calculateCoordinates(maxValue + 20, index, categories.length);
+
+            // Calcular posição do rótulo do valor
+            const valuePoint = calculateCoordinates(data[index], index, categories.length);
+
             return (
-              <SvgText
-                key={index}
-                x={x}
-                y={y}
-                fontSize="12"
-                textAnchor="middle"
-                fill="black"
-              >
-                {category}
-              </SvgText>
+              <React.Fragment key={index}>
+                {/* Rótulo da categoria */}
+                <SvgText
+                  x={x}
+                  y={y}
+                  fontSize="12"
+                  textAnchor="middle"
+                  fill="black"
+                >
+                  {category}
+                </SvgText>
+
+                {/* Rótulo do valor (na frente do rótulo da categoria) */}
+                <SvgText
+                  x={x}
+                  y={y + 14} // Posicionado abaixo do rótulo da categoria
+                  fontSize="10"
+                  textAnchor="middle"
+                  fill="black"
+                >
+                  {data[index].toFixed(1)}
+                </SvgText>
+              </React.Fragment>
             );
           })}
 
           {/* Centro */}
-          <Circle cx={radius} cy={radius} r="3" fill="black" />
+          <Circle cx={margin + radius} cy={margin + radius} r="3" fill="black" />
         </Svg>
       )}
     </View>
