@@ -36,7 +36,6 @@ export interface ParallaxProfileProps {
   initialIsRegisting?: boolean; // Se o modo de registro é ativado inicialmente
   children?: React.ReactNode; // Elementos filhos para exibição adicional
   isEditing?: boolean; // Controle externo para ativar o modo de edição
-  onEditChange?: React.Dispatch<React.SetStateAction<boolean>>; // Callback para alterações no modo de edição
   setEditedUser?: React.Dispatch<React.SetStateAction<User>>; // Função para atualizar o estado global do usuário
 }
 
@@ -233,14 +232,16 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
         </View>
       )}
       {!(isEditing || isRegisting) && (
-        <ImageBackground
-          source={{
-            uri: selectedBackgroundImage
-              ? selectedBackgroundImage
-              : "https://example.com/user-image.jpg", // Imagem padrão
-          }}
-          style={localStyles.backgroundImage}
-        />
+        <View style={localStyles.PageCover}>
+          <ImageBackground
+            source={{
+              uri: selectedBackgroundImage
+                ? selectedBackgroundImage
+                : "https://example.com/user-image.jpg", // Imagem padrão
+            }}
+            style={localStyles.backgroundImage}
+          />
+        </View>
       )}
 
       <Animated.View
