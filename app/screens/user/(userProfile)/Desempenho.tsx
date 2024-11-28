@@ -212,7 +212,7 @@ export default function Desempenho() {
               cx="125"
               cy="125"
               r={radius}
-              stroke="#FFA07A"
+              stroke="#fc8e49"
               strokeWidth={strokeWidth}
               fill="none"
               strokeDasharray={`${circumference} ${circumference}`}
