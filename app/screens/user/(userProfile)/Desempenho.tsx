@@ -132,7 +132,7 @@ export default function Desempenho() {
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#4caf50" />
+        <ActivityIndicator size="large" color="#FF8C00" />
         <Text style={{ marginTop: 10 }}>Carregando informações...</Text>
       </View>
     );
@@ -201,7 +201,7 @@ export default function Desempenho() {
               cx="125"
               cy="125"
               r={radius}
-              stroke="#f44336"
+              stroke="#808080"
               strokeWidth={strokeWidth}
               fill="none"
               strokeDasharray={`${circumference} ${circumference}`}
@@ -212,7 +212,7 @@ export default function Desempenho() {
               cx="125"
               cy="125"
               r={radius}
-              stroke="#4caf50"
+              stroke="#FFA07A"
               strokeWidth={strokeWidth}
               fill="none"
               strokeDasharray={`${circumference} ${circumference}`}
@@ -267,9 +267,9 @@ export default function Desempenho() {
           })}
           <Polygon
             points={valuePoints.map((p) => `${p.x},${p.y}`).join(" ")}
-            stroke="#4caf50"
+            stroke="#FFA07A"
             strokeWidth={2}
-            fill="rgba(76, 175, 80, 0.4)"
+            fill="rgba(255, 160, 122, 0.4)"
           />
           {outerPoints.map((point, index) => (
             <SvgText

@@ -106,7 +106,7 @@ export default function Ranking() {
       <Text style={{ marginBottom: 20, fontSize: 16, fontWeight: "bold" }}>Ranking geral do jogo </Text>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#34a853" />
+        <ActivityIndicator size="large" color="#FF8C00" />
       ) : rankingData.length > 0 ? (
         <BarChart
           data={data}
@@ -121,8 +121,8 @@ export default function Ranking() {
             backgroundGradientFrom: "#FFFFFF",
             backgroundGradientTo: "#FFFFFF",
             decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(34, 139, 34, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            color: (opacity = 1) => `rgba(255, 130, 90, 1)`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, 1)`,
             style: {
               borderRadius: 16,
             },

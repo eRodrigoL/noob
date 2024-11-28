@@ -116,7 +116,7 @@ export default function GameDashboard() {
       <Text style={styles.title}> Avaliação do jogo </Text>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#FF8C00" />
       ) : error ? (
         <Text style={styles.error}>{error}</Text>
       ) : (
@@ -175,7 +175,7 @@ export default function GameDashboard() {
         })}
 
         {/* Polígono dos dados */}
-        <Polygon points={points} fill="rgba(26, 255, 146, 0.3)" stroke="green" />
+        <Polygon points={points} fill="rgba(255, 160, 122, 0.3)" stroke="orange" />
 
         {/* Categorias e rótulos de valores */}
         {categories.map((category, index) => {
