@@ -1,61 +1,150 @@
-import React from "react";
-import { View, Text, Dimensions } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Dimensions, ActivityIndicator } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { BarChart } from "react-native-chart-kit";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// Tipo para a estrutura de um vencedor
+type Vencedor = {
+  apelido: string;
+  _id: string;
+};
+
+// Tipo para uma partida
+type Partida = {
+  _id: string;
+  usuarios: { apelido: string; _id: string }[];
+  vencedor: Vencedor[];
+  [key: string]: any; // Para ignorar outras propriedades não usadas
+};
+
+// Tipo para os dados do ranking
+type RankingItem = {
+  apelido: string;
+  count: number;
+};
 
 export default function Ranking() {
   const { id } = useLocalSearchParams<{ id?: string }>();
+  const [loading, setLoading] = useState(true);
+  const [rankingData, setRankingData] = useState<RankingItem[]>([]);
+
+  const screenWidth = Dimensions.get("window").width;
+
+  useEffect(() => {
+    const fetchPartidas = async () => {
+      try {
+
+        const token = await AsyncStorage.getItem("token");
+        const userId = await AsyncStorage.getItem("userId");
+    
+        if (!token || !userId) {
+          setError("Erro de autenticação: Token ou userId ausente.");
+          setLoading(false);
+          return;
+        }
+    
+        // Configurar cabeçalhos com o token
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        };
+        
+        const response = await axios.get<Partida[]>(
+          "https://api-noob-react.onrender.com/api/partidas", config
+        );
+
+        // Garantir que a resposta seja um array
+        const partidas = Array.isArray(response.data) ? response.data : [];
+
+        // Filtrar partidas e calcular vitórias
+        const vencedores = partidas
+          .filter((partida) =>
+            partida.vencedor.some((v) => v.apelido.startsWith("@"))
+          )
+          .flatMap((partida) =>
+            partida.vencedor.filter((v) => v.apelido.startsWith("@"))
+          );
+
+        // Declarar o tipo de vitoriaContagem explicitamente
+        const vitoriaContagem: Record<string, number> = vencedores.reduce((acc: Record<string, number>, vencedor) => {
+          acc[vencedor.apelido] = (acc[vencedor.apelido] || 0) + 1;
+          return acc;
+        }, {});
+
+        // Transformar em array, ordenar e pegar os 5 primeiros
+        const ranking = Object.entries(vitoriaContagem)
+          .map(([apelido, count]) => ({ apelido, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
+
+        setRankingData(ranking);
+      } catch (error) {
+        console.error("Erro ao buscar partidas:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPartidas();
+  }, []);
 
   const data = {
-    labels: ["Jogador 1", "Jogador 2", "Jogador 3", "Jogador 4", "Jogador 5"],
+    labels: rankingData.map((item) => item.apelido),
     datasets: [
       {
-        data: [95, 87, 78, 65, 45],
+        data: rankingData.map((item) => item.count),
       },
     ],
   };
 
-  const screenWidth = Dimensions.get("window").width;
-
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f9f9f9" }}>
-      <Text style={{ marginBottom: 20, fontSize: 16, fontWeight: "bold" }}>Ranking dos Jogadores</Text>
-      {id ? (
-        <Text style={{ marginBottom: 20, fontSize: 14 }}>ID do Jogo: {id}</Text>
-      ) : (
-        <Text style={{ marginBottom: 20, fontSize: 14 }}>ID não fornecido</Text>
-      )}
+      <Text style={{ marginBottom: 20, fontSize: 16, fontWeight: "bold" }}>Ranking geral do jogo </Text>
 
-      {/* Gráfico de Ranking Horizontal */}
-      <BarChart
-        data={data}
-        width={screenWidth - 40}
-        height={300}
-        yAxisLabel=""
-        yAxisSuffix=""
-        showValuesOnTopOfBars={true}
-        fromZero={true}
-        //horizontal={true} // Configuração para gráfico horizontal
-        chartConfig={{
-          backgroundColor: "#FFFFFF",
-          backgroundGradientFrom: "#FFFFFF",
-          backgroundGradientTo: "#FFFFFF",
-          decimalPlaces: 0,
-          color: (opacity = 1) => `rgba(34, 139, 34, ${opacity})`, // Verde suave
-          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Preto para rótulos
-          style: {
+      {loading ? (
+        <ActivityIndicator size="large" color="#34a853" />
+      ) : rankingData.length > 0 ? (
+        <BarChart
+          data={data}
+          width={screenWidth - 40}
+          height={300}
+          yAxisLabel=""
+          yAxisSuffix=""
+          showValuesOnTopOfBars={true}
+          fromZero={true}
+          chartConfig={{
+            backgroundColor: "#FFFFFF",
+            backgroundGradientFrom: "#FFFFFF",
+            backgroundGradientTo: "#FFFFFF",
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(34, 139, 34, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            style: {
+              borderRadius: 16,
+            },
+            propsForBackgroundLines: {
+              strokeWidth: 0.5,
+              stroke: "#e3e3e3",
+            },
+          }}
+          style={{
+            marginVertical: 10,
             borderRadius: 16,
-          },
-          propsForBackgroundLines: {
-            strokeWidth: 0.5,
-            stroke: "#e3e3e3", // Linhas mais claras
-          },
-        }}
-        style={{
-          marginVertical: 10,
-          borderRadius: 16,
-        }}
-      />
+          }}
+        />
+      ) : (
+        <Text>Nenhum dado disponível para exibir.</Text>
+      )}
     </View>
   );
 }
+
+
+function setError(arg0: string) {
+  throw new Error("Function not implemented.");
+}
+
