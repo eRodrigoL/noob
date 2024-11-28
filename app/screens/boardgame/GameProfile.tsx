@@ -377,6 +377,17 @@ const GameProfile: React.FC = () => {
                 title="Avaliar Jogo"
                 onPress={() => id && screens.boardgame.rating(id)}
               />
+
+              <ButtonPrimary
+                title="Gráficos"
+                onPress={() => id && screens.boardgame.gameDashboard(id)}
+              />
+
+              <ButtonPrimary
+                title="Ranking"
+                onPress={() => id && screens.boardgame.ranking(id)}
+              />
+
             </View>
           </View>
         </Animated.ScrollView>

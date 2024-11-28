@@ -98,7 +98,7 @@ export default function Historico() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#FF8C00" />
         <Text>Carregando...</Text>
       </View>
     );

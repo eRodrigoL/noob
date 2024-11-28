@@ -158,17 +158,17 @@ const UserProfile: React.FC = () => {
         id={user._id}
         name={user.nome}
         photo={user.foto}
+        cover={user.capa}
         initialIsEditing={false}
         initialIsRegisting={false}
         isEditing={isEditing}
-        onEditChange={setIsEditing}
         setEditedUser={setEditedUser}
       >
         <Tabs
           screenOptions={{
             headerShown: false,
             tabBarStyle: localStyles.tabBar,
-            tabBarActiveTintColor: "#007AFF",
+            tabBarActiveTintColor: "#000",
             tabBarInactiveTintColor: "#8E8E93",
           }}
         >
@@ -180,6 +180,7 @@ const UserProfile: React.FC = () => {
                 <Ionicons name="person-outline" size={size} color={color} />
               ),
             }}
+            initialParams={{ user: user }}
           />
           <Tabs.Screen
             name="Desempenho"
