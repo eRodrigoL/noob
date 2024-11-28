@@ -137,41 +137,86 @@ export default function GameDashboard() {
             </View>
           </View>
 
-          {/* Gráfico */}
           <Svg width={svgSize} height={svgSize}>
-            {[1, 0.75, 0.5, 0.25].map((factor, i) => (
-              <Polygon
-                key={i}
-                points={categories
-                  .map((_, index) => {
-                    const { x, y } = calculateCoordinates(factor * maxValue, index, categories.length);
-                    return `${x},${y}`;
-                  })
-                  .join(" ")}
-                stroke="gray"
-                strokeWidth="0.5"
-                fill="none"
-              />
-            ))}
+        {/* Linhas da grade */}
+        {[1, 0.75, 0.5, 0.25].map((factor, i) => (
+          <Polygon
+            key={i}
+            points={categories
+              .map((_, index) => {
+                const { x, y } = calculateCoordinates(
+                  factor * maxValue,
+                  index,
+                  categories.length
+                );
+                return `${x},${y}`;
+              })
+              .join(" ")}
+            stroke="gray"
+            strokeWidth="0.5"
+            fill="none"
+          />
+        ))}
 
-            {categories.map((_, index) => {
-              const { x, y } = calculateCoordinates(maxValue, index, categories.length);
-              return <Line key={index} x1={margin + radius} y1={margin + radius} x2={x} y2={y} stroke="gray" strokeWidth="0.5" />;
-            })}
+        {/* Eixos */}
+        {categories.map((_, index) => {
+          const { x, y } = calculateCoordinates(maxValue, index, categories.length);
+          return (
+            <Line
+              key={index}
+              x1={margin + radius}
+              y1={margin + radius}
+              x2={x}
+              y2={y}
+              stroke="gray"
+              strokeWidth="0.5"
+            />
+          );
+        })}
 
-            <Polygon points={points} fill="rgba(26, 255, 146, 0.3)" stroke="green" />
+        {/* Polígono dos dados */}
+        <Polygon points={points} fill="rgba(26, 255, 146, 0.3)" stroke="green" />
 
-            {categories.map((category, index) => {
-              const { x, y } = calculateCoordinates(maxValue + 20, index, categories.length);
-              return (
-                <SvgText key={index} x={x} y={y} fontSize="12" textAnchor="middle" fill="black">
-                  {category}
-                </SvgText>
-              );
-            })}
+        {/* Categorias e rótulos de valores */}
+        {categories.map((category, index) => {
+          // Calcular posição do rótulo da categoria
+          const { x: categoryX, y: categoryY } = calculateCoordinates(maxValue + 20, index, categories.length);
 
-            <Circle cx={margin + radius} cy={margin + radius} r="3" fill="black" />
-          </Svg>
+          // Calcular posição do rótulo do valor
+          const { x: valueX, y: valueY } = calculateCoordinates(data[index], index, categories.length);
+
+          return (
+            <React.Fragment key={index}>
+              {/* Rótulo da categoria */}
+              <SvgText
+                x={categoryX}
+                y={categoryY}
+                fontSize="12"
+                textAnchor="middle"
+                fill="black"
+              >
+                {category}
+              </SvgText>
+
+              {/* Rótulo do valor (perto da linha correspondente) */}
+              {/* Rótulo do valor */}
+              <SvgText
+                x={categoryX} // Mesmo x do rótulo da categoria
+                y={categoryY + 14} // Abaixo do rótulo da categoria
+                fontSize="10"
+                textAnchor="middle"
+                fill="black"
+              >
+                {data[index].toFixed(1)}
+              </SvgText>
+            </React.Fragment>
+          );
+        })}
+
+        {/* Centro */}
+        <Circle cx={margin + radius} cy={margin + radius} r="3" fill="black" />
+      </Svg>
+
         </>
       )}
     </View>
