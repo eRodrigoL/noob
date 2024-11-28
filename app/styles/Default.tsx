@@ -70,7 +70,8 @@ const styles = StyleSheet.create({
   },
   signupLink: {
     color: Theme.light.link, // Define a cor do link de cadastro com base no tema
-    fontWeight: "bold", // Define a espessura da fonte como negrito
+    fontWeight: "bold",
+    fontSize: 16 // Define a espessura da fonte como negrito
   },
   profileImageContainer: {
     width: 120, // Define a largura do contêiner da imagem de perfil
