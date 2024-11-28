@@ -4,50 +4,51 @@ import { useLocalSearchParams } from "expo-router";
 import { BarChart } from "react-native-chart-kit";
 
 export default function Ranking() {
-  // Capturando o parâmetro `id` da rota
   const { id } = useLocalSearchParams<{ id?: string }>();
 
-  // Dados fictícios do ranking
   const data = {
-    labels: ["Jogador 1", "Jogador 2", "Jogador 3", "Jogador 4", "Jogador 5"], // Nomes no ranking
+    labels: ["Jogador 1", "Jogador 2", "Jogador 3", "Jogador 4", "Jogador 5"],
     datasets: [
       {
-        data: [95, 87, 78, 65, 45], // Pontuações correspondentes
+        data: [95, 87, 78, 65, 45],
       },
     ],
   };
 
-  const screenWidth = Dimensions.get("window").width; // Largura da tela
+  const screenWidth = Dimensions.get("window").width;
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text style={{ marginBottom: 20 }}>Conteúdo da aba Ranking</Text>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f9f9f9" }}>
+      <Text style={{ marginBottom: 20, fontSize: 16, fontWeight: "bold" }}>Ranking dos Jogadores</Text>
       {id ? (
-        <Text style={{ marginBottom: 20 }}>ID do Jogo: {id}</Text>
+        <Text style={{ marginBottom: 20, fontSize: 14 }}>ID do Jogo: {id}</Text>
       ) : (
-        <Text style={{ marginBottom: 20 }}>ID não fornecido</Text>
+        <Text style={{ marginBottom: 20, fontSize: 14 }}>ID não fornecido</Text>
       )}
 
-      {/* Gráfico de Ranking */}
+      {/* Gráfico de Ranking Horizontal */}
       <BarChart
         data={data}
-        width={screenWidth - 40} // Largura do gráfico
-        height={220} // Altura do gráfico
-        yAxisLabel="" // Prefixo do eixo Y
-        yAxisSuffix="" // Sufixo obrigatório do eixo Y (aqui vazio)
+        width={screenWidth - 40}
+        height={300}
+        yAxisLabel=""
+        yAxisSuffix=""
+        showValuesOnTopOfBars={true}
+        fromZero={true}
+        //horizontal={true} // Configuração para gráfico horizontal
         chartConfig={{
-          backgroundColor: "#1E2923",
-          backgroundGradientFrom: "#08130D",
-          backgroundGradientTo: "#1F4E45",
-          decimalPlaces: 0, // Sem casas decimais nos valores
-          color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+          backgroundColor: "#FFFFFF",
+          backgroundGradientFrom: "#FFFFFF",
+          backgroundGradientTo: "#FFFFFF",
+          decimalPlaces: 0,
+          color: (opacity = 1) => `rgba(34, 139, 34, ${opacity})`, // Verde suave
+          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Preto para rótulos
           style: {
             borderRadius: 16,
           },
           propsForBackgroundLines: {
             strokeWidth: 0.5,
-            stroke: "gray",
+            stroke: "#e3e3e3", // Linhas mais claras
           },
         }}
         style={{
@@ -58,4 +59,3 @@ export default function Ranking() {
     </View>
   );
 }
-
