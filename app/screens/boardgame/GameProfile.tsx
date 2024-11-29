@@ -364,30 +364,28 @@ const GameProfile: React.FC = () => {
                 <Text style={localStyles.gameInfoText}>{game.descricao}</Text>
               )}
 
-              {/* Botão de Editar/Salvar */}
-              <TouchableOpacity
-                style={styles.buttonPrimary}
-                onPress={handleEditToggle}
-              >
-                <Text style={styles.buttonPrimaryText}>
-                  {isEditing ? "Salvar" : "Editar Perfil"}
-                </Text>
-              </TouchableOpacity>
-              <ButtonPrimary
-                title="Avaliar Jogo"
-                onPress={() => id && screens.boardgame.rating(id)}
-              />
-
-              <ButtonPrimary
-                title="Gráficos"
-                onPress={() => id && screens.boardgame.gameDashboard(id)}
-              />
-
-              <ButtonPrimary
-                title="Ranking"
-                onPress={() => id && screens.boardgame.ranking(id)}
-              />
-
+                <View style={{ alignItems: "center", marginTop: 16 }}>
+                <TouchableOpacity
+                  style={styles.buttonPrimary}
+                  onPress={handleEditToggle}
+                >
+                  <Text style={styles.buttonPrimaryText}>
+                    {isEditing ? "Salvar" : "Editar Perfil"}
+                  </Text>
+                </TouchableOpacity>
+                <ButtonPrimary
+                  title="Avaliar Jogo"
+                  onPress={() => id && screens.boardgame.rating(id)}
+                />
+                <ButtonPrimary
+                  title="Gráficos"
+                  onPress={() => id && screens.boardgame.gameDashboard(id)}
+                />
+                <ButtonPrimary
+                  title="Ranking"
+                  onPress={() => id && screens.boardgame.ranking(id)}
+                />
+              </View>
             </View>
           </View>
         </Animated.ScrollView>

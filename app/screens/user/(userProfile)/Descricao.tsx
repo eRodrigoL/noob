@@ -3,7 +3,6 @@ import {
   View,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Alert,
@@ -11,11 +10,10 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import styles from "@/app/styles/Default";
+import { screens } from "@/app/routes/Routes";
 
 export default function Descricao() {
   const [user, setUser] = useState<any>(null);
-  const [editedUser, setEditedUser] = useState<any>(null);
-  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     fetchUserData();
@@ -41,48 +39,9 @@ export default function Descricao() {
       );
 
       setUser(response.data);
-      setEditedUser(response.data);
     } catch (error) {
       console.error("Erro ao buscar os dados do usuário:", error);
       Alert.alert("Erro", "Não foi possível carregar os dados do usuário.");
-    }
-  };
-
-  const handleEditToggle = () => {
-    if (isEditing) {
-      updateUserProfile();
-    }
-    setIsEditing(!isEditing);
-  };
-
-  const updateUserProfile = async () => {
-    try {
-      const userId = await AsyncStorage.getItem("userId");
-      const token = await AsyncStorage.getItem("token");
-
-      if (!userId || !token) {
-        Alert.alert("Erro", "ID do usuário ou token não encontrados.");
-        return;
-      }
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      };
-
-      await axios.put(
-        `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
-        editedUser,
-        config
-      );
-
-      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
-      fetchUserData(); // Recarrega os dados atualizados
-    } catch (error) {
-      console.error("Erro ao atualizar o perfil:", error);
-      Alert.alert("Erro", "Não foi possível atualizar o perfil.");
     }
   };
 
@@ -109,60 +68,19 @@ export default function Descricao() {
 
         {/* Email */}
         <Text style={styles.label}>Email:</Text>
-        {isEditing ? (
-          <TextInput
-            style={styles.input}
-            value={editedUser.email}
-            onChangeText={(text) =>
-              setEditedUser((prevState: any) => ({
-                ...prevState,
-                email: text,
-              }))
-            }
-          />
-        ) : (
-          <Text style={styles.label}>{user.email}</Text>
-        )}
+        <Text style={styles.label}>{user.email}</Text>
 
         {/* Data de Nascimento */}
         <Text style={styles.label}>Data de Nascimento:</Text>
-        {isEditing ? (
-          <TextInput
-            style={styles.input}
-            value={addOneDay(editedUser.nascimento)}
-            onChangeText={(text) =>
-              setEditedUser((prevState: any) => ({
-                ...prevState,
-                nascimento: text,
-              }))
-            }
-          />
-        ) : (
-          <Text style={styles.label}>{addOneDay(user.nascimento)}</Text>
-        )}
+        <Text style={styles.label}>{addOneDay(user.nascimento)}</Text>
 
-        {/* Botão de Editar/Salvar */}
+        {/* Botão de Editar */}
         <TouchableOpacity
           style={styles.buttonPrimary}
-          onPress={handleEditToggle}
+          onPress={screens.user.editProfile}
         >
-          <Text style={styles.buttonPrimaryText}>
-            {isEditing ? "Salvar" : "Editar Perfil"}
-          </Text>
+          <Text style={styles.buttonPrimaryText}>Editar Perfil</Text>
         </TouchableOpacity>
-
-        {/* Botão Cancelar visível apenas se isEditing for true */}
-        {isEditing && (
-          <TouchableOpacity
-            style={styles.buttonSecondary}
-            onPress={() => {
-              setIsEditing(false);
-              setEditedUser(user);
-            }}
-          >
-            <Text style={styles.buttonSecondaryText}>Cancelar</Text>
-          </TouchableOpacity>
-        )}
       </ScrollView>
     </View>
   );
