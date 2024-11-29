@@ -103,7 +103,7 @@ export default function Ranking() {
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f9f9f9" }}>
-      <Text style={{ marginBottom: 20, fontSize: 16, fontWeight: "bold" }}>Ranking geral do jogo </Text>
+      <Text style={{ marginBottom: 20, fontSize: 18, fontWeight: "bold" }}>Ranking geral do jogo </Text>
 
       {loading ? (
         <ActivityIndicator size="large" color="#FF8C00" />
