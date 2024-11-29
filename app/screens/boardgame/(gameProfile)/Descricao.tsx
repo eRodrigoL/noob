@@ -6,12 +6,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Dimensions,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import styles from "@/app/styles/Default";
 import { screens } from "@/app/routes/Routes";
 import { useLocalSearchParams } from "expo-router";
+
+const screenWidth = Dimensions.get("window").width;
 
 // Componente principal
 export default function Descricao() {
@@ -80,8 +83,7 @@ export default function Descricao() {
   // Renderização do conteúdo principal quando os dados do jogo/usuário estão disponíveis
   return (
     <View style={localStyles.container}>
-      <ScrollView style={{ flex: 1 }}>
-
+      <ScrollView style={{ flex: 1, width: screenWidth }}>
         {/* Idade */}
         <Text style={styles.label}>Idade:</Text>
         <Text style={styles.label}>{game.idade}</Text>
@@ -111,12 +113,14 @@ export default function Descricao() {
         <Text style={styles.label}>{addOneDay(game.descricao)}</Text>
 
         {/* Botão de Editar */}
-        <TouchableOpacity
-          style={styles.buttonPrimary}
-          onPress={screens.user.editProfile}
-        >
-          <Text style={styles.buttonPrimaryText}>Editar Perfil</Text>
-        </TouchableOpacity>
+        <View style={{ flex: 1, alignItems: "center" }}>
+          <TouchableOpacity
+            style={styles.buttonPrimary}
+            onPress={screens.user.editProfile}
+          >
+            <Text style={styles.buttonPrimaryText}>Editar Jogo</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -125,6 +129,8 @@ export default function Descricao() {
 const localStyles = StyleSheet.create({
   container: {
     flex: 1,
+    width: screenWidth,
+    minWidth: screenWidth,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f5f5f5",

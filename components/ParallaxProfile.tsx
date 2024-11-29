@@ -18,6 +18,7 @@ import Animated, {
 } from "react-native-reanimated";
 import * as ImagePicker from "expo-image-picker"; // Para permitir a seleção de imagens da galeria do dispositivo
 import { Theme } from "@/app/styles/Theme"; // Importa a paleta de cores do tema
+import { images } from "@/app/routes/Routes";
 
 // Obtém as dimensões da tela e define valores constantes para o cabeçalho e cobertura da página
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
@@ -221,9 +222,10 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
         <View style={localStyles.PageCover}>
           <ImageBackground
             source={{
-              uri: selectedBackgroundImage
-                ? selectedBackgroundImage
-                : "https://example.com/user-image.jpg", // Imagem padrão
+              uri:
+                selectedBackgroundImage && selectedBackgroundImage !== ""
+                  ? selectedBackgroundImage
+                  : images.fundo, // Imagem padrão
             }}
             style={localStyles.backgroundImage}
           />
@@ -234,9 +236,10 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
         <View style={localStyles.PageCover}>
           <ImageBackground
             source={{
-              uri: selectedBackgroundImage
-                ? selectedBackgroundImage
-                : "https://example.com/user-image.jpg", // Imagem padrão
+              uri:
+                selectedBackgroundImage && selectedBackgroundImage !== ""
+                  ? selectedBackgroundImage
+                  : images.fundo, // Imagem padrão
             }}
             style={localStyles.backgroundImage}
           />
@@ -271,9 +274,10 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
               >
                 <Image
                   source={{
-                    uri: selectedImage
-                      ? selectedImage
-                      : "https://example.com/user-image.jpg", // imagem padrão se foto for null
+                    uri:
+                      selectedImage && selectedImage !== ""
+                        ? selectedImage
+                        : "https://example.com/user-image.jpg", // imagem padrão se foto for null
                   }}
                   style={localStyles.foto}
                 />
@@ -282,9 +286,10 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
             {!(isEditing || isRegisting) && (
               <Image
                 source={{
-                  uri: selectedImage
-                    ? selectedImage
-                    : "https://example.com/user-image.jpg", // imagem padrão se foto for null
+                  uri:
+                    selectedImage && selectedImage !== ""
+                      ? selectedImage
+                      : "https://example.com/user-image.jpg", // imagem padrão se foto for null
                 }}
                 style={localStyles.foto}
               />

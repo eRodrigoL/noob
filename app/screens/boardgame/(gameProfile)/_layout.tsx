@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Alert, StyleSheet } from "react-native";
+import { View, Text, Alert, StyleSheet, Dimensions } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import { Tabs } from "expo-router";
@@ -8,6 +8,8 @@ import styles from "@styles/Default";
 import Header from "@/components/Header";
 import ParallaxProfile from "@/components/ParallaxProfile";
 import ApiWakeUp from "@/app/services/AcordarAPI";
+
+const screenWidth = Dimensions.get("window").width;
 
 // Define o tipo para os dados do jogo
 interface Game {
@@ -89,7 +91,7 @@ const GameProfile: React.FC = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <Header title="Perfil" />
+      <Header title="Jogo" />
       <ParallaxProfile
         id={id}
         name={`${game.titulo} (${game.ano})`}
@@ -114,15 +116,15 @@ const GameProfile: React.FC = () => {
               options={{
                 title: "Descrição",
                 tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="person-outline" size={size} color={color} />
+                  <Ionicons name="dice-outline" size={size} color={color} />
                 ),
               }}
               initialParams={{ id: id }}
             />
             <Tabs.Screen
-              name="Desempenho"
+              name="Analises"
               options={{
-                title: "Desempenho",
+                title: "Análises",
                 tabBarIcon: ({ color, size }) => (
                   <Ionicons
                     name="stats-chart-outline"
@@ -131,15 +133,31 @@ const GameProfile: React.FC = () => {
                   />
                 ),
               }}
+              initialParams={{ id: id }}
             />
             <Tabs.Screen
-              name="Historico"
+              name="Classificacao"
               options={{
-                title: "Histórico",
+                title: "Classificação",
                 tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="time-outline" size={size} color={color} />
+                  <Ionicons name="trophy-outline" size={size} color={color} />
                 ),
               }}
+              initialParams={{ id: id }}
+            />
+            <Tabs.Screen
+              name="Avaliacao"
+              options={{
+                title: "Avaliação",
+                tabBarIcon: ({ color, size }) => (
+                  <Ionicons
+                    name="clipboard-outline"
+                    size={size}
+                    color={color}
+                  />
+                ),
+              }}
+              initialParams={{ id: id }}
             />
           </Tabs>
         </View>
@@ -149,14 +167,13 @@ const GameProfile: React.FC = () => {
 };
 
 const localStyles = StyleSheet.create({
-  content: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
   tabBar: {
     backgroundColor: "#ffffff",
     borderTopWidth: 1,
     borderTopColor: "#e0e0e0",
+  },
+  tabBarItemStyle: {
+    flex: 1,
   },
 });
 

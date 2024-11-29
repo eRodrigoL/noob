@@ -7,7 +7,8 @@ const images = {
   loading1: require("../../assets/images/1.gif"),
   loading2: require("../../assets/images/2.gif"),
   loading3: require("../../assets/images/3.gif"),
-  fundo: require("../../assets/images/Plano de fundo.jpg"),
+  fundo:
+    "https://t4.ftcdn.net/jpg/02/94/52/49/360_F_294524929_lUE0O2yalxV2OlMEKQGnYFXoZZ5w9t1k.jpg",
 };
 
 // Definição de rotas do aplicativo, organizadas por seções
@@ -41,7 +42,7 @@ const screens = {
 
     // Rota para o perfil dos jogos
     gameProfile: (id: string | number) =>
-      router.push(`/screens/boardgame/GameProfile?id=${id}`),
+      router.push(`/screens/boardgame/(gameProfile)?id=${id}`),
 
     // Rota para o avaliação dos jogos
     rating: (id: string | number) =>

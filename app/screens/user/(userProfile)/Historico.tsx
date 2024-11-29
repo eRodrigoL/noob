@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -109,7 +115,8 @@ export default function Historico() {
       <Text style={styles.header}>Histórico de Partidas</Text>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {partidas.map((partida) => {
-          const { tituloJogo, usuarios, vencedor, duracao, fim, explicacao } = partida;
+          const { tituloJogo, usuarios, vencedor, duracao, fim, explicacao } =
+            partida;
           const dataConclusao = formatarData(fim);
           const participantes = usuarios.map((u) => u.apelido).join(", ");
           const vencedorNome = vencedor.map((v) => v.apelido).join(", ");

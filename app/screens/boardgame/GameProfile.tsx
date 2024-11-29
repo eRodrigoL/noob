@@ -266,7 +266,6 @@ const GameProfile: React.FC = () => {
 
             {/* Segundo container com conteúdo, ajustando o topo para começar após a imagem */}
             <View style={[localStyles.textContainer, { marginTop: 25 }]}>
-              <Text>{id}</Text>
               {/* Ano */}
               <Text style={localStyles.label}>Ano:</Text>
               {isEditing ? (
