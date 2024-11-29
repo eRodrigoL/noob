@@ -15,7 +15,6 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-  runOnJS,
 } from "react-native-reanimated";
 import * as ImagePicker from "expo-image-picker"; // Para permitir a seleção de imagens da galeria do dispositivo
 import { Theme } from "@/app/styles/Theme"; // Importa a paleta de cores do tema

@@ -62,7 +62,7 @@ const GameProfile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedGame, seteditedGame] = useState<any>(null);
 
-  // Função para buscar os dados do usuário
+  // Função para buscar os dados do boardgame
   const fetchGameData = async () => {
     try {
       if (!id) {
@@ -204,7 +204,7 @@ const GameProfile: React.FC = () => {
   if (!game) {
     return (
       <View style={styles.container}>
-        <Text>Erro ao carregar os dados do usuário.</Text>
+        <Text>Erro ao carregar os dados do jogo.</Text>
       </View>
     );
   }
@@ -266,6 +266,7 @@ const GameProfile: React.FC = () => {
 
             {/* Segundo container com conteúdo, ajustando o topo para começar após a imagem */}
             <View style={[localStyles.textContainer, { marginTop: 25 }]}>
+              <Text>{id}</Text>
               {/* Ano */}
               <Text style={localStyles.label}>Ano:</Text>
               {isEditing ? (
@@ -364,7 +365,7 @@ const GameProfile: React.FC = () => {
                 <Text style={localStyles.gameInfoText}>{game.descricao}</Text>
               )}
 
-                <View style={{ alignItems: "center", marginTop: 16 }}>
+              <View style={{ alignItems: "center", marginTop: 16 }}>
                 <TouchableOpacity
                   style={styles.buttonPrimary}
                   onPress={handleEditToggle}
