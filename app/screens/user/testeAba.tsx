@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Alert, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import styles from "@styles/Default";
 import Header from "@/components/Header";
 import ParallaxProfile from "@/components/ParallaxProfile";
@@ -90,6 +88,19 @@ const UserProfile: React.FC = () => {
         } as any);
       }
 
+      if (editedUser.capa) {
+        const localUri = editedUser.capa;
+        const filename = localUri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename ?? "");
+        const fileType = match ? `image/${match[1]}` : `image`;
+
+        formData.append("capa", {
+          uri: localUri,
+          name: filename ?? "profile.jpg",
+          type: fileType,
+        } as any);
+      }
+
       await axios.put(
         `https://api-noob-react.onrender.com/api/usuarios/${userId}`,
         formData,
@@ -112,6 +123,10 @@ const UserProfile: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
   // Função para alternar entre edição e exibição
   const handleEditToggle = () => {
     if (isEditing) {
@@ -120,20 +135,6 @@ const UserProfile: React.FC = () => {
     }
     setIsEditing(!isEditing);
   };
-
-  const addOneDay = (dateString: string) => {
-    const date = new Date(dateString);
-    date.setDate(date.getDate() + 1); // Adiciona 1 dia
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
 
   if (loading) {
     return (
@@ -151,75 +152,89 @@ const UserProfile: React.FC = () => {
     );
   }
 
+  const addOneDay = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1); // Adiciona 1 dia
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+  // TRECHO API -- FIM
+
   return (
     <View style={{ flex: 1 }}>
+      {/* Exibe o cabeçalho com título */}
       <Header title="Perfil" />
+
       <ParallaxProfile
         id={user._id}
         name={user.nome}
         photo={user.foto}
+        cover={user.capa}
         initialIsEditing={false}
         initialIsRegisting={false}
         isEditing={isEditing}
-        onEditChange={setIsEditing}
         setEditedUser={setEditedUser}
       >
-        <View style={localStyles.content}>
-          <Tabs
-            screenOptions={{
-              tabBarStyle: localStyles.tabBar,
-              tabBarActiveTintColor: "#007AFF",
-              tabBarInactiveTintColor: "#8E8E93",
+        {/* Apelido */}
+        <Text style={styles.label}>Apelido:</Text>
+        <Text style={styles.label}>{user.apelido}</Text>
+
+        {/* Email */}
+        <Text style={styles.label}>Email:</Text>
+        {isEditing ? (
+          <TextInput
+            style={styles.input}
+            value={editedUser.email}
+            onChangeText={(text) =>
+              setEditedUser((prevState: any) => ({
+                ...prevState,
+                email: text,
+              }))
+            }
+          />
+        ) : (
+          <Text style={styles.label}>{user.email}</Text>
+        )}
+
+        {/* Data de Nascimento */}
+        <Text style={styles.label}>Data de Nascimento:</Text>
+        {isEditing ? (
+          <TextInput
+            style={styles.input}
+            value={addOneDay(editedUser.nascimento)}
+          />
+        ) : (
+          <Text style={styles.label}>{addOneDay(user.nascimento)}</Text>
+        )}
+
+        {/* Botão de Editar/Salvar */}
+        <TouchableOpacity
+          style={styles.buttonPrimary}
+          onPress={handleEditToggle}
+        >
+          <Text style={styles.buttonPrimaryText}>
+            {isEditing ? "Salvar" : "Editar Perfil"}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Botão Cancelar visível apenas se isEditing for true */}
+        {isEditing && (
+          <TouchableOpacity
+            style={styles.buttonSecondary}
+            onPress={() => {
+              setIsEditing(false); // Sai do modo de edição
+              setEditedUser(user); // Reverte as mudanças, restaurando os dados originais
             }}
           >
-            <Tabs.Screen
-              name="Descricao"
-              options={{
-                title: "Descrição",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="person-outline" size={size} color={color} />
-                ),
-              }}
-            />
-            <Tabs.Screen
-              name="Desempenho"
-              options={{
-                title: "Desempenho",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons
-                    name="stats-chart-outline"
-                    size={size}
-                    color={color}
-                  />
-                ),
-              }}
-            />
-            <Tabs.Screen
-              name="Historico"
-              options={{
-                title: "Histórico",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="time-outline" size={size} color={color} />
-                ),
-              }}
-            />
-          </Tabs>
-        </View>
+            <Text style={styles.buttonSecondaryText}>Cancelar</Text>
+          </TouchableOpacity>
+        )}
       </ParallaxProfile>
     </View>
   );
 };
-
-const localStyles = StyleSheet.create({
-  content: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  tabBar: {
-    backgroundColor: "#ffffff",
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
-  },
-});
 
 export default UserProfile;

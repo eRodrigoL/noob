@@ -14,7 +14,7 @@ const images = {
 const screens = {
   testeDeRota: "/",
 
-  teste: () => router.push("/screens/user/(userProfile)"),
+  teste: () => router.push("/screens/user/EditProfile"),
   teste2: () => router.push("/TESTE2"),
 
   user: {
@@ -25,7 +25,10 @@ const screens = {
     register: () => router.push("/screens/user/RegisterUser"),
 
     // Rota para o perfil do usuário
-    userProfile: () => router.push("/screens/user/UserProfile"),
+    userProfile: () => router.push("/screens/user/(userProfile)"),
+
+    // Rota para edição do perfil do usuário
+    editProfile: () => router.push("/screens/user/EditProfile"),
   },
 
   boardgame: {
