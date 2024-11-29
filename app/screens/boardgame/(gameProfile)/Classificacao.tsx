@@ -60,17 +60,10 @@ export default function Ranking() {
         // Garantir que a resposta seja um array
         const partidas = Array.isArray(response.data) ? response.data : [];
 
-        // **Log para verificar o id e as partidas**
-        console.log("ID recebido:", id);
-        console.log("Partidas retornadas:", partidas);
-
         // **Filtrar partidas pelo ID do jogo, se o `id` estiver definido**
         const partidasFiltradas = id
           ? partidas.filter((partida) => partida.jogo === id)
           : partidas;
-
-        // **Log para verificar as partidas filtradas**
-        console.log("Partidas filtradas pelo ID:", partidasFiltradas);
 
         // Se nenhuma partida for encontrada, limpar o ranking
         if (partidasFiltradas.length === 0) {
