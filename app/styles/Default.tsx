@@ -10,7 +10,8 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.light.background, // Define a cor de fundo com base no tema
   },
   title: {
-    fontSize: 48, // Define o tamanho da fonte do título
+    marginTop: 20,
+    fontSize: 46, // Define o tamanho da fonte do título
     fontWeight: "bold", // Define a espessura da fonte como negrito
     color: Theme.light.text, // Define a cor do texto com base no tema
     marginBottom: 40, // Define a margem inferior
@@ -70,7 +71,8 @@ const styles = StyleSheet.create({
   },
   signupLink: {
     color: Theme.light.link, // Define a cor do link de cadastro com base no tema
-    fontWeight: "bold", // Define a espessura da fonte como negrito
+    fontWeight: "bold",
+    fontSize: 16 // Define a espessura da fonte como negrito
   },
   profileImageContainer: {
     width: 120, // Define a largura do contêiner da imagem de perfil

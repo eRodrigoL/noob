@@ -44,21 +44,34 @@ export default function GameReview() {
     return Math.floor(totalNotas / numberOfFields); // Retorna a média inteira
   };
 
-  const handleInputChange = (field: keyof Avaliacao, value: string) => {
-    setAvaliacao((prev) => {
-      const updatedAvaliacao = {
-        ...prev,
-        [field]: Number(value),
-      };
-
-      // Chama a função para calcular a média da nota
-      return {
-        ...updatedAvaliacao,
-        nota: calculateAverage(updatedAvaliacao), // Atualiza a nota geral
-      };
-    });
+  const validateInput = (text: string, setState: (arg0: string) => void, min = 0, max = 10) => {
+    const numericValue = parseInt(text, 10);
+  
+    if (!isNaN(numericValue) && numericValue >= min && numericValue <= max) {
+      setState(text); // Atualiza o estado se o valor for válido
+    } else if (text === "") {
+      setState(""); // Permite limpar o campo
+    } else {
+      Alert.alert("Erro", `Por favor, insira um valor entre ${min} e ${max}.`);
+    }
   };
 
+  const handleInputChange = (field: keyof Avaliacao, value: string) => {
+    validateInput(value, (validValue) => {
+      setAvaliacao((prev) => {
+        const updatedAvaliacao = {
+          ...prev,
+          [field]: Number(validValue),
+        };
+  
+        // Atualiza a nota geral ao calcular a média
+        return {
+          ...updatedAvaliacao,
+          nota: calculateAverage(updatedAvaliacao),
+        };
+      });
+    });
+  };
   // Função para buscar os dados completos do jogo usando o ID
   const fetchGameDetails = async () => {
     if (!jogo) {
@@ -194,7 +207,8 @@ export default function GameReview() {
       <Text style={localStyles.label}>Nota Geral:</Text>
       <Text style={localStyles.input}>{avaliacao.nota.toString()}</Text>
 
-      <Button
+      <Button 
+        color="#FF8C00"
         title="Enviar Avaliação"
         onPress={submitReview}
         disabled={loading}

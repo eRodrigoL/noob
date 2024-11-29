@@ -149,7 +149,7 @@ const UserProfile: React.FC = () => {
           screenOptions={{
             headerShown: false,
             tabBarStyle: localStyles.tabBar,
-            tabBarActiveTintColor: "#007AFF",
+            tabBarActiveTintColor: "#000",
             tabBarInactiveTintColor: "#8E8E93",
           }}
         >
