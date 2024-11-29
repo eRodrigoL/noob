@@ -13,10 +13,9 @@ import axios from "axios";
 import styles from "@styles/Default";
 import { TextInputMask } from "react-native-masked-text";
 import ButtonPrimary from "@components/ButtonPrimary";
-import ButtonGoBack from "@/components/ButtonGoBack";
-import { useRouter } from "expo-router";
 import { screens } from "@routes/Routes";
 import ApiWakeUp from "@/app/services/AcordarAPI";
+import Header from "@/components/Header";
 
 const RegisterUser: React.FC = () => {
   <ApiWakeUp />; // Mantem a API desperta
@@ -136,11 +135,10 @@ const RegisterUser: React.FC = () => {
   };
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
+      <Header title="Resgistro de usuário" />
       <ScrollView>
         <View style={styles.container}>
-          <ButtonGoBack />
-          <View style={{ width: 100, height: 70 }}></View>
           <Text style={styles.title}>Crie sua conta:</Text>
           {/* Botão para selecionar imagem de perfil */}
           <TouchableOpacity
@@ -173,8 +171,12 @@ const RegisterUser: React.FC = () => {
           <TextInput
             style={styles.input}
             placeholder="Apelido"
-            value={apelido}
-            onChangeText={setApelido}
+            value={`@${apelido}`}
+            onChangeText={(text) => {
+              const sanitizedText = text.replace("@", ""); // Remove qualquer '@'
+              setApelido(sanitizedText);
+            }}
+            autoCapitalize="none"
           />
           <TextInputMask
             style={styles.input}
@@ -207,7 +209,24 @@ const RegisterUser: React.FC = () => {
             value={confirmarSenha}
             onChangeText={setConfirmarSenha}
           />
-          <ButtonPrimary title="Cadastrar" onPress={handleRegister} />
+
+          {/* Botão para criar uma conta */}
+          <TouchableOpacity
+            style={styles.buttonPrimary}
+            onPress={() => {
+              handleRegister();
+            }}
+          >
+            <Text style={styles.buttonPrimaryText}>Cadastrar</Text>
+          </TouchableOpacity>
+
+          {/* Botão para criar uma conta */}
+          <TouchableOpacity
+            style={styles.buttonSecondary}
+            onPress={screens.boardgame.list}
+          >
+            <Text style={styles.buttonPrimaryText}>Cancelar</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>

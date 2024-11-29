@@ -228,7 +228,9 @@ const GameProfile: React.FC = () => {
         {/* Cabeçalho fixo */}
         <View style={localStyles.header}>
           <ImageBackground
-            source={images.fundo}
+            source={{
+              uri: editedGame.capa || images.fundo,
+            }}
             style={localStyles.backgroundImage}
           ></ImageBackground>
         </View>
@@ -373,18 +375,9 @@ const GameProfile: React.FC = () => {
                     {isEditing ? "Salvar" : "Editar Perfil"}
                   </Text>
                 </TouchableOpacity>
-                <ButtonPrimary
-                  title="Avaliar Jogo"
-                  onPress={() => id && screens.boardgame.rating(id)}
-                />
-                <ButtonPrimary
-                  title="Gráficos"
-                  onPress={() => id && screens.boardgame.gameDashboard(id)}
-                />
-                <ButtonPrimary
-                  title="Ranking"
-                  onPress={() => id && screens.boardgame.ranking(id)}
-                />
+                <ButtonPrimary title="Avaliar Jogo" onPress={() => {}} />
+                <ButtonPrimary title="Gráficos" onPress={() => {}} />
+                <ButtonPrimary title="Ranking" onPress={() => {}} />
               </View>
             </View>
           </View>

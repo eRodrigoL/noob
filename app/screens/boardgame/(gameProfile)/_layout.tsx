@@ -34,9 +34,6 @@ const GameProfile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedGame, seteditedGame] = useState<any>(null);
 
-  const [user, setUser] = useState<any>(null); //apagar
-  const [editedUser, setEditedUser] = useState<any>(null); //apagar
-
   // Função para buscar os dados do jogo
   const fetchGameData = async () => {
     try {
@@ -100,7 +97,7 @@ const GameProfile: React.FC = () => {
         initialIsEditing={false}
         initialIsRegisting={false}
         isEditing={isEditing}
-        setEditedUser={setEditedUser}
+        setEdited={seteditedGame}
       >
         <View style={{ flex: 1 }}>
           <Tabs

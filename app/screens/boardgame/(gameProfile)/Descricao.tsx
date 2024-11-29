@@ -116,7 +116,7 @@ export default function Descricao() {
         <View style={{ flex: 1, alignItems: "center" }}>
           <TouchableOpacity
             style={styles.buttonPrimary}
-            onPress={screens.user.editProfile}
+            onPress={screens.boardgame.editGame}
           >
             <Text style={styles.buttonPrimaryText}>Editar Jogo</Text>
           </TouchableOpacity>

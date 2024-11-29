@@ -7,6 +7,7 @@ const images = {
   loading1: require("../../assets/images/1.gif"),
   loading2: require("../../assets/images/2.gif"),
   loading3: require("../../assets/images/3.gif"),
+  // antes era: fundo: require("../../assets/images/Plano de fundo.jpg"),
   fundo:
     "https://t4.ftcdn.net/jpg/02/94/52/49/360_F_294524929_lUE0O2yalxV2OlMEKQGnYFXoZZ5w9t1k.jpg",
 };
@@ -30,7 +31,7 @@ const screens = {
     userProfile: () => router.push("/screens/user/(userProfile)"),
 
     // Rota para edição do perfil do usuário
-    editProfile: () => router.push("/screens/user/EditProfile"),
+    editProfile: () => router.push("/screens/user/EditUser"),
   },
 
   boardgame: {
@@ -44,17 +45,9 @@ const screens = {
     gameProfile: (id: string | number) =>
       router.push(`/screens/boardgame/(gameProfile)?id=${id}`),
 
-    // Rota para o avaliação dos jogos
-    rating: (id: string | number) =>
-      router.push(`/screens/boardgame/GameRating?id=${id}`),
-
-    // Rota para gráficos dos jogos
-    gameDashboard: (id: string | number) =>
-      router.push(`/screens/boardgame/GameDashboard?id=${id}`),
-
-    // Rota para ranking dos jogos
-    ranking: (id: string | number) =>
-      router.push(`/screens/boardgame/Ranking?id=${id}`),
+    // Rota para edição do perfil do usuário
+    editGame: (id: string | number) =>
+      router.push(`/screens/boardgame/EditGame?id=${id}`),
   },
 
   matches: {

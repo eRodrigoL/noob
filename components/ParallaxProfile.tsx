@@ -36,7 +36,7 @@ export interface ParallaxProfileProps {
   initialIsRegisting?: boolean; // Se o modo de registro é ativado inicialmente
   children?: React.ReactNode; // Elementos filhos para exibição adicional
   isEditing?: boolean; // Controle externo para ativar o modo de edição
-  setEditedUser?: React.Dispatch<React.SetStateAction<User>>; // Função para atualizar o estado global do usuário
+  setEdited?: React.Dispatch<React.SetStateAction<User>>; // Função para atualizar o estado global do usuário
 }
 
 // Define a interface para o objeto User
@@ -56,7 +56,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   isEditing = false, // Define o estado inicial do modo de edição
   initialIsRegisting = false, // Define o estado inicial do modo de registro
   children, // Elementos filhos adicionais
-  setEditedUser, // Função para atualizar o estado do usuário
+  setEdited, // Função para atualizar o estado do usuário
 }) => {
   // Estados locais para controlar o registro, foto e nome do perfil
   const [isRegisting, setIsRegisting] = useState<boolean>(
@@ -101,8 +101,8 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
     // Atualiza o estado local e global com a imagem selecionada
     if (!result.canceled) {
       setSelectedBackgroundImage(result.assets[0].uri); // Define a URI da imagem selecionada
-      setEditedUser &&
-        setEditedUser((prev) => ({
+      setEdited &&
+        setEdited((prev) => ({
           ...prev,
           capa: result.assets[0].uri, // Atualiza a foto no estado global
         }));
@@ -130,8 +130,8 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
     // Atualiza o estado local e global com a imagem selecionada
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri); // Define a URI da imagem selecionada
-      setEditedUser &&
-        setEditedUser((prev) => ({
+      setEdited &&
+        setEdited((prev) => ({
           ...prev,
           foto: result.assets[0].uri, // Atualiza a foto no estado global
         }));
@@ -141,8 +141,8 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   // Função para atualizar o nome no estado local e global
   const handleNomeChange = (value: string) => {
     setName(value); // Atualiza o estado local com o novo nome
-    setEditedUser &&
-      setEditedUser((prev) => ({
+    setEdited &&
+      setEdited((prev) => ({
         ...prev,
         nome: value, // Atualiza o nome no estado global
       }));
