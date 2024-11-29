@@ -15,10 +15,10 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-  runOnJS,
 } from "react-native-reanimated";
 import * as ImagePicker from "expo-image-picker"; // Para permitir a seleção de imagens da galeria do dispositivo
 import { Theme } from "@/app/styles/Theme"; // Importa a paleta de cores do tema
+import { images } from "@/app/routes/Routes";
 
 // Obtém as dimensões da tela e define valores constantes para o cabeçalho e cobertura da página
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
@@ -36,7 +36,7 @@ export interface ParallaxProfileProps {
   initialIsRegisting?: boolean; // Se o modo de registro é ativado inicialmente
   children?: React.ReactNode; // Elementos filhos para exibição adicional
   isEditing?: boolean; // Controle externo para ativar o modo de edição
-  setEditedUser?: React.Dispatch<React.SetStateAction<User>>; // Função para atualizar o estado global do usuário
+  setEdited?: React.Dispatch<React.SetStateAction<User>>; // Função para atualizar o estado global do usuário
 }
 
 // Define a interface para o objeto User
@@ -56,7 +56,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   isEditing = false, // Define o estado inicial do modo de edição
   initialIsRegisting = false, // Define o estado inicial do modo de registro
   children, // Elementos filhos adicionais
-  setEditedUser, // Função para atualizar o estado do usuário
+  setEdited, // Função para atualizar o estado do usuário
 }) => {
   // Estados locais para controlar o registro, foto e nome do perfil
   const [isRegisting, setIsRegisting] = useState<boolean>(
@@ -101,8 +101,8 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
     // Atualiza o estado local e global com a imagem selecionada
     if (!result.canceled) {
       setSelectedBackgroundImage(result.assets[0].uri); // Define a URI da imagem selecionada
-      setEditedUser &&
-        setEditedUser((prev) => ({
+      setEdited &&
+        setEdited((prev) => ({
           ...prev,
           capa: result.assets[0].uri, // Atualiza a foto no estado global
         }));
@@ -130,8 +130,8 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
     // Atualiza o estado local e global com a imagem selecionada
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri); // Define a URI da imagem selecionada
-      setEditedUser &&
-        setEditedUser((prev) => ({
+      setEdited &&
+        setEdited((prev) => ({
           ...prev,
           foto: result.assets[0].uri, // Atualiza a foto no estado global
         }));
@@ -141,8 +141,8 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
   // Função para atualizar o nome no estado local e global
   const handleNomeChange = (value: string) => {
     setName(value); // Atualiza o estado local com o novo nome
-    setEditedUser &&
-      setEditedUser((prev) => ({
+    setEdited &&
+      setEdited((prev) => ({
         ...prev,
         nome: value, // Atualiza o nome no estado global
       }));
@@ -222,9 +222,10 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
         <View style={localStyles.PageCover}>
           <ImageBackground
             source={{
-              uri: selectedBackgroundImage
-                ? selectedBackgroundImage
-                : "https://example.com/user-image.jpg", // Imagem padrão
+              uri:
+                selectedBackgroundImage && selectedBackgroundImage !== ""
+                  ? selectedBackgroundImage
+                  : images.fundo, // Imagem padrão
             }}
             style={localStyles.backgroundImage}
           />
@@ -235,9 +236,10 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
         <View style={localStyles.PageCover}>
           <ImageBackground
             source={{
-              uri: selectedBackgroundImage
-                ? selectedBackgroundImage
-                : "https://example.com/user-image.jpg", // Imagem padrão
+              uri:
+                selectedBackgroundImage && selectedBackgroundImage !== ""
+                  ? selectedBackgroundImage
+                  : images.fundo, // Imagem padrão
             }}
             style={localStyles.backgroundImage}
           />
@@ -272,9 +274,10 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
               >
                 <Image
                   source={{
-                    uri: selectedImage
-                      ? selectedImage
-                      : "https://example.com/user-image.jpg", // imagem padrão se foto for null
+                    uri:
+                      selectedImage && selectedImage !== ""
+                        ? selectedImage
+                        : "https://example.com/user-image.jpg", // imagem padrão se foto for null
                   }}
                   style={localStyles.foto}
                 />
@@ -283,9 +286,10 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
             {!(isEditing || isRegisting) && (
               <Image
                 source={{
-                  uri: selectedImage
-                    ? selectedImage
-                    : "https://example.com/user-image.jpg", // imagem padrão se foto for null
+                  uri:
+                    selectedImage && selectedImage !== ""
+                      ? selectedImage
+                      : "https://example.com/user-image.jpg", // imagem padrão se foto for null
                 }}
                 style={localStyles.foto}
               />

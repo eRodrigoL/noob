@@ -9,6 +9,7 @@ import ApiWakeUp from "@/app/services/AcordarAPI";
 
 interface Game {
   titulo: string;
+  ano: string;
 }
 
 // Define o tipo para os dados da avaliação
@@ -44,9 +45,14 @@ export default function GameReview() {
     return Math.floor(totalNotas / numberOfFields); // Retorna a média inteira
   };
 
-  const validateInput = (text: string, setState: (arg0: string) => void, min = 0, max = 10) => {
+  const validateInput = (
+    text: string,
+    setState: (arg0: string) => void,
+    min = 0,
+    max = 10
+  ) => {
     const numericValue = parseInt(text, 10);
-  
+
     if (!isNaN(numericValue) && numericValue >= min && numericValue <= max) {
       setState(text); // Atualiza o estado se o valor for válido
     } else if (text === "") {
@@ -63,7 +69,7 @@ export default function GameReview() {
           ...prev,
           [field]: Number(validValue),
         };
-  
+
         // Atualiza a nota geral ao calcular a média
         return {
           ...updatedAvaliacao,
@@ -160,8 +166,13 @@ export default function GameReview() {
 
   return (
     <View style={localStyles.container}>
-      <Text style={localStyles.title}>Avalie o Jogo</Text>
-      <Text style={styles.title}>{game.titulo}</Text>
+      <Text style={localStyles.title}>
+        Avalie o Jogo <Text style={{ fontWeight: "bold" }}>{game.titulo}</Text>{" "}
+        de
+        {game.ano && game.ano !== "" && (
+          <Text style={{ fontWeight: "bold" }}> ({game.ano})</Text>
+        )}
+      </Text>
       <Text>Beleza:</Text>
       <TextInput
         style={localStyles.input}
@@ -207,7 +218,7 @@ export default function GameReview() {
       <Text style={localStyles.label}>Nota Geral:</Text>
       <Text style={localStyles.input}>{avaliacao.nota.toString()}</Text>
 
-      <Button 
+      <Button
         color="#FF8C00"
         title="Enviar Avaliação"
         onPress={submitReview}
@@ -226,7 +237,6 @@ const localStyles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
     color: Theme.light.text,
     marginBottom: 10,
   },

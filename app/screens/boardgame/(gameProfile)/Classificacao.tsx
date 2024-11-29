@@ -37,13 +37,13 @@ export default function Ranking() {
       try {
         const token = await AsyncStorage.getItem("token");
         const userId = await AsyncStorage.getItem("userId");
-  
+
         if (!token || !userId) {
           console.error("Erro de autenticação: Token ou userId ausente.");
           setLoading(false);
           return;
         }
-  
+
         // Configurar cabeçalhos com o token
         const config = {
           headers: {
@@ -51,34 +51,34 @@ export default function Ranking() {
             "Content-Type": "application/json",
           },
         };
-  
+
         const response = await axios.get<Partida[]>(
           "https://api-noob-react.onrender.com/api/partidas",
           config
         );
-  
+
         // Garantir que a resposta seja um array
         const partidas = Array.isArray(response.data) ? response.data : [];
-  
+
         // **Log para verificar o id e as partidas**
         console.log("ID recebido:", id);
         console.log("Partidas retornadas:", partidas);
-  
+
         // **Filtrar partidas pelo ID do jogo, se o `id` estiver definido**
         const partidasFiltradas = id
           ? partidas.filter((partida) => partida.jogo === id)
           : partidas;
-  
+
         // **Log para verificar as partidas filtradas**
         console.log("Partidas filtradas pelo ID:", partidasFiltradas);
-  
+
         // Se nenhuma partida for encontrada, limpar o ranking
         if (partidasFiltradas.length === 0) {
           setRankingData([]);
           setLoading(false);
           return;
         }
-  
+
         // Filtrar vencedores e calcular vitórias
         const vencedores = partidasFiltradas
           .filter((partida) =>
@@ -87,7 +87,7 @@ export default function Ranking() {
           .flatMap((partida) =>
             partida.vencedor.filter((v) => v.apelido.startsWith("@"))
           );
-  
+
         const vitoriaContagem: Record<string, number> = vencedores.reduce(
           (acc: Record<string, number>, vencedor) => {
             acc[vencedor.apelido] = (acc[vencedor.apelido] || 0) + 1;
@@ -95,15 +95,15 @@ export default function Ranking() {
           },
           {}
         );
-  
+
         // Transformar em array, ordenar e pegar os 5 primeiros
         const ranking = Object.entries(vitoriaContagem)
           .map(([apelido, count]) => ({ apelido, count }))
           .sort((a, b) => b.count - a.count)
           .slice(0, 5);
-  
+
         setRankingData(ranking);
-  
+
         // **Log para verificar o ranking gerado**
         console.log("Ranking gerado:", ranking);
       } catch (error) {
@@ -112,10 +112,9 @@ export default function Ranking() {
         setLoading(false);
       }
     };
-  
+
     fetchPartidas();
   }, [id]); // Dependência no `id` para refazer a busca se ele mudar
-  
 
   const data = {
     labels: rankingData.map((item) => item.apelido),
@@ -127,8 +126,17 @@ export default function Ranking() {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f9f9f9" }}>
-      <Text style={{ marginBottom: 20, fontSize: 18, fontWeight: "bold" }}>Ranking geral do jogo </Text>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f9f9f9",
+      }}
+    >
+      <Text style={{ marginBottom: 20, fontSize: 18, fontWeight: "bold" }}>
+        Ranking geral do jogo{" "}
+      </Text>
 
       {loading ? (
         <ActivityIndicator size="large" color="#FF8C00" />
@@ -163,15 +171,13 @@ export default function Ranking() {
         />
       ) : (
         <Text style={{ fontSize: 16, color: "red" }}>
-        Nenhum dado disponível para exibir.
-      </Text>
+          Nenhum dado disponível para exibir.
+        </Text>
       )}
     </View>
   );
 }
 
-
 function setError(arg0: string) {
   throw new Error("Function not implemented.");
 }
-

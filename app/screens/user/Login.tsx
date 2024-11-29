@@ -4,10 +4,10 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "@styles/Default";
 import { screens } from "@routes/Routes";
-import ButtonPrimary from "@components/ButtonPrimary";
 import ButtonGoBack from "@/components/ButtonGoBack";
 import { useRouter } from "expo-router";
 import ApiWakeUp from "@/app/services/AcordarAPI";
+import Header from "@/components/Header";
 
 const Login: React.FC = () => {
   <ApiWakeUp />; // Mantem a API desperta
@@ -44,10 +44,14 @@ const Login: React.FC = () => {
           ["userId", usuario.id], // Armazena o ID do usuário
         ]);
 
-        Alert.alert("Sucesso", msg); // Exibe mensagem de sucesso
-
-        // Redireciona para a tela inicial ou outra tela <{ARRUMAR: inserir tela desejada}>
-        screens.boardgame.list();
+        Alert.alert("Sucesso", msg, [
+          {
+            text: "OK",
+            onPress: () => {
+              screens.boardgame.list();
+            },
+          },
+        ]);
       }
     } catch (error) {
       // Exibe um alerta de erro em caso de falha no login
@@ -56,41 +60,64 @@ const Login: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Componente para o botão de voltar */}
-      <ButtonGoBack />
+    <View style={{ flex: 1 }}>
+      <Header title="Login" />
+      <View style={styles.container}>
+        {/* Título da página com ícone */}
+        <Text style={styles.title}>
+          Noob <Text style={styles.diceIcon}>🎲</Text>
+        </Text>
 
-      {/* Título da página com ícone */}
-      <Text style={styles.title}>
-        Noob <Text style={styles.diceIcon}>🎲</Text>
-      </Text>
+        {/* Campo de texto para inserção do apelido */}
+        <Text style={styles.label}>Apelido:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Insira seu nome de usário"
+          value={`@${apelido}`}
+          onChangeText={(text) => {
+            const sanitizedText = text.replace("@", ""); // Remove qualquer '@'
+            setApelido(sanitizedText);
+          }}
+          autoCapitalize="none"
+        />
 
-      {/* Campo de texto para inserção do apelido */}
-      <Text style={styles.label}>Apelido:</Text>
-      <TextInput
-        style={styles.input}
-        value={apelido}
-        onChangeText={setApelido} // Atualiza o estado do apelido conforme o usuário digita
-      />
+        {/* Campo de texto para inserção da senha */}
+        <Text style={styles.label}>Senha:</Text>
+        <TextInput
+          style={styles.input}
+          secureTextEntry // Define o campo como senha, ocultando o texto
+          value={senha}
+          onChangeText={setSenha} // Atualiza o estado da senha conforme o usuário digita
+          placeholder=""
+        />
 
-      {/* Campo de texto para inserção da senha */}
-      <Text style={styles.label}>Senha:</Text>
-      <TextInput
-        style={styles.input}
-        secureTextEntry // Define o campo como senha, ocultando o texto
-        value={senha}
-        onChangeText={setSenha} // Atualiza o estado da senha conforme o usuário digita
-      />
-
-      {/* Botão para realizar o login */}
-      <ButtonPrimary title="Entrar" onPress={handleLogin} />
-
-      {/* Texto e link para redirecionar para a tela de cadastro */}
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text style={styles.signupText}>Ainda não tem uma conta? </Text>
-        <TouchableOpacity onPress={screens.user.register}>
-          <Text style={styles.signupLink}> Cadastre-se</Text>
+        {/* Botão para realizar o login */}
+        <TouchableOpacity
+          style={styles.buttonPrimary}
+          onPress={() => {
+            handleLogin();
+          }}
+        >
+          <Text style={styles.buttonPrimaryText}>Entrar</Text>
         </TouchableOpacity>
+
+        {/* Botão para cancelar o login */}
+        <TouchableOpacity
+          style={styles.buttonSecondary}
+          onPress={() => {
+            router.back();
+          }}
+        >
+          <Text style={styles.buttonPrimaryText}>Voltar</Text>
+        </TouchableOpacity>
+
+        {/* Texto e link para redirecionar para a tela de cadastro */}
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={styles.signupText}>Ainda não tem uma conta? </Text>
+          <TouchableOpacity onPress={screens.user.register}>
+            <Text style={styles.signupLink}> Cadastre-se</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

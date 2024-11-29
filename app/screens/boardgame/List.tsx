@@ -19,7 +19,7 @@ import { screens } from "@routes/Routes";
 import ApiWakeUp from "@/app/services/AcordarAPI";
 
 interface Product {
-  id: number;
+  id: string;
   titulo: string;
   ano?: number;
   capa?: string;
@@ -117,8 +117,10 @@ export default function List() {
           </Text>
           <ButtonPrimary
             title="Adicionar"
-            onPress={screens.boardgame.register}
-          />
+            onPress={() => {
+              screens.boardgame.register();
+            }}
+          />  
         </View>
       )}
     </View>

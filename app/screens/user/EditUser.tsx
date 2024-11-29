@@ -9,7 +9,7 @@ import ApiWakeUp from "@/app/services/AcordarAPI";
 import { router } from "expo-router";
 import { screens } from "@/app/routes/Routes";
 
-const EditProfile: React.FC = () => {
+const EditUser: React.FC = () => {
   <ApiWakeUp />; // Mantem a API desperta
 
   const [user, setUser] = useState<any>(null);
@@ -169,7 +169,7 @@ const EditProfile: React.FC = () => {
         initialIsEditing={false}
         initialIsRegisting={false}
         isEditing={isEditing}
-        setEditedUser={setEditedUser}
+        setEdited={setEditedUser}
       >
         {/* Apelido */}
         <Text style={styles.label}>Apelido:</Text>
@@ -231,4 +231,4 @@ const EditProfile: React.FC = () => {
   );
 };
 
-export default EditProfile;
+export default EditUser;

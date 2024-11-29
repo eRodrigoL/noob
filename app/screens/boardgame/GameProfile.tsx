@@ -62,7 +62,7 @@ const GameProfile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedGame, seteditedGame] = useState<any>(null);
 
-  // Função para buscar os dados do usuário
+  // Função para buscar os dados do boardgame
   const fetchGameData = async () => {
     try {
       if (!id) {
@@ -204,7 +204,7 @@ const GameProfile: React.FC = () => {
   if (!game) {
     return (
       <View style={styles.container}>
-        <Text>Erro ao carregar os dados do usuário.</Text>
+        <Text>Erro ao carregar os dados do jogo.</Text>
       </View>
     );
   }
@@ -228,7 +228,9 @@ const GameProfile: React.FC = () => {
         {/* Cabeçalho fixo */}
         <View style={localStyles.header}>
           <ImageBackground
-            source={images.fundo}
+            source={{
+              uri: editedGame.capa || images.fundo,
+            }}
             style={localStyles.backgroundImage}
           ></ImageBackground>
         </View>
@@ -364,7 +366,7 @@ const GameProfile: React.FC = () => {
                 <Text style={localStyles.gameInfoText}>{game.descricao}</Text>
               )}
 
-                <View style={{ alignItems: "center", marginTop: 16 }}>
+              <View style={{ alignItems: "center", marginTop: 16 }}>
                 <TouchableOpacity
                   style={styles.buttonPrimary}
                   onPress={handleEditToggle}
@@ -373,18 +375,9 @@ const GameProfile: React.FC = () => {
                     {isEditing ? "Salvar" : "Editar Perfil"}
                   </Text>
                 </TouchableOpacity>
-                <ButtonPrimary
-                  title="Avaliar Jogo"
-                  onPress={() => id && screens.boardgame.rating(id)}
-                />
-                <ButtonPrimary
-                  title="Gráficos"
-                  onPress={() => id && screens.boardgame.gameDashboard(id)}
-                />
-                <ButtonPrimary
-                  title="Ranking"
-                  onPress={() => id && screens.boardgame.ranking(id)}
-                />
+                <ButtonPrimary title="Avaliar Jogo" onPress={() => {}} />
+                <ButtonPrimary title="Gráficos" onPress={() => {}} />
+                <ButtonPrimary title="Ranking" onPress={() => {}} />
               </View>
             </View>
           </View>

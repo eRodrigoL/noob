@@ -192,14 +192,13 @@ const UserProfile: React.FC = () => {
 };
 
 const localStyles = StyleSheet.create({
-  content: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
   tabBar: {
     backgroundColor: "#ffffff",
     borderTopWidth: 1,
     borderTopColor: "#e0e0e0",
+  },
+  tabBarItemStyle: {
+    flex: 1,
   },
 });
 
