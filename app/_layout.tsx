@@ -5,7 +5,11 @@ import { Stack } from "expo-router";
 export default function RootLayout() {
   return (
     // Envolve o conteúdo em um Stack, que organiza as telas em pilha
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
       {/* Define a tela inicial da pilha com o nome "index" */}
       <Stack.Screen name="index" />
     </Stack>
