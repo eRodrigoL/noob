@@ -40,7 +40,7 @@ const screens = {
 
     // Rota para edição do perfil do usuário
     editGame: (id: string) =>
-      router.push(`/screens/boardgame/EditGame_copy?id=${id}`),
+      router.push(`/screens/boardgame/EditGame?id=${id}`),
   },
 
   matches: {
