@@ -20,16 +20,17 @@ const styles = StyleSheet.create({
     fontSize: 48, // Define o tamanho da fonte do ícone de dado
   },
   label: {
-    fontSize: 18,// Define o tamanho da fonte do rótulo
+    fontSize: 18, // Define o tamanho da fonte do rótulo
     color: Theme.light.text, // Define a cor do texto com base no tema
     alignSelf: "flex-start", // Alinha o rótulo ao início do contêiner
     marginLeft: "5%", // Define a margem esquerda
     marginBottom: 8, // Define a margem inferior
   },
-  customLabel: {//criei para alguns pontos especificos
+  customLabel: {
+    //criei para alguns pontos especificos
     fontSize: 20, //Define o tamanho da fonte do rótulo
     color: "000000", // Vermelho, por exemplo
-    alignSelf: "flex-start",// Alinha o rótulo ao início do contêiner
+    alignSelf: "flex-start", // Alinha o rótulo ao início do contêiner
     marginLeft: "5%", // Define a margem esquerda
     fontWeight: "bold", //O texto será exibido com uma aparência mais "forte", ou seja, com letras mais grossas
     marginBottom: 8, // Define a margem inferior
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
   signupLink: {
     color: Theme.light.link, // Define a cor do link de cadastro com base no tema
     fontWeight: "bold",
-    fontSize: 16 // Define a espessura da fonte como negrito
+    fontSize: 16, // Define a espessura da fonte como negrito
   },
   profileImageContainer: {
     width: 120, // Define a largura do contêiner da imagem de perfil
@@ -123,6 +124,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1, // Define a opacidade da sombra
     shadowRadius: 5, // Define o raio da sombra
     elevation: 5, // Define a elevação para dispositivos Android
+  },
+  labelNegrito: {
+    fontSize: 18, // Define o tamanho da fonte do rótulo
+    color: Theme.light.text, // Define a cor do texto com base no tema
+    alignSelf: "flex-start", // Alinha o rótulo ao início do contêiner
+    marginLeft: "5%", // Define a margem esquerda
+    marginBottom: 8, // Define a margem inferior
+    fontWeight: "bold",
   },
 });
 

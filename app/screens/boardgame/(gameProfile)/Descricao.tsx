@@ -85,31 +85,27 @@ export default function Descricao() {
     <View style={localStyles.container}>
       <ScrollView style={{ flex: 1, width: screenWidth }}>
         {/* Idade */}
-        <Text style={styles.label}>Idade:</Text>
+        <Text style={styles.customLabel}>Idade:</Text>
         <Text style={styles.label}>{game.idade}</Text>
 
         {/* Designer */}
-        <Text style={styles.label}>Designer:</Text>
+        <Text style={styles.customLabel}>Designer:</Text>
         <Text style={styles.label}>{game.designer}</Text>
 
         {/* Editora */}
-        <Text style={styles.label}>Editora:</Text>
+        <Text style={styles.customLabel}>Editora:</Text>
         <Text style={styles.label}>{game.editora}</Text>
 
-        {/* Versão digital */}
-        <Text style={styles.label}>Versão digital:</Text>
-        <Text style={styles.label}>{game.digital}</Text>
-
         {/* Categoria */}
-        <Text style={styles.label}>Categoria:</Text>
+        <Text style={styles.customLabel}>Categoria:</Text>
         <Text style={styles.label}>{game.categoria}</Text>
 
         {/* Componentes */}
-        <Text style={styles.label}>Componentes:</Text>
+        <Text style={styles.customLabel}>Componentes:</Text>
         <Text style={styles.label}>{game.componentes}</Text>
 
         {/* Descrição */}
-        <Text style={styles.label}>Descrição:</Text>
+        <Text style={styles.customLabel}>Descrição:</Text>
         <Text style={styles.label}>{game.descricao}</Text>
 
         {/* Botão de Editar */}
