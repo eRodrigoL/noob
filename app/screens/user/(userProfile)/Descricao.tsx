@@ -66,15 +66,15 @@ export default function Descricao() {
     <View style={localStyles.container}>
       <ScrollView style={{ flex: 1, width: screenWidth }}>
         {/* Apelido */}
-        <Text style={styles.label}>Apelido:</Text>
+        <Text style={styles.customLabel}>Apelido:</Text>
         <Text style={styles.label}>{user.apelido}</Text>
 
         {/* Email */}
-        <Text style={styles.label}>Email:</Text>
+        <Text style={styles.customLabel}>Email:</Text>
         <Text style={styles.label}>{user.email}</Text>
 
         {/* Data de Nascimento */}
-        <Text style={styles.label}>Data de Nascimento:</Text>
+        <Text style={styles.customLabel}>Data de Nascimento:</Text>
         <Text style={styles.label}>{addOneDay(user.nascimento)}</Text>
 
         <View style={{ flex: 1, alignItems: "center" }}>

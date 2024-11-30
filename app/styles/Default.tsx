@@ -20,12 +20,21 @@ const styles = StyleSheet.create({
     fontSize: 48, // Define o tamanho da fonte do ícone de dado
   },
   label: {
-    fontSize: 18, // Define o tamanho da fonte do rótulo
+    fontSize: 18,// Define o tamanho da fonte do rótulo
     color: Theme.light.text, // Define a cor do texto com base no tema
     alignSelf: "flex-start", // Alinha o rótulo ao início do contêiner
-    marginLeft: "10%", // Define a margem esquerda
+    marginLeft: "5%", // Define a margem esquerda
     marginBottom: 8, // Define a margem inferior
   },
+  customLabel: {//criei para alguns pontos especificos
+    fontSize: 20, //Define o tamanho da fonte do rótulo
+    color: "000000", // Vermelho, por exemplo
+    alignSelf: "flex-start",// Alinha o rótulo ao início do contêiner
+    marginLeft: "5%", // Define a margem esquerda
+    fontWeight: "bold", //O texto será exibido com uma aparência mais "forte", ou seja, com letras mais grossas
+    marginBottom: 8, // Define a margem inferior
+  },
+
   input: {
     width: "80%", // Define a largura do campo de entrada
     height: 40, // Define a altura do campo de entrada

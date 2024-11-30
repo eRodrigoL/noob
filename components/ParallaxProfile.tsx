@@ -402,8 +402,7 @@ const localStyles = StyleSheet.create({
     marginLeft: 180,
   },
   scrollContent: {
-    flexGrow: 1,
-    flexDirection: "column",
+    flexGrow: 0,
   },
   bodyContainer: {
     paddingTop: 0,
