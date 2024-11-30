@@ -65,7 +65,7 @@ export default function Descricao() {
   return (
     <View style={localStyles.container}>
       <ScrollView style={{ flex: 1, width: screenWidth }}>
-        <Text>
+        <Text >
           Pedro Paulo Pereira Pinto, pequeno pintor paulista, pintava portas,
           paredes, portais. Porém, pediu para parar porque preferiu pintar
           panfletos. Partindo para Piracicaba, pintou prateleiras para poder
@@ -130,15 +130,15 @@ export default function Descricao() {
         </Text>
 
         {/* Apelido */}
-        <Text style={styles.label}>Apelido:</Text>
+        <Text style={styles.customLabel}>Apelido:</Text>
         <Text style={styles.label}>{user.apelido}</Text>
 
         {/* Email */}
-        <Text style={styles.label}>Email:</Text>
+        <Text style={styles.customLabel}>Email:</Text>
         <Text style={styles.label}>{user.email}</Text>
 
         {/* Data de Nascimento */}
-        <Text style={styles.label}>Data de Nascimento:</Text>
+        <Text style={styles.customLabel}>Data de Nascimento:</Text>
         <Text style={styles.label}>{addOneDay(user.nascimento)}</Text>
 
         <View style={{ flex: 1, alignItems: "center" }}>
