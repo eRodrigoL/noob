@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import styles from "@styles/Default";
@@ -15,13 +8,24 @@ import ParallaxProfile from "@/components/ParallaxProfile";
 import ApiWakeUp from "@/app/services/AcordarAPI";
 import { router, useLocalSearchParams } from "expo-router";
 import { screens } from "@/app/routes/Routes";
-import { Theme } from "@/app/styles/Theme";
 
-const EditGame: React.FC = () => {
+// Define o tipo para os dados do jogo
+interface Game {
+  capa: string;
+  titulo: string;
+  ano: string; // Ajustado para string, conforme o modelo da API
+  idade: number;
+  designer: string;
+  artista: string;
+  editora: string;
+  descricao: string;
+}
+
+const EditUser: React.FC = () => {
   <ApiWakeUp />; // Mantem a API desperta
 
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const [game, setGame] = useState<any>(null);
+  const [game, setGame] = useState<Game | null>(null);
   const [editedGame, seteditedGame] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(true);
@@ -152,7 +156,16 @@ const EditGame: React.FC = () => {
       {/* Exibe o cabeçalho com título */}
       <Header title="Perfil" />
 
-      <View style={localStyles.bodyContainer}>
+      <ParallaxProfile
+        id={id}
+        name={`${game.titulo}`}
+        photo={game.capa}
+        cover={null}
+        initialIsEditing={false}
+        initialIsRegisting={false}
+        isEditing={isEditing}
+        setEdited={seteditedGame}
+      >
         {/* Ano */}
         <Text style={styles.label}>Ano:</Text>
         {isEditing ? (
@@ -272,53 +285,9 @@ const EditGame: React.FC = () => {
             <Text style={styles.buttonSecondaryText}>Cancelar</Text>
           </TouchableOpacity>
         )}
-      </View>
+      </ParallaxProfile>
     </View>
   );
 };
 
-const localStyles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: "#ffffff",
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
-  },
-  header: {
-    backgroundColor: Theme.light.background,
-    top: 0,
-    width: "100%",
-    justifyContent: "center",
-    borderBottomWidth: 3,
-    borderColor: Theme.light.text,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  fotoContainer: {
-    width: 150,
-    height: 150,
-    borderColor: Theme.light.text,
-    borderRadius: 15,
-    margin: 30,
-  },
-  foto: {
-    width: 150,
-    height: 150,
-    borderWidth: 4,
-    borderColor: Theme.light.text,
-    borderRadius: 15,
-    backgroundColor: "white",
-  },
-  headerTitle: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: Theme.light.text,
-  },
-  bodyContainer: {
-    paddingTop: 0,
-    flex: 1,
-    padding: 0,
-    backgroundColor: Theme.light.background,
-  },
-});
-
-export default EditGame;
+export default EditUser;
