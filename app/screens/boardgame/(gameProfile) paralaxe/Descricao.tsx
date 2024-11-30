@@ -90,31 +90,31 @@ export default function Descricao() {
 
         {/* Designer */}
         <Text style={styles.label}>Designer:</Text>
-        <Text style={styles.label}>{game.designer}</Text>
+        <Text style={styles.label}>{addOneDay(game.designer)}</Text>
 
         {/* Editora */}
         <Text style={styles.label}>Editora:</Text>
-        <Text style={styles.label}>{game.editora}</Text>
+        <Text style={styles.label}>{addOneDay(game.editora)}</Text>
 
         {/* Versão digital */}
         <Text style={styles.label}>Versão digital:</Text>
-        <Text style={styles.label}>{game.digital}</Text>
+        <Text style={styles.label}>{addOneDay(game.digital)}</Text>
 
         {/* Categoria */}
         <Text style={styles.label}>Categoria:</Text>
-        <Text style={styles.label}>{game.categoria}</Text>
+        <Text style={styles.label}>{addOneDay(game.categoria)}</Text>
 
         {/* Componentes */}
         <Text style={styles.label}>Componentes:</Text>
-        <Text style={styles.label}>{game.componentes}</Text>
+        <Text style={styles.label}>{addOneDay(game.componentes)}</Text>
 
         {/* Descrição */}
         <Text style={styles.label}>Descrição:</Text>
-        <Text style={styles.label}>{game.descricao}</Text>
+        <Text style={styles.label}>{addOneDay(game.descricao)}</Text>
 
         {/* Botão de Editar */}
         <View style={{ flex: 1, alignItems: "center" }}>
-          <TouchableOpacity
+        <TouchableOpacity
             style={styles.buttonPrimary}
             onPress={() => screens.boardgame.editGame(id)}
           >

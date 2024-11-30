@@ -151,18 +151,8 @@ const SandwichMenu: React.FC<ModalProps> = ({ visible, onClose }) => {
                       onPress={() => screens.user.userProfile()}
                     />
                     <ButtonPrimary title="Jogar" onPress={handlePlayPress} />
-                    <ButtonPrimary
-                      title="Teste"
-                      onPress={() => screens.teste()}
-                    />
-                    <ButtonPrimary
-                      title="Teste 2"
-                      onPress={() => screens.teste2()}
-                    />
-                    <ButtonPrimary
-                      title="Sair"
-                      onPress={handleLogout}
-                    />
+
+                    <ButtonPrimary title="Sair" onPress={handleLogout} />
                   </>
                 )}
               </View>

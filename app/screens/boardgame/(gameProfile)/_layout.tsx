@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Alert, StyleSheet, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  Alert,
+  Image,
+  StyleSheet,
+  Dimensions,
+  ImageBackground,
+} from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "@styles/Default";
 import Header from "@/components/Header";
-import ParallaxProfile from "@/components/ParallaxProfile";
 import ApiWakeUp from "@/app/services/AcordarAPI";
+import { Theme } from "@/app/styles/Theme";
+import { images } from "@/app/routes/Routes";
 
-const screenWidth = Dimensions.get("window").width;
+const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 
 // Define o tipo para os dados do jogo
 interface Game {
@@ -89,76 +98,81 @@ const GameProfile: React.FC = () => {
   return (
     <View style={{ flex: 1 }}>
       <Header title="Jogo" />
-      <ParallaxProfile
-        id={id}
-        name={`${game.titulo} (${game.ano})`}
-        photo={game.capa}
-        cover={null}
-        initialIsEditing={false}
-        initialIsRegisting={false}
-        isEditing={isEditing}
-        setEdited={seteditedGame}
-      >
-        <View style={{ flex: 1 }}>
-          <Tabs
-            screenOptions={{
-              headerShown: false,
-              tabBarStyle: localStyles.tabBar,
-              tabBarActiveTintColor: "#000",
-              tabBarInactiveTintColor: "#8E8E93",
+
+      {/* Container da foto, nome e ano*/}
+      <View style={localStyles.header}>
+        <View style={localStyles.fotoContainer}>
+          {/* Local da foto*/}
+          <Image
+            source={{
+              uri:
+                game.capa && game.capa !== "" ? game.capa : images.unavailable, // imagem padrão se foto for null
             }}
-          >
-            <Tabs.Screen
-              name="Descricao"
-              options={{
-                title: "Descrição",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="dice-outline" size={size} color={color} />
-                ),
-              }}
-              initialParams={{ id: id }}
-            />
-            <Tabs.Screen
-              name="Analises"
-              options={{
-                title: "Análises",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons
-                    name="stats-chart-outline"
-                    size={size}
-                    color={color}
-                  />
-                ),
-              }}
-              initialParams={{ id: id }}
-            />
-            <Tabs.Screen
-              name="Classificacao"
-              options={{
-                title: "Classificação",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="trophy-outline" size={size} color={color} />
-                ),
-              }}
-              initialParams={{ id: id }}
-            />
-            <Tabs.Screen
-              name="Avaliacao"
-              options={{
-                title: "Avaliação",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons
-                    name="clipboard-outline"
-                    size={size}
-                    color={color}
-                  />
-                ),
-              }}
-              initialParams={{ id: id }}
-            />
-          </Tabs>
+            style={localStyles.foto}
+          />
         </View>
-      </ParallaxProfile>
+
+        {/* Local do nome */}
+        <Text style={localStyles.headerTitle}>
+          {game.titulo} {game.ano}
+        </Text>
+      </View>
+
+      <View style={localStyles.bodyContainer}>
+        <Tabs
+          screenOptions={{
+            headerShown: false,
+            tabBarStyle: localStyles.tabBar,
+            tabBarActiveTintColor: "#000",
+            tabBarInactiveTintColor: "#8E8E93",
+          }}
+        >
+          <Tabs.Screen
+            name="Descricao"
+            options={{
+              title: "Descrição",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="dice-outline" size={size} color={color} />
+              ),
+            }}
+            initialParams={{ id: id }}
+          />
+          <Tabs.Screen
+            name="Analises"
+            options={{
+              title: "Análises",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons
+                  name="stats-chart-outline"
+                  size={size}
+                  color={color}
+                />
+              ),
+            }}
+            initialParams={{ id: id }}
+          />
+          <Tabs.Screen
+            name="Classificacao"
+            options={{
+              title: "Classificação",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="trophy-outline" size={size} color={color} />
+              ),
+            }}
+            initialParams={{ id: id }}
+          />
+          <Tabs.Screen
+            name="Avaliacao"
+            options={{
+              title: "Avaliação",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="clipboard-outline" size={size} color={color} />
+              ),
+            }}
+            initialParams={{ id: id }}
+          />
+        </Tabs>
+      </View>
     </View>
   );
 };
@@ -169,8 +183,41 @@ const localStyles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#e0e0e0",
   },
-  tabBarItemStyle: {
+  header: {
+    backgroundColor: Theme.light.background,
+    top: 0,
+    width: "100%",
+    justifyContent: "center",
+    borderBottomWidth: 3,
+    borderColor: Theme.light.text,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  fotoContainer: {
+    width: 150,
+    height: 150,
+    borderColor: Theme.light.text,
+    borderRadius: 15,
+    margin: 30,
+  },
+  foto: {
+    width: 150,
+    height: 150,
+    borderWidth: 4,
+    borderColor: Theme.light.text,
+    borderRadius: 15,
+    backgroundColor: "white",
+  },
+  headerTitle: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: Theme.light.text,
+  },
+  bodyContainer: {
+    paddingTop: 10,
     flex: 1,
+    padding: 0,
+    backgroundColor: Theme.light.background,
   },
 });
 

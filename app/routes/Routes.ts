@@ -7,19 +7,12 @@ const images = {
   loading1: require("../../assets/images/1.gif"),
   loading2: require("../../assets/images/2.gif"),
   loading3: require("../../assets/images/3.gif"),
-  // antes era: fundo: require("../../assets/images/Plano de fundo.jpg"),
-  fundo:
-    "https://t4.ftcdn.net/jpg/02/94/52/49/360_F_294524929_lUE0O2yalxV2OlMEKQGnYFXoZZ5w9t1k.jpg",
+  fundo: require("../../assets/images/Plano de fundo.jpg"),
+  fundo2: require("../../assets/images/Plano de fundo 2.jpg"),
 };
 
 // Definição de rotas do aplicativo, organizadas por seções
 const screens = {
-  testeDeRota: "/",
-
-  teste: () =>
-    router.push(`/screens/boardgame/(gameProfile)?id=6660e497cae9928f8184c291`),
-  teste2: () => router.push("/TESTE2"),
-
   user: {
     // Rota para login do usuário
     login: () => router.push("/screens/user/Login"),
@@ -42,12 +35,12 @@ const screens = {
     register: () => router.push("/screens/boardgame/RegisterGame"),
 
     // Rota para o perfil dos jogos
-    gameProfile: (id: string | number) =>
+    gameProfile: (id: string) =>
       router.push(`/screens/boardgame/(gameProfile)?id=${id}`),
 
     // Rota para edição do perfil do usuário
-    editGame: (id: string | number) =>
-      router.push(`/screens/boardgame/EditGame?id=${id}`),
+    editGame: (id: string) =>
+      router.push(`/screens/boardgame/EditGame_copy?id=${id}`),
   },
 
   matches: {

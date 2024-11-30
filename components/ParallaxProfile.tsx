@@ -277,7 +277,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
                     uri:
                       selectedImage && selectedImage !== ""
                         ? selectedImage
-                        : "https://example.com/user-image.jpg", // imagem padrão se foto for null
+                        : images.unavailable, // imagem padrão se foto for null
                   }}
                   style={localStyles.foto}
                 />
@@ -289,7 +289,7 @@ const ParallaxProfile: React.FC<ParallaxProfileProps> = ({
                   uri:
                     selectedImage && selectedImage !== ""
                       ? selectedImage
-                      : "https://example.com/user-image.jpg", // imagem padrão se foto for null
+                      : images.unavailable, // imagem padrão se foto for null
                 }}
                 style={localStyles.foto}
               />

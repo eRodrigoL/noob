@@ -143,7 +143,7 @@ const UserProfile: React.FC = () => {
         initialIsEditing={false}
         initialIsRegisting={false}
         isEditing={isEditing}
-        setEditedUser={setEditedUser}
+        setEdited={setEditedUser}
       >
         <Tabs
           screenOptions={{
